@@ -1,0 +1,2872 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIcee</title>
+
+
+    <link rel="icon" type="image/png" href="/assets/aicee-favicon.png">
+<link rel="apple-touch-icon" href="/assets/aicee-favicon.png">
+    <script>
+        try {
+            const saved = JSON.parse(localStorage.getItem("aicee_ui_settings") || "{}");
+            const preference = saved.theme || "system";
+            const resolved = preference === "system"
+                ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+                : preference;
+            document.documentElement.dataset.theme = resolved;
+            document.documentElement.dataset.accent = saved.accent || "blue";
+            document.documentElement.dataset.animations = saved.animations === false ? "off" : "on";
+            document.documentElement.dataset.loginAnimation = saved.loginAnimation === false ? "off" : "on";
+        } catch (error) {
+            document.documentElement.dataset.theme = "light";
+            document.documentElement.dataset.accent = "blue";
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- DataTables CSS -->
+<link
+    rel="stylesheet"
+    href="https://cdn.datatables.net/3.0.1/css/dataTables.dataTables.css"
+>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="aicee-upgrade.css">
+
+<!-- DataTables JavaScript -->
+<script
+    src="https://cdn.datatables.net/3.0.1/js/dataTables.js"
+    defer
+></script>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+<script type="module" src="./aicee-3d.js"></script>
+<script src="app.js" defer></script>
+    
+</head>
+<body class="tail-container bg-gray-50 text-gray-900 overflow-hidden">
+   <!-- LOGIN PAGE -->
+<div id="login-page" class="aicee-login min-h-screen overflow-hidden">
+
+    <div class="login-ambient" aria-hidden="true">
+        <span class="login-blob login-blob-one"></span>
+        <span class="login-blob login-blob-two"></span>
+        <span class="login-blob login-blob-three"></span>
+        <span class="login-grid"></span>
+    </div>
+
+    <div class="relative z-10 min-h-screen grid lg:grid-cols-[1.08fr_.92fr]">
+
+        <section class="login-showcase hidden lg:flex flex-col justify-between p-12 xl:p-16 text-white relative overflow-hidden">
+            <div class="login-showcase-shine" aria-hidden="true"></div>
+
+            <div class="flex items-center gap-4 login-reveal login-delay-1">
+                <div class="login-logo-shell">
+                    <img
+                        src="./assets/aicee-logo.png"
+                        alt="AIcee mascot logo"
+                        class="w-14 h-14 rounded-2xl object-cover"
+                    >
+                </div>
+                <div>
+                    <div class="text-3xl font-bold tracking-tight">AIcee</div>
+                    <div class="text-sm text-white/70">AI-Centered Educational Enhancement</div>
+                </div>
+            </div>
+
+            <div class="max-w-xl login-reveal login-delay-2 login-showcase-copy">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 backdrop-blur-xl text-sm font-medium mb-7">
+                    <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                    Personalized learning, made friendlier
+                </div>
+
+                <h1 class="text-5xl xl:text-6xl font-bold leading-[1.05] tracking-tight">
+                    Learn smarter with a study companion that knows your progress.
+                </h1>
+
+                <p class="mt-6 text-lg leading-relaxed text-white/75 max-w-lg">
+                    Review modules, track grades, finish assignments, and receive personalized guidance—all in one learning space.
+                </p>
+
+                <div class="grid grid-cols-3 gap-4 mt-10">
+                    <div class="login-stat-card">
+                        <i class="fa-solid fa-brain"></i>
+                        <strong>Personalized</strong>
+                        <span>Study support</span>
+                    </div>
+                    <div class="login-stat-card">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <strong>Trackable</strong>
+                        <span>Learning progress</span>
+                    </div>
+                    <div class="login-stat-card">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <strong>Focused</strong>
+                        <span>Student records</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-white/55 login-reveal login-delay-3">
+                <span>Built for Senior High School learners</span>
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-300"></i>
+                    Connected learning workspace
+                </span>
+            </div>
+
+
+            <!-- LIVE 3D AICEE MASCOT -->
+            <div class="aicee-3d-wrap login-reveal login-delay-2" aria-label="AIcee interactive 3D mascot">
+                <div class="aicee-3d-halo" aria-hidden="true"></div>
+
+                <div
+                    id="aicee-speech-bubble"
+                    class="aicee-speech-bubble is-speaking"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <span class="aicee-speech-name">
+                        <span class="aicee-speech-status"></span>
+                        AIcee
+                    </span>
+                    <span id="aicee-speech-text" class="aicee-speech-text">Hi! Ready to learn with me? 👋</span>
+                </div>
+
+                <div id="aicee-3d-stage" class="aicee-3d-stage"></div>
+
+                <div id="aicee-3d-loader" class="aicee-3d-loader" role="status" aria-live="polite">
+                    <span class="aicee-3d-loader-dot"></span>
+                    <span id="aicee-3d-loader-text">Loading AIcee in 3D…</span>
+                </div>
+
+                <div class="aicee-3d-badge">
+                    <span class="aicee-3d-live-dot"></span>
+                    Live 3D study companion
+                </div>
+            </div>
+
+            <div class="login-orbit login-orbit-one" aria-hidden="true">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+            <div class="login-orbit login-orbit-two" aria-hidden="true">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="login-orbit login-orbit-three" aria-hidden="true">
+                <i class="fa-solid fa-lightbulb"></i>
+            </div>
+        </section>
+
+        <section class="login-form-side flex items-center justify-center px-5 py-10 sm:px-10 lg:px-12">
+            <div class="w-full max-w-md login-card-wrap login-reveal login-delay-2">
+
+                <div class="lg:hidden flex items-center gap-3 justify-center mb-8">
+                    <img
+                        src="./assets/aicee-logo.png"
+                        alt="AIcee mascot logo"
+                        class="w-14 h-14 rounded-2xl object-cover shadow-lg"
+                    >
+                    <div>
+                        <div class="text-2xl font-bold">AIcee</div>
+                        <div class="text-xs text-gray-500">AI Study Companion</div>
+                    </div>
+                </div>
+
+                <div class="login-card">
+                    <div class="mb-8">
+                        <div class="login-eyebrow">
+                            <i class="fa-solid fa-sparkles"></i>
+                            Welcome to your workspace
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mt-3">Welcome back</h2>
+                        <p class="text-gray-500 mt-2">Sign in and continue where you left off.</p>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="aicee-field-group">
+                            <label for="email" class="aicee-field-label">Email address</label>
+                            <div class="aicee-input-shell">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value="student@eduvision.edu"
+                                    autocomplete="email"
+                                    placeholder="name@school.edu"
+                                    class="aicee-input"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="aicee-field-group">
+                            <div class="flex items-center justify-between gap-4">
+                                <label for="password" class="aicee-field-label">Password</label>
+                                <button
+                                    type="button"
+                                    onclick="showForgotPasswordModal()"
+                                    class="login-text-button"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+
+                            <div class="aicee-input-shell">
+                                <i class="fa-solid fa-lock"></i>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    value="demo123"
+                                    autocomplete="current-password"
+                                    placeholder="Enter your password"
+                                    class="aicee-input pr-12"
+                                >
+                                <button
+                                    id="login-password-toggle"
+                                    type="button"
+                                    onclick="toggleLoginPassword()"
+                                    class="password-toggle"
+                                    aria-label="Show password"
+                                >
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <p id="login-error" class="login-error-message min-h-[22px]"></p>
+
+                        <button
+                            id="login-submit-button"
+                            type="button"
+                            onclick="login()"
+                            class="aicee-primary-button w-full"
+                        >
+                            <span id="login-button-content" class="flex items-center justify-center gap-3">
+                                <span>Sign In</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+                            <span id="login-button-loading" class="hidden items-center justify-center gap-3">
+                                <span class="aicee-spinner"></span>
+                                Signing in...
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="login-security-note">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Your account connects you only to your assigned learning records.</span>
+                    </div>
+                </div>
+
+                <p class="text-center text-xs text-gray-400 mt-6">
+                    AICEE Learning Management System
+                </p>
+            </div>
+        </section>
+
+    </div>
+</div>
+<!-- END LOGIN PAGE -->
+    <!-- MAIN APP -->
+    <div id="main-app" class="hidden h-screen flex overflow-hidden">
+        <div
+            id="mobile-sidebar-overlay"
+            onclick="closeMobileSidebar()"
+            class="hidden fixed inset-0 z-[190] bg-black/40 backdrop-blur-[1px] lg:hidden"
+        ></div>
+
+        <!-- SIDEBAR -->
+        <div
+            id="sidebar"
+            class="w-72 max-w-[85vw] bg-white border-r border-gray-200 flex flex-col h-screen fixed inset-y-0 left-0 z-[200] -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out"
+        >
+            <div class="p-6 border-b border-gray-100 flex items-center gap-3">
+                <img
+                    src="./assets/aicee-logo.png"
+                    alt="AIcee mascot logo"
+                    class="w-11 h-11 rounded-full object-cover shadow-sm"
+                >
+
+                <div>
+                    <div class="logo-font text-2xl font-semibold tracking-tight">
+                        AIcee
+                    </div>
+
+                    <div class="text-[11px] text-gray-500">
+                        AI Study Companion
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="closeMobileSidebar()"
+                    class="lg:hidden ml-auto w-9 h-9 rounded-xl text-gray-500 hover:bg-gray-100 flex items-center justify-center"
+                    aria-label="Close menu"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="px-6 py-4 bg-gray-50 border-b flex items-center gap-3">
+                <div id="role-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700"></div>
+                <div id="user-name" class="font-medium text-sm"></div>
+            </div>
+            
+            <nav id="nav-student" class="flex-1 overflow-y-auto p-4 space-y-1"></nav>
+            <nav id="nav-teacher" class="flex-1 overflow-y-auto p-4 space-y-1 hidden"></nav>
+            <nav id="nav-admin" class="flex-1 overflow-y-auto p-4 space-y-1 hidden"></nav>
+            
+            <div class="p-4 border-t">
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-3 px-5 py-3 text-red-600 hover:bg-red-50 rounded-2xl font-medium">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 lg:ml-72 min-w-0 w-full">
+            <!-- Topbar -->
+            <header class="bg-white border-b h-16 flex items-center px-4 sm:px-6 lg:px-8 justify-between sticky top-0 z-50">
+                <div class="flex items-center">
+                    <button onclick="toggleMobileSidebar()" class="lg:hidden mr-4 text-2xl text-gray-500">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div id="current-page-title" class="font-semibold text-xl">Dashboard</div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <button onclick="openAIAssistant()" class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-2 rounded-2xl text-sm font-medium hover:shadow-lg transition-all">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span class="hidden sm:inline">AI Assistant</span>
+                    </button>
+                    
+                    <div class="relative">
+
+    <button
+        onclick="toggleNotifications()"
+        class="w-10 h-10 flex items-center justify-center text-gray-500 relative"
+    >
+        <i class="fa-solid fa-bell text-xl"></i>
+
+        <span
+            id="notif-count"
+            class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold min-w-5 h-5 px-1 flex items-center justify-center rounded-full"
+        >
+            0
+        </span>
+    </button>
+
+    <div
+        id="notification-dropdown"
+        class="hidden absolute right-0 mt-3 w-96 max-w-[90vw] bg-white border border-gray-200 rounded-3xl shadow-2xl overflow-hidden z-[150]"
+    >
+
+        <div class="px-5 py-4 border-b">
+            <h3 class="font-semibold text-gray-900">
+                Notifications
+            </h3>
+
+            <p class="text-xs text-gray-500 mt-1">
+                Account requests and system updates
+            </p>
+        </div>
+
+        <div
+            id="notification-list"
+            class="max-h-96 overflow-y-auto"
+        >
+            <div class="p-6 text-sm text-gray-500 text-center">
+                Loading notifications...
+            </div>
+        </div>
+
+    </div>
+
+</div>
+                    
+                    <div onclick="showProfileMenu()" class="flex items-center gap-3 cursor-pointer">
+                        <div class="text-right">
+                            <div id="header-name" class="font-medium text-sm"></div>
+                            <div id="header-role" class="text-xs text-gray-500"></div>
+                        </div>
+                        <div id="header-avatar-initials" class="w-10 h-10 aicee-header-avatar rounded-2xl flex items-center justify-center font-bold">SJ</div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Area -->
+            <div class="p-4 sm:p-6 lg:p-8 overflow-auto" style="height: calc(100vh - 64px)">
+                
+                <!-- STUDENT DASHBOARD -->
+                <div id="student-dashboard" class="space-y-8">
+
+                    <!-- AI-CENTERED HERO -->
+                    <section class="relative overflow-hidden rounded-[32px] border border-blue-100 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 p-7 sm:p-9 text-white shadow-xl shadow-blue-900/10">
+                        <div class="absolute -top-24 -right-20 w-72 h-72 rounded-full bg-white/10 blur-2xl" aria-hidden="true"></div>
+                        <div class="absolute -bottom-28 left-1/3 w-64 h-64 rounded-full bg-cyan-300/10 blur-3xl" aria-hidden="true"></div>
+
+                        <div class="relative z-10 grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold backdrop-blur">
+                                    <i class="fa-solid fa-sparkles"></i>
+                                    Personalized learning bridge
+                                </div>
+
+                                <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mt-5">
+                                    Hi, <span id="learning-welcome-name">Student</span>. AIcee is learning how you learn.
+                                </h2>
+
+                                <p class="mt-3 text-white/75 max-w-2xl leading-relaxed">
+                                    AIcee uses your recurring diagnostic results, learning bio, and study conversations to personalize guidance. You can also study from teacher-provided PDF learning materials.
+                                </p>
+
+                                <div class="flex flex-col sm:flex-row gap-3 mt-7">
+                                    <button
+                                        type="button"
+                                        onclick="openAIAssistant()"
+                                        class="min-h-12 px-6 rounded-2xl bg-white text-blue-700 font-bold inline-flex items-center justify-center gap-2 hover:bg-blue-50 transition-all shadow-lg shadow-blue-950/10"
+                                    >
+                                        <i class="fa-solid fa-robot"></i>
+                                        Ask AIcee
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onclick="navigateTo('profile')"
+                                        class="min-h-12 px-6 rounded-2xl bg-white/10 border border-white/20 text-white font-semibold inline-flex items-center justify-center gap-2 hover:bg-white/15 transition-all"
+                                    >
+                                        <i class="fa-solid fa-brain"></i>
+                                        My Learning Profile
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="hidden lg:grid place-items-center w-44 h-44 rounded-[36px] bg-white/10 border border-white/15 backdrop-blur-xl shadow-2xl">
+                                <div class="text-center">
+                                    <div class="w-20 h-20 mx-auto rounded-3xl bg-white/15 flex items-center justify-center text-4xl">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    </div>
+                                    <div id="learning-profile-status" class="mt-4 text-sm font-bold">Personalizing...</div>
+                                    <div class="text-[11px] text-white/60 mt-1">Private AI context</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- LEARNING SUMMARY -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <section class="aicee-panel p-6 relative overflow-hidden">
+                            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                            </div>
+                            <div class="text-xs uppercase tracking-[.14em] text-gray-400 font-bold mt-5">Strongest area</div>
+                            <div id="learning-strongest-area" class="text-2xl font-bold mt-2 text-gray-900">Analyzing...</div>
+                            <p class="text-xs text-gray-500 mt-2">Based on your latest diagnostic assessment.</p>
+                        </section>
+
+                        <section class="aicee-panel p-6 relative overflow-hidden">
+                            <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-bullseye"></i>
+                            </div>
+                            <div class="text-xs uppercase tracking-[.14em] text-gray-400 font-bold mt-5">Needs focus</div>
+                            <div id="learning-needs-focus" class="text-2xl font-bold mt-2 text-gray-900">Analyzing...</div>
+                            <p class="text-xs text-gray-500 mt-2">AIcee can prioritize this area during study conversations.</p>
+                        </section>
+
+                        <section class="aicee-panel p-6 relative overflow-hidden">
+                            <div class="w-11 h-11 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-fingerprint"></i>
+                            </div>
+                            <div class="text-xs uppercase tracking-[.14em] text-gray-400 font-bold mt-5">Personalization</div>
+                            <div id="learning-personalization-label" class="text-2xl font-bold mt-2 text-gray-900">Ready</div>
+                            <p id="learning-personalization-copy" class="text-xs text-gray-500 mt-2">Complete your diagnostic assessment to improve AIcee's guidance.</p>
+                        </section>
+                    </div>
+
+                    <!-- INSIGHT + DIAGNOSTIC -->
+                    <div class="grid grid-cols-1 xl:grid-cols-[1.1fr_.9fr] gap-6">
+                        <section class="aicee-panel p-7 sm:p-8">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="aicee-kicker">AIcee insight</p>
+                                    <h3 class="text-2xl font-bold mt-1">Your learning direction</h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
+                                    <i class="fa-solid fa-compass"></i>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 p-5 rounded-2xl bg-blue-50/70 border border-blue-100">
+                                <p id="learning-insight-text" class="text-sm sm:text-base text-gray-700 leading-relaxed">
+                                    AIcee is preparing a learning insight from your available profile and diagnostic information.
+                                </p>
+                            </div>
+
+                            <div class="grid sm:grid-cols-3 gap-3 mt-6">
+                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                                    <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                        <i class="fa-solid fa-graduation-cap text-blue-600"></i>
+                                        Teacher materials
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-2">Teacher-provided PDF materials can be selected inside AIcee.</div>
+                                </div>
+
+                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                                    <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                        <i class="fa-solid fa-chart-simple text-violet-600"></i>
+                                        Diagnostic history
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-2">Recurring assessments show how your learning profile changes over time.</div>
+                                </div>
+
+                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                                    <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                        <i class="fa-solid fa-lock text-emerald-600"></i>
+                                        Private by design
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-2">Your learning profile is private and used only for personalized study guidance.</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="aicee-panel p-7 sm:p-8">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="w-11 h-11 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center">
+                                    <i class="fa-solid fa-brain"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-lg">Diagnostic Learning Profile</div>
+                                    <div class="text-xs text-gray-500">A private personalization signal for AIcee</div>
+                                </div>
+                            </div>
+
+                            <div id="diagnostic-summary" class="text-sm leading-relaxed text-gray-700">
+                                Complete your diagnostic assessment so AIcee can identify your learning strengths and areas that may need support.
+                            </div>
+
+                            <div id="diagnostic-subjects" class="space-y-4 mt-6"></div>
+
+                            <div class="mt-6 pt-6 border-t border-gray-100">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div><div class="text-sm font-semibold text-gray-800">Diagnostic History</div><div class="text-xs text-gray-500 mt-1">Your profile updates after each recurring assessment.</div></div>
+                                    <div class="text-right"><div class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Next Diagnostic</div><div id="diagnostic-next-date" class="text-sm font-bold text-blue-600 mt-1">Checking...</div></div>
+                                </div>
+                                <div id="diagnostic-history" class="space-y-3"></div>
+                            </div>
+
+                            <button
+                                id="diagnostic-action"
+                                type="button"
+                                onclick="openDiagnosticQuiz()"
+                                class="mt-6 w-full py-3 text-sm border border-gray-300 hover:bg-gray-50 rounded-2xl font-semibold"
+                            >
+                                Take Diagnostic Assessment
+                            </button>
+                        </section>
+                    </div>
+
+                    <!-- WHAT AICEE IS -->
+                    <section class="aicee-panel p-7 sm:p-8">
+                        <div class="grid lg:grid-cols-[auto_1fr_auto] gap-5 items-center">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-600/20">
+                                <i class="fa-solid fa-link"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">AIcee is the bridge — not the replacement.</h3>
+                                <p class="text-sm text-gray-500 mt-1 leading-relaxed">
+                                    AIcee turns your recurring diagnostic profile, learning bio, and selected teacher materials into personalized study guidance.
+                                </p>
+                            </div>
+                            <button type="button" onclick="openAIAssistant()" class="aicee-primary-button whitespace-nowrap">
+                                <i class="fa-solid fa-comments"></i>
+                                Start a study session
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- TEACHER DASHBOARD -->
+<div id="teacher-dashboard" class="hidden space-y-8">
+    <section class="aicee-panel p-7 sm:p-8 overflow-hidden relative">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div><p class="aicee-kicker">Teacher workspace</p><h2 class="text-3xl font-bold tracking-tight mt-1">Learning materials + diagnostic-guided AI</h2><p class="text-sm text-gray-500 mt-2 max-w-3xl leading-relaxed">Upload learning materials for your handled sections. Students build their AIcee learning profile through recurring diagnostic assessments and can use assigned PDF materials during AI-assisted study sessions.</p></div>
+            <button type="button" onclick="showUploadModal()" class="aicee-primary-button whitespace-nowrap"><i class="fa-solid fa-file-arrow-up"></i>Upload Learning Material</button>
+        </div>
+    </section>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-3xl p-6 border border-gray-100"><div class="text-sm text-gray-500">Total Students</div><div id="teacher-total-students" class="text-5xl font-semibold mt-3 text-blue-600">0</div><div class="text-xs text-gray-400 mt-2">Learners handled by this teacher</div></div>
+        <div class="bg-white rounded-3xl p-6 border border-gray-100"><div class="text-sm text-gray-500">Diagnostic Profiles Ready</div><div id="teacher-diagnostic-completed" class="text-5xl font-semibold mt-3 text-emerald-600">0</div><div class="text-xs text-gray-400 mt-2">Students with a diagnostic learning profile</div></div>
+        <div class="bg-white rounded-3xl p-6 border border-gray-100"><div class="text-sm text-gray-500">AI Profiles Ready</div><div id="teacher-ai-profiles-ready" class="text-5xl font-semibold mt-3 text-violet-600">0</div><div class="text-xs text-gray-400 mt-2">Ready for personalized AIcee guidance</div></div>
+        <div id="teacher-needs-support" class="hidden">0</div>
+    </div>
+    <section class="aicee-panel p-7">
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="rounded-2xl bg-violet-50 border border-violet-100 p-5"><div class="text-violet-600 font-semibold"><i class="fa-solid fa-file-pdf mr-2"></i>Teacher Materials</div><p class="text-xs text-gray-500 mt-2 leading-relaxed">PDF learning materials can be assigned to sections and selected by students inside AIcee.</p></div>
+            <div class="rounded-2xl bg-blue-50 border border-blue-100 p-5"><div class="text-blue-600 font-semibold"><i class="fa-solid fa-clipboard-question mr-2"></i>Recurring Diagnostics</div><p class="text-xs text-gray-500 mt-2 leading-relaxed">Weekly diagnostic history updates each student's strengths, focus areas, and progress trend.</p></div>
+            <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-5"><div class="text-emerald-600 font-semibold"><i class="fa-solid fa-robot mr-2"></i>AIcee</div><p class="text-xs text-gray-500 mt-2 leading-relaxed">Uses diagnostic context, learning bio, recent chat context, and a selected teacher PDF for personalized guidance.</p></div>
+        </div>
+    </section>
+    <div id="at-risk-students" class="hidden"></div><canvas id="classPerfChart" class="hidden"></canvas>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="admin-dashboard" class="hidden space-y-8">
+    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
+        <div>
+            <p class="text-sm font-semibold text-blue-600 uppercase tracking-[0.18em]">AICEE Control Center</p>
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mt-2">System Dashboard</h2>
+            <p class="text-sm text-gray-500 mt-2 max-w-2xl">Manage accounts, sections, and the prototype data-source layer without turning AIcee into a full LMS.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span id="admin-api-status" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-2xl text-sm font-semibold">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> API Online
+            </span>
+            <span id="admin-db-status" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-2xl text-sm font-semibold">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span> Database Checking
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div class="aicee-panel p-6">
+            <div class="flex justify-between items-start gap-4">
+                <div><p class="text-sm text-gray-500">Students</p><div id="admin-total-students" class="text-5xl font-bold text-blue-600 mt-3">0</div></div>
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-user-graduate"></i></div>
+            </div>
+        </div>
+        <div class="aicee-panel p-6">
+            <div class="flex justify-between items-start gap-4">
+                <div><p class="text-sm text-gray-500">Teachers</p><div id="admin-total-teachers" class="text-5xl font-bold text-violet-600 mt-3">0</div></div>
+                <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
+            </div>
+        </div>
+        <div class="aicee-panel p-6">
+            <div class="flex justify-between items-start gap-4">
+                <div><p class="text-sm text-gray-500">Sections</p><div id="admin-total-sections" class="text-5xl font-bold text-emerald-600 mt-3">0</div></div>
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-rectangle"></i></div>
+            </div>
+        </div>
+        <div class="aicee-panel p-6">
+            <div class="flex justify-between items-start gap-4">
+                <div><p class="text-sm text-gray-500">AI Profiles Ready</p><div id="admin-ai-profiles-ready" class="text-5xl font-bold text-amber-600 mt-3">0</div></div>
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-brain"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <button type="button" onclick="navigateTo('admin-accounts')" class="aicee-panel p-6 text-left group">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-gear"></i></div>
+            <h3 class="font-bold text-xl mt-5">Account Management</h3>
+            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Create student and teacher accounts, update records, assign student sections, and reset temporary passwords.</p>
+            <span class="inline-flex items-center gap-2 mt-5 text-blue-600 font-semibold text-sm">Open accounts <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+        </button>
+        <button type="button" onclick="navigateTo('admin-sections')" class="aicee-panel p-6 text-left group">
+            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-school"></i></div>
+            <h3 class="font-bold text-xl mt-5">Section Management</h3>
+            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Create and rename sections, then assign the teacher responsible for each class.</p>
+            <span class="inline-flex items-center gap-2 mt-5 text-emerald-600 font-semibold text-sm">Open sections <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+        </button>
+        <button type="button" onclick="navigateTo('admin-data-sources')" class="aicee-panel p-6 text-left group">
+            <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-diagram-project"></i></div>
+            <h3 class="font-bold text-xl mt-5">Data Sources</h3>
+            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Clearly show which learning signals are live inside AIcee and which Moodle/Portal connections are simulated for the prototype.</p>
+            <span class="inline-flex items-center gap-2 mt-5 text-violet-600 font-semibold text-sm">View data flow <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-[1.25fr_.75fr] gap-6">
+        <section class="aicee-panel p-7">
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <p class="aicee-kicker">Prototype architecture</p>
+                    <h3 class="text-xl font-bold mt-1">AIcee stays the bridge</h3>
+                </div>
+                <i class="fa-solid fa-link text-blue-600 text-xl"></i>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="rounded-2xl bg-violet-50 border border-violet-100 p-5"><div class="font-semibold text-violet-700">Moodle Context</div><div class="text-xs text-violet-600 mt-2">SIMULATED</div><p class="text-xs text-gray-500 mt-3">Sample learning resources supplied invisibly to AIcee.</p></div>
+                <div class="rounded-2xl bg-blue-50 border border-blue-100 p-5"><div class="font-semibold text-blue-700">Portal Context</div><div class="text-xs text-blue-600 mt-2">SIMULATED</div><p class="text-xs text-gray-500 mt-3">Sample academic records used as background learning signals.</p></div>
+                <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-5"><div class="font-semibold text-emerald-700">Diagnostic</div><div class="text-xs text-emerald-600 mt-2">LIVE IN AICEE</div><p class="text-xs text-gray-500 mt-3">Student diagnostic results stored and used by the current prototype.</p></div>
+            </div>
+        </section>
+        <section class="rounded-3xl p-7 bg-gradient-to-br from-slate-950 to-blue-950 text-white">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-xl"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3 class="text-xl font-bold mt-5">Admin boundaries</h3>
+            <p class="text-sm text-white/65 mt-3 leading-relaxed">Admins manage system records. They cannot create or edit other administrator accounts from the website, and academic tutoring remains centered on AIcee.</p>
+            <div class="mt-6 text-sm text-emerald-300 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Role-based protection enabled</div>
+        </section>
+    </div>
+</div>
+<!-- END ADMIN DASHBOARD -->
+
+<!-- ADMIN ACCOUNT MANAGEMENT -->
+<div id="admin-accounts-view" class="hidden space-y-7">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div><p class="aicee-kicker">System users</p><h2 class="text-3xl font-bold mt-1">Account Management</h2><p class="text-sm text-gray-500 mt-2">Manage student and teacher accounts. Admin accounts are intentionally protected.</p></div>
+        <button type="button" onclick="openAdminAccountModal()" class="aicee-primary-button lg:w-auto px-6"><i class="fa-solid fa-user-plus"></i> New Account</button>
+    </div>
+    <section class="aicee-panel p-6">
+        <div class="grid md:grid-cols-[1fr_180px] gap-4 mb-6">
+            <div class="aicee-input-shell"><i class="fa-solid fa-magnifying-glass"></i><input id="admin-account-search" class="aicee-input" type="search" placeholder="Search name, email, or section..." oninput="renderAdminAccounts()"></div>
+            <select id="admin-account-role-filter" class="aicee-input-shell px-4" onchange="renderAdminAccounts()"><option value="all">All roles</option><option value="student">Students</option><option value="teacher">Teachers</option></select>
+        </div>
+        <div id="admin-accounts-list" class="space-y-3"><div class="text-sm text-gray-500 text-center py-10">Loading accounts...</div></div>
+    </section>
+</div>
+
+<!-- ADMIN SECTION MANAGEMENT -->
+<div id="admin-sections-view" class="hidden space-y-7">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div><p class="aicee-kicker">Academic structure</p><h2 class="text-3xl font-bold mt-1">Section Management</h2><p class="text-sm text-gray-500 mt-2">Create sections and assign a teacher to each class.</p></div>
+        <button type="button" onclick="openAdminSectionModal()" class="aicee-primary-button lg:w-auto px-6"><i class="fa-solid fa-plus"></i> New Section</button>
+    </div>
+    <div id="admin-sections-list" class="grid md:grid-cols-2 xl:grid-cols-3 gap-5"><div class="aicee-panel p-6 text-gray-500">Loading sections...</div></div>
+</div>
+
+<!-- ADMIN DATA SOURCES -->
+<div id="admin-data-sources-view" class="hidden space-y-7">
+    <div><p class="aicee-kicker">Prototype transparency</p><h2 class="text-3xl font-bold mt-1">AI Data Sources</h2><p class="text-sm text-gray-500 mt-2 max-w-3xl">This page documents what AIcee is designed to receive from external school systems and what is already live inside the prototype.</p></div>
+    <div class="grid lg:grid-cols-3 gap-6">
+        <section class="aicee-panel p-7"><div class="flex items-center justify-between"><div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-book-open"></i></div><span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold">SIMULATED</span></div><h3 class="text-xl font-bold mt-5">Moodle Learning Context</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">Represents module/topic information that a future Moodle integration could provide to AIcee. The current prototype uses sample context instead of a live Moodle API connection.</p></section>
+        <section class="aicee-panel p-7"><div class="flex items-center justify-between"><div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chart-line"></i></div><span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold">SIMULATED</span></div><h3 class="text-xl font-bold mt-5">Portal Academic Context</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">Represents grade and academic-performance information that a future school portal integration could supply. It is presented as prototype context, not a claimed live connection.</p></section>
+        <section class="aicee-panel p-7"><div class="flex items-center justify-between"><div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-question"></i></div><span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">LIVE</span></div><h3 class="text-xl font-bold mt-5">AICEE Diagnostic</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">The diagnostic assessment is part of AICEE itself and can produce student-specific learning signals used for strengths, weaknesses, and personalized guidance.</p></section>
+    </div>
+    <section class="rounded-3xl bg-slate-950 text-white p-7 sm:p-9">
+        <div class="grid md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-5 text-center">
+            <div class="rounded-2xl bg-white/5 border border-white/10 p-5"><i class="fa-solid fa-book-open text-violet-300 text-2xl"></i><div class="font-bold mt-3">Moodle</div><div class="text-xs text-white/50 mt-1">sample learning context</div></div>
+            <i class="fa-solid fa-arrow-right text-white/30 hidden md:block"></i>
+            <div class="rounded-2xl bg-blue-500/15 border border-blue-400/20 p-5"><i class="fa-solid fa-robot text-blue-300 text-2xl"></i><div class="font-bold mt-3">AIcee</div><div class="text-xs text-white/50 mt-1">interprets learning signals</div></div>
+            <i class="fa-solid fa-arrow-right text-white/30 hidden md:block"></i>
+            <div class="rounded-2xl bg-white/5 border border-white/10 p-5"><i class="fa-solid fa-user-graduate text-emerald-300 text-2xl"></i><div class="font-bold mt-3">Student</div><div class="text-xs text-white/50 mt-1">personalized study guidance</div></div>
+        </div>
+        <div class="text-center text-xs text-white/45 mt-5">Portal academic context and AICEE diagnostic signals also feed the AIcee personalization layer.</div>
+    </section>
+</div>
+
+<!-- ADMIN ACCOUNT MODAL -->
+<div id="admin-account-modal" class="hidden fixed inset-0 z-[120] bg-slate-950/55 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Administrator</p><h3 id="admin-account-modal-title" class="text-2xl font-bold mt-1">Create Account</h3></div><button type="button" onclick="closeAdminAccountModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100"><i class="fa-solid fa-xmark"></i></button></div>
+        <form id="admin-account-form" onsubmit="submitAdminAccount(event)" class="space-y-5 mt-7">
+            <input id="admin-account-id" type="hidden">
+            <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-name">Full name</label><div class="aicee-input-shell"><i class="fa-regular fa-user"></i><input id="admin-account-name" class="aicee-input" required maxlength="100"></div></div>
+            <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-email">Email</label><div class="aicee-input-shell"><i class="fa-regular fa-envelope"></i><input id="admin-account-email" class="aicee-input" type="email" required maxlength="150"></div></div>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-role">Role</label><select id="admin-account-role" class="aicee-input-shell px-4 w-full" onchange="syncAdminAccountSectionField()"><option value="student">Student</option><option value="teacher">Teacher</option></select></div>
+                <div id="admin-account-section-wrap" class="aicee-field-group"><label class="aicee-field-label" for="admin-account-section">Section</label><select id="admin-account-section" class="aicee-input-shell px-4 w-full"></select></div>
+            </div>
+            <div id="admin-account-password-wrap" class="aicee-field-group"><label class="aicee-field-label" for="admin-account-password">Temporary password</label><div class="aicee-input-shell"><i class="fa-solid fa-key"></i><input id="admin-account-password" class="aicee-input" type="password" minlength="6" maxlength="72" autocomplete="new-password"></div><p class="text-xs text-gray-400 mt-2">Required only when creating a new account.</p></div>
+            <p id="admin-account-form-status" class="text-sm min-h-[20px]"></p>
+            <button id="admin-account-save" type="submit" class="aicee-primary-button w-full"><i class="fa-regular fa-floppy-disk"></i> Save Account</button>
+        </form>
+    </div>
+</div>
+
+<!-- ADMIN RESET PASSWORD MODAL -->
+<div id="admin-reset-modal" class="hidden fixed inset-0 z-[125] bg-slate-950/55 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Security</p><h3 class="text-2xl font-bold mt-1">Reset Password</h3></div><button type="button" onclick="closeAdminResetModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100"><i class="fa-solid fa-xmark"></i></button></div>
+        <form onsubmit="submitAdminPasswordReset(event)" class="space-y-5 mt-7"><input id="admin-reset-account-id" type="hidden"><p id="admin-reset-account-label" class="text-sm text-gray-500"></p><div class="aicee-field-group"><label class="aicee-field-label" for="admin-reset-password">New temporary password</label><div class="aicee-input-shell"><i class="fa-solid fa-key"></i><input id="admin-reset-password" class="aicee-input" type="password" required minlength="6" maxlength="72"></div></div><p id="admin-reset-status" class="text-sm min-h-[20px]"></p><button type="submit" class="aicee-primary-button w-full"><i class="fa-solid fa-rotate"></i> Reset Password</button></form>
+    </div>
+</div>
+
+<!-- ADMIN SECTION MODAL -->
+<div id="admin-section-modal" class="hidden fixed inset-0 z-[120] bg-slate-950/55 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Academic structure</p><h3 id="admin-section-modal-title" class="text-2xl font-bold mt-1">Create Section</h3></div><button type="button" onclick="closeAdminSectionModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100"><i class="fa-solid fa-xmark"></i></button></div>
+        <form onsubmit="submitAdminSection(event)" class="space-y-5 mt-7"><input id="admin-section-id" type="hidden"><div class="aicee-field-group"><label class="aicee-field-label" for="admin-section-name">Section name</label><div class="aicee-input-shell"><i class="fa-solid fa-users-rectangle"></i><input id="admin-section-name" class="aicee-input" required maxlength="100" placeholder="e.g. ICT 12-1"></div></div><div class="aicee-field-group"><label class="aicee-field-label" for="admin-section-teacher">Assigned teacher</label><select id="admin-section-teacher" class="aicee-input-shell px-4 w-full" required></select></div><p id="admin-section-status" class="text-sm min-h-[20px]"></p><button type="submit" class="aicee-primary-button w-full"><i class="fa-regular fa-floppy-disk"></i> Save Section</button></form>
+    </div>
+</div>
+                
+
+                
+                <!-- MANAGE STUDENTS VIEW -->
+<div id="students-view" class="hidden space-y-6">
+
+    <!-- PAGE HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <div>
+            <h2 class="text-3xl font-semibold text-gray-900">
+                Student Learning Profiles
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                View diagnostic readiness and the learning signals AIcee can use for personalization.
+            </p>
+        </div>
+
+        <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-blue-50 text-blue-700 text-sm font-semibold">
+            <i class="fa-solid fa-shield-halved"></i>
+            Learning overview only
+        </div>
+
+    </div>
+
+    <!-- STUDENT SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+
+            <div class="text-sm text-gray-500">
+                Total Students
+            </div>
+
+            <div
+                id="managed-student-count"
+                class="text-4xl font-bold text-blue-600 mt-2"
+            >
+                0
+            </div>
+
+        </div>
+
+        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+
+            <div class="text-sm text-gray-500">
+                Completed Diagnostic
+            </div>
+
+            <div
+                id="diagnostic-completed-count"
+                class="text-4xl font-bold text-emerald-600 mt-2"
+            >
+                0
+            </div>
+
+        </div>
+
+        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+
+            <div class="text-sm text-gray-500">
+                Pending Diagnostic
+            </div>
+
+            <div
+                id="diagnostic-pending-count"
+                class="text-4xl font-bold text-amber-600 mt-2"
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SEARCH AND FILTER -->
+    <div class="bg-white border border-gray-100 rounded-3xl p-5">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div class="relative">
+
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+                <input
+                    id="student-search"
+                    type="text"
+                    placeholder="Search student name or email..."
+                    oninput="filterManagedStudents()"
+                    class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+
+            </div>
+
+            <select
+                id="student-section-filter"
+                onchange="filterManagedStudents()"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+            >
+                <option value="">
+                    All Sections
+                </option>
+            </select>
+
+        </div>
+
+    </div>
+
+    <!-- STUDENT TABLE -->
+    <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden">
+
+        <div class="overflow-x-auto">
+
+            <table
+    id="managed-students-table"
+    class="w-full min-w-[850px]"
+>
+                <thead class="bg-gray-50 border-b border-gray-100">
+
+                    <tr class="text-xs uppercase tracking-wide text-gray-500">
+
+                        <th class="px-6 py-4 text-left">
+                            Student
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Email
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Section
+                        </th>
+
+                        <th class="px-6 py-4 text-center">
+                            Diagnostic
+                        </th>
+
+                        <th class="px-6 py-4 text-center">
+                            AI Profile
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody
+                    id="managed-students-tbody"
+                    class="divide-y divide-gray-100"
+                >
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="px-6 py-12 text-center text-gray-500"
+                        >
+                            Open this page to load student accounts.
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TEACHER AI LEARNING INSIGHTS VIEW -->
+<div id="teacher-ai-insights-view" class="hidden space-y-7">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+        <div>
+            <p class="aicee-kicker">AI-supported teaching view</p>
+            <h2 class="text-3xl font-bold tracking-tight mt-1">AI Learning Insights</h2>
+            <p class="text-sm text-gray-500 mt-2 max-w-3xl leading-relaxed">
+                This page summarizes learning signals available to AIcee. It does not expose student AI conversations and it is not a replacement for Moodle or the official school Portal.
+            </p>
+        </div>
+        <button type="button" onclick="navigateTo('teacher-context')" class="aicee-secondary-button whitespace-nowrap">
+            <i class="fa-solid fa-database"></i>
+            View prototype context
+        </button>
+    </div>
+
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">Students</div><div id="teacher-insights-total" class="text-4xl font-bold text-blue-600 mt-2">0</div></div>
+        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">AI Profiles Ready</div><div id="teacher-insights-ready" class="text-4xl font-bold text-emerald-600 mt-2">0</div></div>
+        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">Diagnostic Pending</div><div id="teacher-insights-pending" class="text-4xl font-bold text-violet-600 mt-2">0</div></div>
+        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">Needs Attention</div><div id="teacher-insights-support" class="text-4xl font-bold text-amber-600 mt-2">0</div></div>
+    </div>
+
+    <div class="grid lg:grid-cols-[1.3fr_.7fr] gap-6">
+        <section class="aicee-panel p-6 sm:p-7">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-lightbulb"></i></div>
+                <div><h3 class="font-bold">Learning-priority signals</h3><p class="text-xs text-gray-500 mt-1">Students who may benefit from additional AI-guided support.</p></div>
+            </div>
+            <div id="teacher-insights-student-list" class="space-y-3">
+                <div class="text-sm text-gray-500">Loading insights...</div>
+            </div>
+        </section>
+
+        <aside class="aicee-panel p-6 sm:p-7">
+            <p class="aicee-kicker">How to interpret this</p>
+            <h3 class="text-xl font-bold mt-1">Teacher sees signals, not private chats.</h3>
+            <div class="space-y-4 mt-5 text-sm text-gray-600 leading-relaxed">
+                <p><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i>Diagnostic completion helps AIcee build a stronger learner profile.</p>
+                <p><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i>Academic performance can indicate subjects that need more support.</p>
+                <p><i class="fa-solid fa-lock text-blue-500 mr-2"></i>Student-AI conversations are not shown here.</p>
+                <p><i class="fa-solid fa-flask text-violet-500 mr-2"></i>Moodle and Portal information on this prototype is simulated/sample context.</p>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- TEACHER AI CONTEXT DATA VIEW -->
+<div id="teacher-context-view" class="hidden space-y-7">
+    <div>
+        <p class="aicee-kicker">Prototype integration layer</p>
+        <h2 class="text-3xl font-bold tracking-tight mt-1">AI Context Data</h2>
+        <p class="text-sm text-gray-500 mt-2 max-w-3xl leading-relaxed">
+            These sample records simulate the kind of information AIcee could receive from Moodle and the school Portal. They are intentionally separate from the student-facing interface.
+        </p>
+    </div>
+
+    <div class="rounded-3xl border border-amber-200 bg-amber-50 p-5 flex gap-4">
+        <div class="text-amber-600 text-xl"><i class="fa-solid fa-flask"></i></div>
+        <div>
+            <div class="font-semibold text-amber-800">Prototype / simulated data</div>
+            <p class="text-sm text-amber-800/80 mt-1 leading-relaxed">AIcee is not literally connected to the school's real Moodle or Portal in this prototype. This page demonstrates the intended bridge concept for the research system.</p>
+        </div>
+    </div>
+
+    <div class="grid xl:grid-cols-2 gap-6">
+        <section class="aicee-panel p-6 sm:p-7">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-chart-simple"></i></div>
+                <div><h3 class="font-bold">Simulated Portal Academic Data</h3><p class="text-xs text-gray-500 mt-1">Sample grades available to AIcee in the background.</p></div>
+            </div>
+            <div id="teacher-context-portal-list"></div>
+        </section>
+
+        <section class="aicee-panel p-6 sm:p-7">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center"><i class="fa-solid fa-book-open"></i></div>
+                <div><h3 class="font-bold">Simulated Moodle Learning Resources</h3><p class="text-xs text-gray-500 mt-1">One sample learning resource for each prototype subject.</p></div>
+            </div>
+            <div id="teacher-context-moodle-list" class="space-y-3"></div>
+        </section>
+    </div>
+
+    <section class="aicee-panel p-6 sm:p-7">
+        <div class="grid md:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 items-center text-center">
+            <div class="rounded-2xl bg-violet-50 p-5"><i class="fa-solid fa-book text-violet-600 text-2xl"></i><div class="font-semibold mt-2">Moodle</div><div class="text-xs text-gray-500 mt-1">Learning resources</div></div>
+            <i class="fa-solid fa-arrow-right text-gray-300 hidden md:block"></i>
+            <div class="rounded-2xl bg-blue-50 p-5"><i class="fa-solid fa-robot text-blue-600 text-2xl"></i><div class="font-semibold mt-2">AIcee</div><div class="text-xs text-gray-500 mt-1">Interprets context</div></div>
+            <i class="fa-solid fa-arrow-right text-gray-300 hidden md:block"></i>
+            <div class="rounded-2xl bg-emerald-50 p-5"><i class="fa-solid fa-user-graduate text-emerald-600 text-2xl"></i><div class="font-semibold mt-2">Student</div><div class="text-xs text-gray-500 mt-1">Receives personalized guidance</div></div>
+        </div>
+        <div class="mt-4 text-center text-xs text-gray-400">Portal academic data also feeds AIcee as an invisible personalization signal.</div>
+    </section>
+</div>
+
+                <div id="modules-view" class="hidden">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-3xl font-semibold">Learning Modules</h2>
+                        <button
+                            id="upload-button"
+                            type="button"
+                            onclick="showUploadModal()"
+                            class="hidden items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl"
+                        >
+                            <i class="fa-solid fa-upload"></i>
+                            <span>Upload New</span>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modules-grid"></div>
+                </div>
+
+                <!-- ASSIGNMENTS VIEW -->
+
+
+    <!-- TEACHER SUBMISSIONS VIEW -->
+<div
+    id="submissions-view"
+    class="hidden space-y-6"
+>
+
+    <div>
+        <h2 class="text-3xl font-semibold text-gray-900">
+            Student Submissions
+        </h2>
+
+        <p class="text-sm text-gray-500 mt-1">
+            Review submitted assignments and provide grades and feedback.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+            <div class="text-sm text-gray-500">
+                Total Submissions
+            </div>
+
+            <div
+                id="submission-total-count"
+                class="text-4xl font-bold text-blue-600 mt-2"
+            >
+                0
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+            <div class="text-sm text-gray-500">
+                Pending Review
+            </div>
+
+            <div
+                id="submission-pending-count"
+                class="text-4xl font-bold text-amber-600 mt-2"
+            >
+                0
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+            <div class="text-sm text-gray-500">
+                Graded
+            </div>
+
+            <div
+                id="submission-graded-count"
+                class="text-4xl font-bold text-emerald-600 mt-2"
+            >
+                0
+            </div>
+        </div>
+
+    </div>
+
+    <div
+        id="teacher-submissions-list"
+        class="space-y-4"
+    >
+        <div class="bg-white border rounded-3xl p-8 text-gray-500">
+            Loading submissions...
+        </div>
+    </div>
+
+</div>
+
+<!-- ASSIGNMENTS VIEW -->
+<div id="assignments-view" class="hidden space-y-6">
+
+    <div class="flex justify-between items-center mb-4">
+
+        <div>
+            <h2 class="text-3xl font-semibold">
+                Assignments & Tasks
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                View and manage class assignments.
+            </p>
+        </div>
+
+        <button
+            id="new-assignment-button"
+            type="button"
+            onclick="showAssignmentModal()"
+            class="hidden bg-blue-600 text-white px-5 py-2.5 rounded-2xl font-medium text-sm items-center gap-2"
+        >
+            <i class="fa-solid fa-plus"></i>
+            New Task
+        </button>
+
+    </div>
+
+    <div
+        id="assignments-list"
+        class="space-y-4"
+    >
+    </div>
+
+</div>
+
+<!-- OFFICIAL GRADEBOOK VIEW -->
+<div id="gradebook-view" class="hidden space-y-6">
+
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-semibold text-gray-900">
+                Official Gradebook
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">
+                Encode and update students' official subject grades.
+            </p>
+        </div>
+
+        <button
+            id="gradebook-save-button"
+            type="button"
+            onclick="saveOfficialGrades()"
+            class="hidden items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-medium"
+        >
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save All Grades
+        </button>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-3xl p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Section
+                </label>
+                <select
+                    id="gradebook-section"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+                    <option value="">Select section</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Subject
+                </label>
+                <input
+                    id="gradebook-subject"
+                    type="text"
+                    placeholder="e.g. Programming 2"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Grading Period
+                </label>
+                <select
+                    id="gradebook-period"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+                    <option value="">Select period</option>
+                    <option value="1st Quarter">1st Quarter</option>
+                    <option value="2nd Quarter">2nd Quarter</option>
+                    <option value="3rd Quarter">3rd Quarter</option>
+                    <option value="4th Quarter">4th Quarter</option>
+                    <option value="Final Grade">Final Grade</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    School Year
+                </label>
+                <input
+                    id="gradebook-school-year"
+                    type="text"
+                    value="2026-2027"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Semester
+                </label>
+                <select
+                    id="gradebook-semester"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 mt-5">
+            <button
+                type="button"
+                onclick="loadOfficialGradebook()"
+                class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-medium"
+            >
+                <i class="fa-solid fa-rotate"></i>
+                Load Students
+            </button>
+
+            <div
+                id="gradebook-message"
+                class="hidden flex-1 rounded-2xl px-4 py-3 text-sm"
+            ></div>
+        </div>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table
+                id="official-gradebook-table"
+                class="w-full min-w-[850px]"
+            >
+                <thead class="bg-gray-50 border-b border-gray-100">
+                    <tr class="text-xs uppercase tracking-wide text-gray-500">
+                        <th class="px-6 py-4 text-left">Student</th>
+                        <th class="px-6 py-4 text-left">Email</th>
+                        <th class="px-6 py-4 text-left">Section</th>
+                        <th class="px-6 py-4 text-center">Official Grade</th>
+                    </tr>
+                </thead>
+
+                <tbody
+                    id="official-gradebook-tbody"
+                    class="divide-y divide-gray-100"
+                >
+                    <tr>
+                        <td
+                            colspan="4"
+                            class="px-6 py-12 text-center text-gray-500"
+                        >
+                            Select the gradebook details, then click Load Students.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+          <!-- GRADES VIEW -->
+<div id="grades-view" class="hidden space-y-6">
+
+    <div class="flex justify-between items-center mb-4">
+
+        <h2 class="text-3xl font-semibold">
+            Academic Report Card
+        </h2>
+
+    </div>
+
+    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 border-b pb-8">
+
+            <div>
+
+                <div class="text-xs text-gray-400 font-medium uppercase">
+                    Overall Average
+                </div>
+
+                <div
+                    id="report-overall-grade"
+                    class="text-4xl font-bold text-blue-600 mt-1"
+                >
+                    —
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-xs text-gray-400 font-medium uppercase">
+                    Modules Completed
+                </div>
+
+                <div
+                    id="report-modules-completed"
+                    class="text-4xl font-bold text-emerald-600 mt-1"
+                >
+                    0 / 0
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-xs text-gray-400 font-medium uppercase">
+                    Academic Status
+                </div>
+
+                <div
+                    id="report-status"
+                    class="text-4xl font-bold text-gray-800 mt-1"
+                >
+                    No Grades
+                </div>
+
+            </div>
+
+        </div>
+
+        <h3 class="font-semibold text-xl mb-4">
+            Current Subject Performance
+        </h3>
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full text-left">
+
+                <thead>
+
+                    <tr class="border-b text-xs font-semibold text-gray-400 uppercase tracking-wider">
+
+                        <th class="pb-3">
+                            Subject Name
+                        </th>
+
+                        <th class="pb-3">
+                            Instructor
+                        </th>
+
+                        <th class="pb-3">
+                            Percentage
+                        </th>
+
+                        <th class="pb-3">
+                            Letter Grade
+                        </th>
+
+                        <th class="pb-3">
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody
+                    id="full-grades-tbody"
+                    class="text-sm divide-y divide-gray-100"
+                >
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+                <!-- PROFILE VIEW -->
+                <div id="profile-view" class="hidden space-y-7">
+
+                    <section class="profile-hero overflow-hidden">
+                        <div class="profile-cover-pattern" aria-hidden="true"></div>
+
+                        <div class="profile-hero-content">
+                            <div class="profile-avatar-wrap">
+                                <div id="profile-avatar-initials" class="profile-avatar">SJ</div>
+                                <span class="profile-online-dot" title="Active account"></span>
+                            </div>
+
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <h2 id="profile-name" class="text-3xl sm:text-4xl font-bold tracking-tight truncate">Student Name</h2>
+                                    <span id="profile-role-badge" class="profile-role-badge">Student</span>
+                                </div>
+                                <p id="profile-bio-preview" class="text-white/75 mt-2 max-w-2xl leading-relaxed">
+                                    Add a short learning note so AIcee can understand you better.
+                                </p>
+                                <div class="flex flex-wrap gap-x-5 gap-y-2 mt-4 text-sm text-white/70">
+                                    <span class="flex items-center gap-2">
+                                        <i class="fa-regular fa-envelope"></i>
+                                        <span id="profile-email">No email</span>
+                                    </span>
+                                    <span class="flex items-center gap-2">
+                                        <i class="fa-solid fa-users-rectangle"></i>
+                                        <span id="profile-section">No section assigned</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onclick="navigateTo('settings')"
+                                class="profile-settings-button"
+                            >
+                                <i class="fa-solid fa-sliders"></i>
+                                Settings
+                            </button>
+                        </div>
+                    </section>
+
+                    <section id="profile-ai-privacy-note" class="aicee-panel p-5 sm:p-6 border-blue-100 bg-blue-50/50">
+                        <div class="flex items-start gap-4">
+                            <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-user-lock"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900">Private to your AI learning experience</h3>
+                                <p class="text-sm text-gray-600 mt-1 leading-relaxed">
+                                    Other students cannot browse this profile. For student accounts, AIcee may use the learning bio together with recurring diagnostic results and relevant study conversations to personalize guidance.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-7">
+
+                        <section class="aicee-panel p-6 sm:p-8">
+                            <div class="flex items-start justify-between gap-5 mb-7">
+                                <div>
+                                    <p class="aicee-kicker">Personal information</p>
+                                    <h3 class="text-2xl font-bold mt-1">Edit your profile</h3>
+                                    <p class="text-sm text-gray-500 mt-2">Keep your account information accurate and recognizable.</p>
+                                </div>
+                                <div class="hidden sm:flex w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 items-center justify-center text-xl">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </div>
+                            </div>
+
+                            <form id="profile-form" onsubmit="updateProfile(event)" class="space-y-6">
+                                <div class="grid md:grid-cols-2 gap-5">
+                                    <div class="aicee-field-group">
+                                        <label for="edit-name" class="aicee-field-label">Full name</label>
+                                        <div class="aicee-input-shell">
+                                            <i class="fa-regular fa-user"></i>
+                                            <input id="edit-name" type="text" class="aicee-input" maxlength="100" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="aicee-field-group">
+                                        <label for="edit-email" class="aicee-field-label">Email address</label>
+                                        <div class="aicee-input-shell">
+                                            <i class="fa-regular fa-envelope"></i>
+                                            <input id="edit-email" type="email" class="aicee-input" maxlength="150" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="aicee-field-group">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <label for="edit-bio" class="aicee-field-label">Learning note for AIcee</label>
+                                        <span id="profile-bio-count" class="text-xs text-gray-400">0 / 240</span>
+                                    </div>
+                                    <textarea
+                                        id="edit-bio"
+                                        rows="5"
+                                        maxlength="240"
+                                        oninput="updateProfileBioCount()"
+                                        placeholder="Example: I learn better with examples, I want to improve in math, and I enjoy programming..."
+                                        class="aicee-textarea"
+                                    ></textarea>
+                                </div>
+
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                                    <p id="profile-save-status" class="text-sm text-gray-500 min-h-[20px]"></p>
+                                    <button id="profile-save-button" type="submit" class="aicee-primary-button sm:w-auto px-8">
+                                        <span class="flex items-center justify-center gap-2">
+                                            <i class="fa-regular fa-floppy-disk"></i>
+                                            Save changes
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </section>
+
+                        <aside class="space-y-6">
+                            <section class="aicee-panel p-6">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p class="aicee-kicker">Profile completion</p>
+                                        <div class="text-3xl font-bold mt-1"><span id="profile-completion-value">0</span>%</div>
+                                    </div>
+                                    <div class="profile-progress-ring" id="profile-progress-ring">
+                                        <span id="profile-progress-ring-text">0%</span>
+                                    </div>
+                                </div>
+                                <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden mt-5">
+                                    <div id="profile-completion-bar" class="h-full rounded-full transition-all duration-700" style="width:0%"></div>
+                                </div>
+                                <p id="profile-completion-message" class="text-xs text-gray-500 leading-relaxed mt-3">
+                                    Complete your basic information to finish your profile.
+                                </p>
+                            </section>
+
+                            <section class="aicee-panel p-6">
+                                <p class="aicee-kicker mb-4">Account details</p>
+                                <div class="profile-detail-list">
+                                    <div>
+                                        <span><i class="fa-solid fa-fingerprint"></i> Account ID</span>
+                                        <strong id="profile-account-id">—</strong>
+                                    </div>
+                                    <div>
+                                        <span><i class="fa-solid fa-user-shield"></i> Account type</span>
+                                        <strong id="profile-role">Student</strong>
+                                    </div>
+                                    <div>
+                                        <span><i class="fa-regular fa-calendar"></i> Member since</span>
+                                        <strong id="profile-member-since">—</strong>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <button type="button" onclick="navigateTo('settings')" class="aicee-secondary-button w-full">
+                                <i class="fa-solid fa-palette"></i>
+                                Personalize appearance
+                            </button>
+                        </aside>
+
+                    </div>
+                </div>
+
+                <!-- SETTINGS VIEW -->
+                <div id="settings-view" class="hidden space-y-7">
+                    <div class="settings-heading">
+                        <div>
+                            <p class="aicee-kicker">Personalize AICEE</p>
+                            <h2 class="text-3xl font-bold tracking-tight mt-1">Settings</h2>
+                            <p class="text-gray-500 mt-2">Choose how your learning workspace looks and moves on this device.</p>
+                        </div>
+                        <button type="button" onclick="resetAiceeSettings()" class="aicee-secondary-button">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Reset defaults
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-7">
+                        <div class="space-y-6">
+                            <section class="aicee-panel p-6 sm:p-8">
+                                <div class="settings-section-title">
+                                    <span class="settings-icon"><i class="fa-solid fa-circle-half-stroke"></i></span>
+                                    <div>
+                                        <h3>Appearance</h3>
+                                        <p>Switch between light, dark, or your device preference.</p>
+                                    </div>
+                                </div>
+
+                                <div class="theme-choice-grid mt-6">
+                                    <button type="button" data-theme-choice="light" onclick="setThemePreference('light')" class="theme-choice-card">
+                                        <span class="theme-preview theme-preview-light">
+                                            <i></i><b></b><em></em>
+                                        </span>
+                                        <strong>Light</strong>
+                                        <small>Bright and clean</small>
+                                    </button>
+                                    <button type="button" data-theme-choice="dark" onclick="setThemePreference('dark')" class="theme-choice-card">
+                                        <span class="theme-preview theme-preview-dark">
+                                            <i></i><b></b><em></em>
+                                        </span>
+                                        <strong>Dark</strong>
+                                        <small>Easy on the eyes</small>
+                                    </button>
+                                    <button type="button" data-theme-choice="system" onclick="setThemePreference('system')" class="theme-choice-card">
+                                        <span class="theme-preview theme-preview-system">
+                                            <i></i><b></b><em></em>
+                                        </span>
+                                        <strong>System</strong>
+                                        <small>Match your device</small>
+                                    </button>
+                                </div>
+                            </section>
+
+                            <section class="aicee-panel p-6 sm:p-8">
+                                <div class="settings-section-title">
+                                    <span class="settings-icon"><i class="fa-solid fa-droplet"></i></span>
+                                    <div>
+                                        <h3>Accent color</h3>
+                                        <p>Pick the main color used for buttons, highlights, and focus states.</p>
+                                    </div>
+                                </div>
+
+                                <div class="accent-choice-row mt-6">
+                                    <button type="button" data-accent-choice="blue" onclick="setAccentPreference('blue')" class="accent-choice accent-blue" aria-label="Blue accent"></button>
+                                    <button type="button" data-accent-choice="violet" onclick="setAccentPreference('violet')" class="accent-choice accent-violet" aria-label="Violet accent"></button>
+                                    <button type="button" data-accent-choice="emerald" onclick="setAccentPreference('emerald')" class="accent-choice accent-emerald" aria-label="Emerald accent"></button>
+                                    <button type="button" data-accent-choice="rose" onclick="setAccentPreference('rose')" class="accent-choice accent-rose" aria-label="Rose accent"></button>
+                                    <button type="button" data-accent-choice="amber" onclick="setAccentPreference('amber')" class="accent-choice accent-amber" aria-label="Amber accent"></button>
+                                </div>
+                            </section>
+
+                            <section class="aicee-panel p-6 sm:p-8">
+                                <div class="settings-section-title">
+                                    <span class="settings-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                                    <div>
+                                        <h3>Interface behavior</h3>
+                                        <p>Fine-tune animation and spacing preferences.</p>
+                                    </div>
+                                </div>
+
+                                <div class="settings-toggle-list mt-6">
+                                    <label class="settings-toggle-row">
+                                        <span>
+                                            <strong>Interface animations</strong>
+                                            <small>Animate pages, buttons, cards, and login elements.</small>
+                                        </span>
+                                        <input id="setting-animations" type="checkbox" onchange="setBooleanSetting('animations', this.checked)">
+                                        <i class="settings-switch"></i>
+                                    </label>
+
+                                    <label class="settings-toggle-row">
+                                        <span>
+                                            <strong>Compact layout</strong>
+                                            <small>Reduce spacing to display more content at once.</small>
+                                        </span>
+                                        <input id="setting-compact" type="checkbox" onchange="setBooleanSetting('compact', this.checked)">
+                                        <i class="settings-switch"></i>
+                                    </label>
+
+                                    <label class="settings-toggle-row">
+                                        <span>
+                                            <strong>Animated login background</strong>
+                                            <small>Show ambient movement on the sign-in page.</small>
+                                        </span>
+                                        <input id="setting-login-animation" type="checkbox" onchange="setBooleanSetting('loginAnimation', this.checked)">
+                                        <i class="settings-switch"></i>
+                                    </label>
+                                </div>
+                            </section>
+                        </div>
+
+                        <aside class="space-y-6">
+                            <section class="settings-preview-card">
+                                <div class="settings-preview-top">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <div class="settings-preview-body">
+                                    <div class="settings-preview-sidebar">
+                                        <b></b><i></i><i></i><i></i>
+                                    </div>
+                                    <div class="settings-preview-content">
+                                        <span class="settings-preview-pill">AICEE</span>
+                                        <strong>Live preview</strong>
+                                        <small>Your selected appearance is applied immediately.</small>
+                                        <button type="button">Primary action</button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="aicee-panel p-6">
+                                <div class="flex items-center gap-3">
+                                    <span class="settings-icon"><i class="fa-solid fa-floppy-disk"></i></span>
+                                    <div>
+                                        <h3 class="font-bold">Saved automatically</h3>
+                                        <p class="text-xs text-gray-500 mt-1">These preferences stay on this browser and device.</p>
+                                    </div>
+                                </div>
+                                <p id="settings-save-status" class="settings-saved-status">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    Settings are up to date
+                                </p>
+                            </section>
+                        </aside>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI ASSISTANT MODAL -->
+    <div id="ai-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-2xl mx-4 rounded-3xl shadow-2xl modal">
+            <div class="flex items-center justify-between border-b px-6 py-5">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-sparkles text-amber-500 text-2xl"></i>
+                    <div>
+                        <div class="font-semibold">AIcee Study Assistant</div>
+                        <div class="text-xs text-gray-500">Personalized learning companion</div>
+                    </div>
+                </div>
+                <button onclick="closeAIModal()" class="text-3xl leading-none text-gray-400 hover:text-gray-600">×</button>
+            </div>
+            
+            <div class="h-96 p-6 overflow-auto bg-gray-50" id="ai-chat-log"></div>
+            
+            <div class="p-5 border-t bg-white">
+                <div class="mb-4">
+                    <label for="ai-module-select" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Teacher Learning Material</label>
+                    <select id="ai-module-select" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-blue-500"><option value="">No specific learning material</option></select>
+                    <p class="text-[11px] text-gray-400 mt-2">Select a teacher-provided PDF if you want AIcee to answer using that learning material.</p>
+                </div>
+                <div class="flex gap-3">
+                    <input id="ai-input" onkeypress="if(event.key === 'Enter') sendAIMessage()" type="text" placeholder="Ask AIcee about what you're studying..." class="flex-1 px-6 py-4 bg-white border border-gray-200 rounded-3xl focus:outline-none focus:border-blue-500">
+                    <button onclick="sendAIMessage()" class="px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-medium transition">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- UPLOAD MODAL -->
+    <div
+        id="upload-modal"
+        class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4"
+    >
+        <div class="bg-white rounded-3xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-2xl font-semibold">
+                        Upload Learning Material
+                    </h3>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Upload a learning material and assign it to selected sections. PDF files can be read directly by AIcee when a student selects them.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="closeUploadModal()"
+                    class="text-3xl leading-none text-gray-400 hover:text-gray-600"
+                >
+                    ×
+                </button>
+            </div>
+
+            <div class="space-y-5">
+
+                <div>
+                    <label
+                        for="module-title"
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                        Module Title
+                    </label>
+
+                    <input
+                        id="module-title"
+                        type="text"
+                        placeholder="Enter the module title"
+                        class="w-full border border-gray-200 px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500"
+                    >
+                </div>
+
+                <div>
+                    <label
+                        for="module-description"
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                        Description
+                    </label>
+
+                    <textarea
+                        id="module-description"
+                        rows="4"
+                        placeholder="Enter a short description"
+                        class="w-full border border-gray-200 px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500"
+                    ></textarea>
+                </div>
+
+                <div>
+                    <label
+                        for="module-file"
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                        Module File
+                    </label>
+
+                    <input
+                        id="module-file"
+                        type="file"
+                        class="w-full border border-gray-200 p-3 rounded-2xl"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Assign to Sections
+                    </label>
+
+                    <div
+                        id="section-list"
+                        class="border border-gray-200 rounded-2xl p-4 max-h-52 overflow-y-auto space-y-3"
+                    >
+                        Loading sections...
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3">
+                    <button
+                        type="button"
+                        onclick="closeUploadModal()"
+                        class="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-2xl"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="fakeUpload()"
+                        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
+                    >
+                        Upload
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+<!-- CREATE ASSIGNMENT MODAL -->
+<div
+    id="assignment-modal"
+    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4"
+>
+
+    <div class="bg-white rounded-3xl w-full max-w-xl p-8 max-h-[90vh] overflow-y-auto">
+
+        <div class="flex items-center justify-between mb-6">
+
+            <div>
+                <h3 class="text-2xl font-semibold">
+                    Create Assignment
+                </h3>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Assign a task to selected sections.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                onclick="closeAssignmentModal()"
+                class="text-3xl text-gray-400 hover:text-gray-600"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <form
+            id="assignment-form"
+            onsubmit="createAssignment(event)"
+        >
+
+            <div>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Assignment Title
+                </label>
+
+                <input
+                    id="assignment-title"
+                    type="text"
+                    required
+                    placeholder="Example: Programming Quiz #1"
+                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+
+            </div>
+
+            <div>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                </label>
+
+                <textarea
+                    id="assignment-description"
+                    rows="4"
+                    placeholder="Instructions for the students..."
+                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                ></textarea>
+
+            </div>
+
+            <div>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Related Module
+                </label>
+
+                <select
+                    id="assignment-module"
+                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+                    <option value="">
+                        No related module
+                    </option>
+                </select>
+
+            </div>
+
+            <div>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Due Date
+                </label>
+
+                <input
+                    id="assignment-due-date"
+                    type="datetime-local"
+                    required
+                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+
+            </div>
+
+            <div>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Assign to Sections
+                </label>
+
+                <div
+                    id="assignment-section-list"
+                    class="border border-gray-200 rounded-2xl p-4 max-h-52 overflow-y-auto space-y-3"
+                >
+                    Loading sections...
+                </div>
+
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+
+                <button
+                    type="button"
+                    onclick="closeAssignmentModal()"
+                    class="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-2xl"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="create-assignment-submit"
+                    type="submit"
+                    class="px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium"
+                >
+                    Create Assignment
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div
+    id="diagnostic-modal"
+    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+>
+    <div class="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-8">
+
+        <div class="mb-6">
+
+            <h2 class="text-2xl font-bold text-gray-900">
+                Let’s Personalize Your Learning
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-2">
+                This short quiz is not graded. It helps AIcee understand what you already know and where you may need more guidance.
+            </p>
+
+        </div>
+
+        <form id="diagnostic-form">
+
+            <div
+                id="diagnostic-questions-container"
+                class="space-y-8"
+            >
+                <p class="text-gray-500">
+                    Loading questions...
+                </p>
+            </div>
+
+            <div class="mt-8 space-y-3">
+
+                <button
+                    type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-semibold"
+                >
+                    Start My Learning Profile
+                </button>
+
+                <button
+                    type="button"
+                    onclick="skipDiagnosticQuiz()"
+                    class="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 py-3 rounded-2xl font-semibold"
+                >
+                    Maybe Later
+                </button>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+
+                    <p class="text-sm text-amber-800">
+                        ⚠️ Completing this quiz helps AIcee identify your strengths and subjects that may need more support.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+<!-- CUSTOM CONFIRMATION POPUP -->
+<div
+    id="confirm-popup"
+    class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+>
+    <div
+        id="confirm-popup-box"
+        class="bg-white w-full max-w-md rounded-3xl p-7 shadow-2xl popup-enter"
+    >
+        <div class="flex items-start gap-4">
+
+            <div
+                id="confirm-popup-icon"
+                class="w-12 h-12 shrink-0 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl"
+            >
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+
+            <div class="flex-1">
+
+                <h3
+                    id="confirm-popup-title"
+                    class="text-xl font-bold text-gray-900"
+                >
+                    Confirmation
+                </h3>
+
+                <p
+                    id="confirm-popup-message"
+                    class="text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line"
+                >
+                    Are you sure you want to continue?
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-7">
+
+            <button
+                id="confirm-popup-cancel"
+                type="button"
+                class="py-3 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-2xl font-semibold transition-all"
+            >
+                Cancel
+            </button>
+
+            <button
+                id="confirm-popup-confirm"
+                type="button"
+                class="py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all"
+            >
+                Continue
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- CUSTOM MESSAGE POPUP -->
+<div
+    id="message-popup"
+    class="hidden fixed inset-0 z-[310] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+>
+    <div
+        id="message-popup-box"
+        class="bg-white w-full max-w-md rounded-3xl p-7 shadow-2xl popup-enter"
+    >
+        <div class="flex items-start gap-4">
+
+            <div
+                id="message-popup-icon"
+                class="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center text-xl"
+            >
+            </div>
+
+            <div class="flex-1">
+
+                <h3
+                    id="message-popup-title"
+                    class="text-xl font-bold text-gray-900"
+                >
+                    Message
+                </h3>
+
+                <p
+                    id="message-popup-text"
+                    class="text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line"
+                >
+                Your action was completed.
+                </p>
+
+            </div>
+
+        </div>
+
+        <button
+            id="message-popup-button"
+            type="button"
+            onclick="closeMessagePopup()"
+            class="mt-7 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all"
+        >
+            Okay
+        </button>
+
+    </div>
+</div>
+
+
+<!-- CUSTOM INPUT POPUP -->
+<div
+    id="prompt-popup"
+    class="hidden fixed inset-0 z-[320] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+>
+    <div
+        id="prompt-popup-box"
+        class="bg-white w-full max-w-lg rounded-3xl p-7 shadow-2xl popup-enter"
+    >
+        <div class="flex items-start gap-4">
+            <div
+                id="prompt-popup-icon"
+                class="w-12 h-12 shrink-0 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl"
+            >
+                <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+
+            <div class="flex-1 min-w-0">
+                <h3
+                    id="prompt-popup-title"
+                    class="text-xl font-bold text-gray-900"
+                >
+                    Enter Information
+                </h3>
+
+                <p
+                    id="prompt-popup-message"
+                    class="text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line"
+                ></p>
+            </div>
+        </div>
+
+        <input
+            id="prompt-popup-input"
+            type="text"
+            class="mt-6 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+        >
+
+        <textarea
+            id="prompt-popup-textarea"
+            rows="5"
+            class="hidden mt-6 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-y"
+        ></textarea>
+
+        <p
+            id="prompt-popup-error"
+            class="hidden text-sm text-red-600 mt-3"
+        ></p>
+
+        <div class="grid grid-cols-2 gap-3 mt-7">
+            <button
+                id="prompt-popup-cancel"
+                type="button"
+                class="py-3 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-2xl font-semibold transition-all"
+            >
+                Cancel
+            </button>
+
+            <button
+                id="prompt-popup-confirm"
+                type="button"
+                class="py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all"
+            >
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ADD STUDENT MODAL -->
+<div
+    id="add-student-modal"
+    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[120] p-4"
+>
+
+    <div class="bg-white rounded-3xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+
+        <div class="flex items-start justify-between mb-6">
+
+            <div>
+
+                <h3 class="text-2xl font-semibold text-gray-900">
+                    Create Student Account
+                </h3>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    The student will use the temporary password to sign in.
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                onclick="closeAddStudentModal()"
+                class="text-3xl text-gray-400 hover:text-gray-600 leading-none"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <form
+            id="add-student-form"
+            onsubmit="createStudentAccount(event)"
+            class="space-y-5"
+        >
+
+            <div>
+
+                <label
+                    for="new-student-name"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Full Name
+                </label>
+
+                <input
+                    id="new-student-name"
+                    type="text"
+                    required
+                    placeholder="Example: Juan Dela Cruz"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+
+            </div>
+
+            <div>
+
+                <label
+                    for="new-student-email"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Email Address
+                </label>
+
+                <input
+                    id="new-student-email"
+                    type="email"
+                    required
+                    placeholder="student@example.com"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+
+            </div>
+
+            <div>
+
+                <label
+                    for="new-student-section"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Section
+                </label>
+
+                <select
+                    id="new-student-section"
+                    required
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+
+                    <option value="">
+                        Select a section
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div>
+
+                <label
+                    for="new-student-password"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Temporary Password
+                </label>
+
+                <div class="flex gap-3">
+
+                    <input
+                        id="new-student-password"
+                        type="text"
+                        required
+                        minlength="4"
+                        placeholder="Temporary password"
+                        class="flex-1 px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                    >
+
+                    <button
+                        type="button"
+                        onclick="generateTemporaryPassword()"
+                        class="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl text-sm font-medium whitespace-nowrap"
+                    >
+                        Generate
+                    </button>
+
+                </div>
+
+            </div>
+
+            <p
+                id="add-student-message"
+                class="text-sm text-center min-h-[20px]"
+            ></p>
+
+            <div class="flex gap-3 pt-2">
+
+                <button
+                    type="button"
+                    onclick="closeAddStudentModal()"
+                    class="flex-1 py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-medium"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium"
+                >
+                    Create Account
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    
+
+</div>
+
+<!-- FIRST LOGIN CHANGE PASSWORD MODAL -->
+<div
+    id="change-password-modal"
+    class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[200] p-4"
+>
+    <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl">
+
+        <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-5">
+            <i class="fa-solid fa-lock"></i>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-900">
+            Create a New Password
+        </h2>
+
+        <p class="text-sm text-gray-500 mt-2 mb-6">
+            You are using a temporary password. Change it before continuing to your dashboard.
+        </p>
+
+        <form
+            id="change-password-form"
+            onsubmit="submitFirstLoginPassword(event)"
+            class="space-y-5"
+        >
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Temporary Password
+                </label>
+
+                <input
+                    id="current-password"
+                    type="password"
+                    required
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    New Password
+                </label>
+
+                <input
+                    id="new-password"
+                    type="password"
+                    required
+                    minlength="6"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm New Password
+                </label>
+
+                <input
+                    id="confirm-new-password"
+                    type="password"
+                    required
+                    minlength="6"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+            </div>
+
+            <p
+                id="change-password-message"
+                class="text-sm text-center min-h-[20px]"
+            ></p>
+
+            <button
+                id="change-password-submit"
+                type="submit"
+                class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold"
+            >
+                Change Password
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+
+
+<!-- FORGOT PASSWORD MODAL -->
+<div
+    id="forgot-password-modal"
+    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[210] p-4"
+>
+    <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl">
+
+        <div class="flex items-start justify-between mb-6">
+
+            <div>
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-4">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+
+                <h2 class="text-2xl font-bold text-gray-900">
+                    Forgot Password
+                </h2>
+
+                <p class="text-sm text-gray-500 mt-2">
+                    Enter your account email to request password-reset instructions.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                onclick="closeForgotPasswordModal()"
+                class="text-3xl text-gray-400 hover:text-gray-600 leading-none"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <form
+            id="forgot-password-form"
+            onsubmit="submitForgotPassword(event)"
+            class="space-y-5"
+        >
+
+            <div>
+                <label
+                    for="forgot-password-email"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Email Address
+                </label>
+
+                <input
+                    id="forgot-password-email"
+                    type="email"
+                    required
+                    placeholder="student@example.com"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+            </div>
+
+            <p
+                id="forgot-password-message"
+                class="text-sm text-center min-h-[20px]"
+            ></p>
+
+            <div class="flex gap-3">
+
+                <button
+                    type="button"
+                    onclick="closeForgotPasswordModal()"
+                    class="flex-1 py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-medium"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="forgot-password-submit"
+                    type="submit"
+                    class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium"
+                >
+                    Continue
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- STUDENT ASSIGNMENT SUBMISSION MODAL -->
+<div
+    id="assignment-submission-modal"
+    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[220] p-4"
+>
+    <div
+        class="bg-white rounded-3xl w-full max-w-xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl"
+    >
+
+        <div class="flex items-start justify-between gap-4 mb-6">
+
+            <div>
+                <div
+                    class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-4"
+                >
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                </div>
+
+                <h2
+                    id="submission-assignment-title"
+                    class="text-2xl font-bold text-gray-900"
+                >
+                    Submit Assignment
+                </h2>
+
+                <p
+                    id="submission-assignment-due"
+                    class="text-sm text-gray-500 mt-2"
+                >
+                    Due date
+                </p>
+            </div>
+
+            <button
+                type="button"
+                onclick="closeAssignmentSubmissionModal()"
+                class="text-3xl text-gray-400 hover:text-gray-600 leading-none"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="bg-gray-50 rounded-2xl p-5 mb-6">
+
+            <div class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Instructions
+            </div>
+
+            <p
+                id="submission-assignment-description"
+                class="text-sm text-gray-700 leading-relaxed mt-2 whitespace-pre-line"
+            >
+                No instructions provided.
+            </p>
+
+        </div>
+
+        <form
+            id="assignment-submission-form"
+            onsubmit="submitAssignmentWork(event)"
+            class="space-y-5"
+        >
+
+            <div>
+
+                <label
+                    for="assignment-answer-text"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Written Answer
+                </label>
+
+                <textarea
+                    id="assignment-answer-text"
+                    rows="7"
+                    placeholder="Type your answer here..."
+                    class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-none"
+                ></textarea>
+
+            </div>
+
+            <div>
+
+                <label
+                    for="assignment-submission-file"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Attach File
+                </label>
+
+                <input
+                    id="assignment-submission-file"
+                    type="file"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.jpg,.jpeg,.png"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl"
+                >
+
+                <p class="text-xs text-gray-500 mt-2">
+                    You may submit a written answer, attach a file, or both.
+                </p>
+
+            </div>
+
+            <p
+                id="assignment-submission-message"
+                class="text-sm text-center min-h-[20px]"
+            ></p>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+
+                <button
+                    type="button"
+                    onclick="closeAssignmentSubmissionModal()"
+                    class="py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-2xl font-semibold"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="assignment-submission-button"
+                    type="submit"
+                    class="py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold flex items-center justify-center gap-2"
+                >
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Submit Work
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- REVIEW SUBMISSION MODAL -->
+<div
+    id="submission-review-modal"
+    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[230] p-4"
+>
+    <div class="bg-white rounded-3xl w-full max-w-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl">
+
+        <div class="flex items-start justify-between gap-4 mb-6">
+
+            <div>
+                <div class="w-12 h-12 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center text-xl mb-4">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                </div>
+
+                <h2
+                    id="review-submission-title"
+                    class="text-2xl font-bold text-gray-900"
+                >
+                    Review Submission
+                </h2>
+
+                <p
+                    id="review-submission-student"
+                    class="text-sm text-gray-500 mt-2"
+                ></p>
+            </div>
+
+            <button
+                type="button"
+                onclick="closeSubmissionReviewModal()"
+                class="text-3xl text-gray-400 hover:text-gray-600"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="bg-gray-50 rounded-2xl p-5 mb-5">
+
+            <div class="text-xs uppercase font-semibold tracking-wide text-gray-400">
+                Student Answer
+            </div>
+
+            <p
+                id="review-submission-answer"
+                class="text-sm text-gray-700 mt-2 whitespace-pre-line"
+            >
+                No written answer.
+            </p>
+
+        </div>
+
+        <a
+            id="review-submission-file"
+            href="#"
+            target="_blank"
+            class="hidden mb-6 items-center justify-center gap-2 w-full py-3 border border-blue-200 bg-blue-50 text-blue-600 rounded-2xl font-medium"
+        >
+            <i class="fa-solid fa-paperclip"></i>
+            Open Attached File
+        </a>
+
+        <form
+            onsubmit="saveSubmissionGrade(event)"
+            class="space-y-5"
+        >
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Score
+                </label>
+
+                <input
+                    id="review-submission-score"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    required
+                    placeholder="0–100"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Teacher Feedback
+                </label>
+
+                <textarea
+                    id="review-submission-feedback"
+                    rows="4"
+                    placeholder="Write feedback for the student..."
+                    class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-none"
+                ></textarea>
+            </div>
+
+            <p
+                id="review-submission-message"
+                class="text-sm text-center min-h-[20px]"
+            ></p>
+
+            <div class="grid grid-cols-2 gap-3">
+
+                <button
+                    type="button"
+                    onclick="closeSubmissionReviewModal()"
+                    class="py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-semibold"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="save-submission-grade-button"
+                    type="submit"
+                    class="py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-semibold"
+                >
+                    Save Grade
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+</body>
+</html> 
