@@ -173,7 +173,18 @@ let fullGradesList = [];
 // =====================================================
 let latestDiagnosticResults = [];
 let diagnosticHistory = [];
-let diagnosticStatus = { has_completed:false, can_take:true, last_taken_at:null, next_available_at:null };
+let diagnosticStatus = {
+    has_completed: false,
+    can_take: true,
+    last_taken_at: null,
+    next_available_at: null
+};
+
+/*
+    Secure token for the exact diagnostic
+    question set assigned to the student.
+*/
+let currentDiagnosticSetToken = "";
 let aiLearningMaterials = [];
 
 console.log("✅ EduVision app.js loaded");
@@ -4899,26 +4910,43 @@ async function loadTeacherStudentProgress() {
 }
 
 async function checkDiagnosticQuiz() {
-
     if (
         currentRole !== "student" ||
-        Number(
-            currentUser.diagnostic_completed
-        ) === 1
+        !currentUser?.id
     ) {
         return;
     }
 
+    /*
+        diagnostic_completed means the student has completed
+        at least one diagnostic. It does NOT permanently disable
+        future weekly diagnostics.
+    */
+    await loadDiagnosticProfileData();
+
+    if (!diagnosticStatus.can_take) {
+        return;
+    }
+
+    const recurring =
+        diagnosticStatus.has_completed;
+
     const accepted =
         await showConfirmPopup({
             title:
-                "Set Up Your Learning Profile?",
+                recurring
+                    ? "Your Weekly Diagnostic Is Ready"
+                    : "Set Up Your Learning Profile?",
 
             message:
-                "Would you like to take a short, ungraded diagnostic quiz? Your answers will help AIcee identify your strengths and subjects where you may need more support.",
+                recurring
+                    ? "A new ungraded diagnostic is available. This week's questions are rotated so AIcee can update your learning profile using fresh evidence."
+                    : "Would you like to take a short, ungraded diagnostic assessment? Your answers will help AIcee identify your current strengths and areas that may need more review.",
 
             confirmText:
-                "Take the Quiz",
+                recurring
+                    ? "Take Weekly Diagnostic"
+                    : "Take the Quiz",
 
             cancelText:
                 "Maybe Later",
@@ -4930,12 +4958,10 @@ async function checkDiagnosticQuiz() {
     if (accepted) {
         await loadDiagnosticQuiz();
     }
-
 }
 
 
 async function loadDiagnosticQuiz() {
-
     const modal = document.getElementById(
         "diagnostic-modal"
     );
@@ -4946,16 +4972,17 @@ async function loadDiagnosticQuiz() {
 
     if (!modal || !container) return;
 
+    currentDiagnosticSetToken = "";
+
     modal.classList.remove("hidden");
 
     container.innerHTML = `
         <p class="text-gray-500">
-            Loading questions...
+            Preparing this week's diagnostic questions...
         </p>
     `;
 
     try {
-
         const response = await fetch(
             "/diagnostic-questions"
         );
@@ -4963,6 +4990,26 @@ async function loadDiagnosticQuiz() {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
+            if (
+                data.code ===
+                "DIAGNOSTIC_COOLDOWN"
+            ) {
+                const next =
+                    data.next_available_at
+                        ? new Date(
+                            data.next_available_at
+                        ).toLocaleString()
+                        : "later";
+
+                container.innerHTML = `
+                    <div class="rounded-2xl bg-amber-50 border border-amber-100 p-5 text-amber-700">
+                        Your next diagnostic will be available on ${next}.
+                    </div>
+                `;
+
+                await loadDiagnosticProfileData();
+                return;
+            }
 
             container.innerHTML = `
                 <p class="text-red-600">
@@ -4974,65 +5021,109 @@ async function loadDiagnosticQuiz() {
             `;
 
             return;
-
         }
 
-        const questions = data.questions || [];
+        const questions =
+            Array.isArray(data.questions)
+                ? data.questions
+                : [];
 
-        container.innerHTML = "";
+        currentDiagnosticSetToken =
+            String(
+                data.diagnostic_set_token ||
+                ""
+            );
 
-        questions.forEach((question, index) => {
-
-            const questionCard =
-                document.createElement("div");
-
-            questionCard.className =
-                "border border-gray-200 rounded-3xl p-6";
-
-            questionCard.innerHTML = `
-                <p class="text-xs uppercase tracking-widest text-blue-600 font-semibold">
-                    ${question.subject}
+        if (
+            !questions.length ||
+            !currentDiagnosticSetToken
+        ) {
+            container.innerHTML = `
+                <p class="text-red-600">
+                    A valid diagnostic question set could not be prepared.
                 </p>
-
-                <h3 class="font-semibold text-gray-900 mt-2 mb-5">
-                    ${index + 1}. ${question.question}
-                </h3>
-
-                <div class="space-y-3">
-
-                    ${createDiagnosticOption(
-                        question.id,
-                        "A",
-                        question.option_a
-                    )}
-
-                    ${createDiagnosticOption(
-                        question.id,
-                        "B",
-                        question.option_b
-                    )}
-
-                    ${createDiagnosticOption(
-                        question.id,
-                        "C",
-                        question.option_c
-                    )}
-
-                    ${createDiagnosticOption(
-                        question.id,
-                        "D",
-                        question.option_d
-                    )}
-
-                </div>
             `;
 
-            container.appendChild(questionCard);
+            return;
+        }
 
-        });
+        const warningSubjects =
+            Array.isArray(
+                data.rotation_warning_subjects
+            )
+                ? data.rotation_warning_subjects
+                : [];
 
+        container.innerHTML = `
+            <div class="diagnostic-info-card rounded-2xl bg-blue-50 border border-blue-100 p-4 mb-5 text-sm text-blue-700">
+                <strong>Fresh weekly set:</strong>
+                AIcee prioritizes questions you have not answered before and avoids questions from your immediately previous diagnostic whenever the question bank allows it.
+
+                ${
+                    warningSubjects.length
+                        ? `
+                            <div class="mt-2 text-amber-700">
+                                Some subjects need a larger question bank to guarantee zero immediate repeats:
+                                ${warningSubjects.join(", ")}.
+                            </div>
+                        `
+                        : ""
+                }
+            </div>
+        `;
+
+        questions.forEach(
+            (question, index) => {
+                const questionCard =
+                    document.createElement(
+                        "div"
+                    );
+
+                questionCard.className =
+                    "diagnostic-question-card border border-gray-200 rounded-3xl p-6";
+
+                questionCard.innerHTML = `
+                    <p class="text-xs uppercase tracking-widest text-blue-600 font-semibold">
+                        ${question.subject}
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 mt-2 mb-5">
+                        ${index + 1}. ${question.question}
+                    </h3>
+
+                    <div class="space-y-3">
+                        ${createDiagnosticOption(
+                            question.id,
+                            "A",
+                            question.option_a
+                        )}
+
+                        ${createDiagnosticOption(
+                            question.id,
+                            "B",
+                            question.option_b
+                        )}
+
+                        ${createDiagnosticOption(
+                            question.id,
+                            "C",
+                            question.option_c
+                        )}
+
+                        ${createDiagnosticOption(
+                            question.id,
+                            "D",
+                            question.option_d
+                        )}
+                    </div>
+                `;
+
+                container.appendChild(
+                    questionCard
+                );
+            }
+        );
     } catch (error) {
-
         console.error(
             "Diagnostic load error:",
             error
@@ -5043,9 +5134,7 @@ async function loadDiagnosticQuiz() {
                 Cannot connect to the server.
             </p>
         `;
-
     }
-
 }
 
 
@@ -5080,46 +5169,55 @@ function createDiagnosticOption(
 }
 
 async function submitDiagnosticQuiz(event) {
-
     event.preventDefault();
 
-    const answerInputs = document.querySelectorAll(
-        ".diagnostic-answer:checked"
-    );
+    const answerInputs =
+        document.querySelectorAll(
+            ".diagnostic-answer:checked"
+        );
 
-    const questionCards = document.querySelectorAll(
-        "#diagnostic-questions-container > div"
-    );
+    const questionCards =
+        document.querySelectorAll(
+            "#diagnostic-questions-container .diagnostic-question-card"
+        );
 
     if (
         answerInputs.length !==
         questionCards.length
     ) {
-
         showMessagePopup(
-    "Incomplete Quiz",
-    "Please answer every question before submitting your diagnostic quiz.",
-    "warning"
-);
+            "Incomplete Quiz",
+            "Please answer every question before submitting your diagnostic quiz.",
+            "warning"
+        );
 
         return;
-
     }
 
-    const answers = Array.from(
-        answerInputs
-    ).map(input => ({
+    if (!currentDiagnosticSetToken) {
+        showMessagePopup(
+            "Diagnostic Set Expired",
+            "Please reopen the diagnostic assessment to get a fresh question set.",
+            "warning"
+        );
 
-        question_id:
-            Number(input.dataset.questionId),
+        return;
+    }
 
-        selected_option:
-            input.value
+    const answers =
+        Array.from(
+            answerInputs
+        ).map(input => ({
+            question_id:
+                Number(
+                    input.dataset.questionId
+                ),
 
-    }));
+            selected_option:
+                input.value
+        }));
 
     try {
-
         const response = await fetch(
             "/diagnostic-submit",
             {
@@ -5133,6 +5231,10 @@ async function submitDiagnosticQuiz(event) {
                 body: JSON.stringify({
                     student_id:
                         currentUser.id,
+
+                    diagnostic_set_token:
+                        currentDiagnosticSetToken,
+
                     answers
                 })
             }
@@ -5141,6 +5243,24 @@ async function submitDiagnosticQuiz(event) {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
+            if (
+                data.code ===
+                    "DIAGNOSTIC_COOLDOWN" ||
+                data.code ===
+                    "DIAGNOSTIC_SET_EXPIRED"
+            ) {
+                currentDiagnosticSetToken = "";
+
+                showMessagePopup(
+                    "Diagnostic Not Available",
+                    data.message ||
+                        "Please reopen the diagnostic assessment.",
+                    "warning"
+                );
+
+                await loadDiagnosticProfileData();
+                return;
+            }
 
             showLegacyAlert(
                 "❌ " +
@@ -5151,14 +5271,20 @@ async function submitDiagnosticQuiz(event) {
             );
 
             return;
-
         }
 
+        currentDiagnosticSetToken = "";
+
+        /*
+            This flag now means "has completed at least
+            one diagnostic", not "never take another one".
+        */
         currentUser.diagnostic_completed = 1;
 
         currentUser.role =
-                String(currentUser.role)
-        .toLowerCase();
+            String(
+                currentUser.role
+            ).toLowerCase();
 
         localStorage.setItem(
             "user",
@@ -5166,59 +5292,77 @@ async function submitDiagnosticQuiz(event) {
         );
 
         document
-            .getElementById("diagnostic-modal")
-            .classList.add("hidden");
+            .getElementById(
+                "diagnostic-modal"
+            )
+            ?.classList.add("hidden");
 
         const results =
-    Array.isArray(data.results)
-        ? data.results
-        : [];
+            Array.isArray(data.results)
+                ? data.results
+                : [];
 
-const totalCorrect =
-    results.reduce(
-        (sum, result) =>
-            sum + Number(result.score || 0),
-        0
-    );
+        const totalCorrect =
+            results.reduce(
+                (sum, result) =>
+                    sum +
+                    Number(
+                        result.score || 0
+                    ),
+                0
+            );
 
-const totalQuestions =
-    results.reduce(
-        (sum, result) =>
-            sum +
-            Number(
-                result.total_questions || 0
-            ),
-        0
-    );
+        const totalQuestions =
+            results.reduce(
+                (sum, result) =>
+                    sum +
+                    Number(
+                        result.total_questions ||
+                        0
+                    ),
+                0
+            );
 
-const overallPercentage =
-    totalQuestions > 0
-        ? Math.round(
-            (
-                totalCorrect /
-                totalQuestions
-            ) * 100
-        )
-        : 0;
+        const overallPercentage =
+            totalQuestions > 0
+                ? Math.round(
+                    (
+                        totalCorrect /
+                        totalQuestions
+                    ) * 100
+                )
+                : 0;
 
-const subjectScores =
-    results
-        .map(result =>
-            `${result.subject}: ` +
-            `${result.score}/${result.total_questions} ` +
-            `(${result.percentage}%)`
-        )
-        .join("\n");
+        const subjectScores =
+            results
+                .map(
+                    result =>
+                        `${result.subject}: ` +
+                        `${result.score}/${result.total_questions} ` +
+                        `(${result.percentage}%)`
+                )
+                .join("\n");
 
-showMessagePopup(
-    "Diagnostic Quiz Results",
-    `Overall Score: ${totalCorrect}/${totalQuestions} (${overallPercentage}%)
+        const nextText =
+            data.next_available_at
+                ? `
+
+Next weekly diagnostic:
+${new Date(
+    data.next_available_at
+).toLocaleString()}`
+                : "";
+
+        showMessagePopup(
+            "Diagnostic Quiz Results",
+            `Overall Score: ${totalCorrect}/${totalQuestions} (${overallPercentage}%)
 
 ${subjectScores}
 
-AIcee will use these results to personalize your learning experience.`,
-    "success"
-);
+AIcee will use these results to update your learning profile.${nextText}`,
+            "success"
+        );
+
         await loadDashboard();
         await loadDiagnosticProfileData();
 
@@ -5228,9 +5372,7 @@ AIcee will use these results to personalize your learning experience.`,
             "Diagnostic results:",
             data.results
         );
-
     } catch (error) {
-
         console.error(
             "Diagnostic submit error:",
             error
@@ -5239,13 +5381,11 @@ AIcee will use these results to personalize your learning experience.`,
         showLegacyAlert(
             "❌ Cannot connect to the server."
         );
-
     }
-
 }
 
-async function skipDiagnosticQuiz() {
 
+async function skipDiagnosticQuiz() {
     const confirmed =
         await showConfirmPopup({
             title: "Skip Diagnostic Quiz?",
@@ -5260,6 +5400,8 @@ async function skipDiagnosticQuiz() {
         return;
     }
 
+    currentDiagnosticSetToken = "";
+
     const modal = document.getElementById(
         "diagnostic-modal"
     );
@@ -5267,20 +5409,55 @@ async function skipDiagnosticQuiz() {
     if (modal) {
         modal.classList.add("hidden");
     }
-
 }
+
 
 async function openDiagnosticQuiz() {
     await loadDiagnosticProfileData();
-    if(!diagnosticStatus.can_take){
-        const next=diagnosticStatus.next_available_at?new Date(diagnosticStatus.next_available_at).toLocaleString():"later";
-        showMessagePopup("Next Diagnostic Not Yet Available",`Your learning profile is up to date. Your next diagnostic will be available on ${next}.`,"warning");
+
+    if (!diagnosticStatus.can_take) {
+        const next =
+            diagnosticStatus.next_available_at
+                ? new Date(
+                    diagnosticStatus.next_available_at
+                ).toLocaleString()
+                : "later";
+
+        showMessagePopup(
+            "Next Diagnostic Not Yet Available",
+            `Your learning profile is up to date. Your next diagnostic will be available on ${next}.`,
+            "warning"
+        );
+
         return;
     }
-    const accepted=await showConfirmPopup({title:diagnosticStatus.has_completed?"Take Weekly Diagnostic?":"Take Diagnostic Assessment?",message:"This assessment is not graded. Its results update your learning profile, dashboard, and AIcee personalization context.",confirmText:"Start Assessment",cancelText:"Not Now",type:"quiz"});
-    if(accepted) await loadDiagnosticQuiz();
-}
 
+    const accepted =
+        await showConfirmPopup({
+            title:
+                diagnosticStatus.has_completed
+                    ? "Take Weekly Diagnostic?"
+                    : "Take Diagnostic Assessment?",
+
+            message:
+                diagnosticStatus.has_completed
+                    ? "This week's assessment uses a rotated question set and is not graded. The results will update your diagnostic history and AIcee learning profile."
+                    : "This assessment is not graded. Its results will create your initial AIcee learning profile.",
+
+            confirmText:
+                "Start Assessment",
+
+            cancelText:
+                "Not Now",
+
+            type:
+                "quiz"
+        });
+
+    if (accepted) {
+        await loadDiagnosticQuiz();
+    }
+}
 
 
 /* =========================================
