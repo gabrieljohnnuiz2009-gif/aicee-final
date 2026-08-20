@@ -1870,3 +1870,752 @@ body.aicee-compact .space-y-8 > :not([hidden]) ~ :not([hidden]) {
         width: 210px !important;
     }
 }
+
+/* =====================================================
+   AICEE ULTRA MAX MOTION SYSTEM — 2026
+   Premium dashboard motion layer. CSS-only, no backend changes.
+   Designed for the current Student / Teacher / Admin UI.
+===================================================== */
+
+:root {
+    --aicee-motion-fast: 160ms;
+    --aicee-motion: 320ms;
+    --aicee-motion-slow: 720ms;
+    --aicee-spring: cubic-bezier(.16, 1, .3, 1);
+    --aicee-spring-soft: cubic-bezier(.22, 1, .36, 1);
+    --aicee-ease: cubic-bezier(.2, .8, .2, 1);
+    --aicee-glow: 0 0 0 1px rgba(var(--aicee-accent-rgb), .12),
+                  0 18px 44px rgba(var(--aicee-accent-rgb), .12);
+    --aicee-glow-strong: 0 0 0 1px rgba(var(--aicee-accent-rgb), .20),
+                         0 24px 70px rgba(var(--aicee-accent-rgb), .19);
+    --aicee-glass: rgba(255,255,255,.72);
+    --aicee-glass-border: rgba(255,255,255,.46);
+}
+
+:root[data-theme="dark"] {
+    --aicee-glass: rgba(17,24,39,.72);
+    --aicee-glass-border: rgba(148,163,184,.13);
+}
+
+/* ---------- App ambient canvas ---------- */
+#main-app .overflow-auto {
+    position: relative;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 13% 8%, rgba(var(--aicee-accent-rgb), .075), transparent 28%),
+        radial-gradient(circle at 92% 88%, rgba(124,58,237,.055), transparent 30%),
+        var(--aicee-bg) !important;
+}
+
+#main-app .overflow-auto::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    width: 34vw;
+    min-width: 360px;
+    aspect-ratio: 1;
+    top: 18%;
+    right: -12vw;
+    border-radius: 999px;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(var(--aicee-accent-rgb), .10), transparent 66%);
+    filter: blur(18px);
+    animation: aiceeAmbientDrift 16s ease-in-out infinite alternate;
+}
+
+@keyframes aiceeAmbientDrift {
+    from { transform: translate3d(0, -16px, 0) scale(.94); opacity: .55; }
+    to   { transform: translate3d(-7vw, 46px, 0) scale(1.10); opacity: .90; }
+}
+
+/* ---------- Header: floating glass ---------- */
+#main-app header {
+    position: relative;
+    z-index: 30;
+    background: color-mix(in srgb, var(--aicee-surface) 84%, transparent) !important;
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    box-shadow: 0 1px 0 var(--aicee-border), 0 12px 30px rgba(15,23,42,.025);
+    animation: aiceeHeaderDrop .58s var(--aicee-spring) both;
+}
+
+@keyframes aiceeHeaderDrop {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#main-app header button,
+#main-app header [role="button"] {
+    transition: transform var(--aicee-motion-fast) var(--aicee-spring),
+                background-color var(--aicee-motion-fast) ease,
+                box-shadow var(--aicee-motion-fast) ease;
+}
+
+#main-app header button:not(:disabled):hover,
+#main-app header [role="button"]:hover {
+    transform: translateY(-1px) scale(1.025);
+}
+
+/* ---------- Sidebar: premium rail motion ---------- */
+#sidebar {
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--aicee-surface) 97%, var(--aicee-accent) 3%), var(--aicee-surface)) !important;
+}
+
+#sidebar::after {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    left: -110px;
+    top: 8%;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(var(--aicee-accent-rgb), .12), transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
+    animation: aiceeSidebarGlow 10s ease-in-out infinite alternate;
+}
+
+@keyframes aiceeSidebarGlow {
+    to { transform: translateY(46vh) scale(1.22); opacity: .48; }
+}
+
+.sidebar-link {
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.sidebar-link::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: 0;
+    background: linear-gradient(100deg, transparent, rgba(var(--aicee-accent-rgb), .10), transparent);
+    transform: translateX(-100%);
+    transition: opacity .2s ease;
+}
+
+.sidebar-link:hover::after {
+    opacity: 1;
+    animation: aiceeNavSweep .65s var(--aicee-ease);
+}
+
+@keyframes aiceeNavSweep {
+    to { transform: translateX(100%); }
+}
+
+.sidebar-link i {
+    transition: transform .30s var(--aicee-spring), color .22s ease;
+    transform-origin: center;
+}
+
+.sidebar-link:hover i {
+    transform: translateX(2px) scale(1.10) rotate(-3deg);
+}
+
+.sidebar-link.is-active i {
+    animation: aiceeActiveIconPop .46s var(--aicee-spring);
+}
+
+@keyframes aiceeActiveIconPop {
+    0% { transform: scale(.80); }
+    65% { transform: scale(1.16) rotate(-4deg); }
+    100% { transform: scale(1); }
+}
+
+.sidebar-link.is-active::before {
+    box-shadow: 0 0 18px rgba(var(--aicee-accent-rgb), .55);
+    animation: aiceeActiveRail 2.8s ease-in-out infinite;
+}
+
+@keyframes aiceeActiveRail {
+    50% { height: 32px; filter: brightness(1.15); }
+}
+
+/* ---------- View entrance orchestration ---------- */
+#student-dashboard:not(.hidden) > *,
+#teacher-dashboard:not(.hidden) > *,
+#admin-dashboard:not(.hidden) > *,
+#learning-profile:not(.hidden) > *,
+#diagnostic-view:not(.hidden) > * {
+    animation: aiceeSectionReveal .72s var(--aicee-spring) both;
+}
+
+#student-dashboard:not(.hidden) > *:nth-child(2),
+#teacher-dashboard:not(.hidden) > *:nth-child(2),
+#admin-dashboard:not(.hidden) > *:nth-child(2) { animation-delay: 55ms; }
+#student-dashboard:not(.hidden) > *:nth-child(3),
+#teacher-dashboard:not(.hidden) > *:nth-child(3),
+#admin-dashboard:not(.hidden) > *:nth-child(3) { animation-delay: 105ms; }
+#student-dashboard:not(.hidden) > *:nth-child(4),
+#teacher-dashboard:not(.hidden) > *:nth-child(4),
+#admin-dashboard:not(.hidden) > *:nth-child(4) { animation-delay: 150ms; }
+#student-dashboard:not(.hidden) > *:nth-child(n+5),
+#teacher-dashboard:not(.hidden) > *:nth-child(n+5),
+#admin-dashboard:not(.hidden) > *:nth-child(n+5) { animation-delay: 190ms; }
+
+@keyframes aiceeSectionReveal {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 24px, 0) scale(.985);
+        filter: blur(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* ---------- Student hero: living aurora ---------- */
+#student-dashboard > section:first-child {
+    isolation: isolate;
+    background-size: 180% 180% !important;
+    animation: aiceeHeroGradient 10s ease-in-out infinite alternate,
+               aiceeSectionReveal .72s var(--aicee-spring) both;
+    box-shadow: 0 28px 80px rgba(37,99,235,.18),
+                inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+#student-dashboard > section:first-child::before {
+    content: "";
+    position: absolute;
+    inset: -45%;
+    pointer-events: none;
+    background: conic-gradient(from 90deg,
+        transparent 0 20%, rgba(255,255,255,.08) 28%, transparent 38% 62%,
+        rgba(103,232,249,.08) 72%, transparent 82%);
+    animation: aiceeHeroOrbit 20s linear infinite;
+}
+
+#student-dashboard > section:first-child::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .35;
+    background-image: radial-gradient(circle at center, rgba(255,255,255,.5) 1px, transparent 1.5px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(115deg, transparent 10%, black 45%, transparent 88%);
+    animation: aiceeHeroStars 13s linear infinite;
+}
+
+@keyframes aiceeHeroGradient {
+    0% { background-position: 0% 20%; }
+    100% { background-position: 100% 80%; }
+}
+
+@keyframes aiceeHeroOrbit {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes aiceeHeroStars {
+    to { background-position: 70px 36px; }
+}
+
+#student-dashboard > section:first-child h2 {
+    text-shadow: 0 8px 28px rgba(15,23,42,.22);
+}
+
+#student-dashboard > section:first-child .inline-flex {
+    animation: aiceeHeroBadgeFloat 4.5s ease-in-out infinite;
+}
+
+@keyframes aiceeHeroBadgeFloat {
+    50% { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(255,255,255,.08); }
+}
+
+/* ---------- Premium panel optics ---------- */
+.aicee-panel,
+#teacher-dashboard > .grid > div,
+#admin-dashboard .grid > div {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    transform: translateZ(0);
+}
+
+.aicee-panel::before,
+#teacher-dashboard > .grid > div::before,
+#admin-dashboard .grid > div::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 200px;
+    height: 200px;
+    top: -130px;
+    right: -120px;
+    border-radius: 999px;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(var(--aicee-accent-rgb), .12), transparent 70%);
+    opacity: .2;
+    transform: scale(.75);
+    transition: opacity .42s ease, transform .52s var(--aicee-spring);
+}
+
+@media (hover: hover) {
+    .aicee-panel:hover,
+    #teacher-dashboard > .grid > div:hover,
+    #admin-dashboard .grid > div:hover {
+        transform: translateY(-5px) scale(1.006);
+        box-shadow: var(--aicee-glow-strong) !important;
+    }
+
+    .aicee-panel:hover::before,
+    #teacher-dashboard > .grid > div:hover::before,
+    #admin-dashboard .grid > div:hover::before {
+        opacity: .95;
+        transform: scale(1.28);
+    }
+}
+
+/* soft top-edge highlight */
+.aicee-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0 10% auto 10%;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(var(--aicee-accent-rgb), .24), transparent);
+    opacity: .55;
+}
+
+/* ---------- KPI cards ---------- */
+#teacher-dashboard > .grid > div,
+#admin-dashboard .grid > div {
+    transition: transform .35s var(--aicee-spring),
+                box-shadow .35s ease,
+                border-color .35s ease,
+                background-color .35s ease;
+}
+
+#teacher-dashboard > .grid > div > .text-5xl,
+#admin-dashboard .text-4xl,
+#admin-dashboard .text-5xl {
+    transform-origin: left bottom;
+    animation: aiceeMetricPop .72s .18s var(--aicee-spring) both;
+}
+
+@keyframes aiceeMetricPop {
+    from { opacity: 0; transform: translateY(8px) scale(.86); filter: blur(3px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* ---------- Buttons: magnetic feel + light sweep ---------- */
+.aicee-primary-button,
+.aicee-secondary-button,
+button.bg-blue-600,
+button.bg-gradient-to-r {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.aicee-primary-button::after,
+button.bg-blue-600::after,
+button.bg-gradient-to-r::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.30) 48%, transparent 66%);
+    transform: translateX(-125%);
+}
+
+@media (hover: hover) {
+    .aicee-primary-button:hover::after,
+    button.bg-blue-600:hover::after,
+    button.bg-gradient-to-r:hover::after {
+        animation: aiceeButtonSweep .72s var(--aicee-ease);
+    }
+
+    .aicee-primary-button:not(:disabled):hover {
+        transform: translateY(-3px) scale(1.018);
+    }
+}
+
+@keyframes aiceeButtonSweep {
+    to { transform: translateX(125%); }
+}
+
+.aicee-primary-button:not(:disabled):active,
+.aicee-secondary-button:not(:disabled):active {
+    transition-duration: 70ms;
+    transform: translateY(0) scale(.965);
+}
+
+/* ---------- Form focus glow ---------- */
+.aicee-input-shell,
+.aicee-textarea,
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+    transition: border-color .24s ease, box-shadow .24s ease,
+                background-color .24s ease, transform .24s var(--aicee-spring);
+}
+
+.aicee-input-shell:focus-within,
+.aicee-textarea:focus,
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+    transform: translateY(-1px);
+}
+
+/* ---------- Modal: cinematic depth ---------- */
+.fixed.inset-0,
+#ai-modal,
+[id$="-modal"] {
+    --aicee-modal-blur: 7px;
+}
+
+.fixed.inset-0:not(.hidden) {
+    animation: aiceeBackdropIn .28s ease both;
+}
+
+.fixed.inset-0:not(.hidden) .modal,
+.fixed.inset-0:not(.hidden) > div:not(.absolute) {
+    animation: aiceeModalSpring .52s var(--aicee-spring) both;
+}
+
+@keyframes aiceeBackdropIn {
+    from { opacity: 0; backdrop-filter: blur(0); }
+    to { opacity: 1; backdrop-filter: blur(var(--aicee-modal-blur)); }
+}
+
+@keyframes aiceeModalSpring {
+    0% { opacity: 0; transform: translateY(30px) scale(.94); filter: blur(8px); }
+    72% { opacity: 1; transform: translateY(-2px) scale(1.006); filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* ---------- AI Assistant: futuristic but readable ---------- */
+#ai-modal .modal {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 34px 110px rgba(2,6,23,.28),
+                0 0 0 1px rgba(var(--aicee-accent-rgb), .12) !important;
+}
+
+#ai-modal .modal::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--aicee-accent), #8b5cf6, var(--aicee-accent), transparent);
+    background-size: 220% 100%;
+    animation: aiceeAIBorderFlow 4s linear infinite;
+}
+
+@keyframes aiceeAIBorderFlow {
+    to { background-position: 220% 0; }
+}
+
+#ai-chat-log {
+    background-image:
+        radial-gradient(circle at 15% 10%, rgba(var(--aicee-accent-rgb), .055), transparent 28%),
+        radial-gradient(circle at 85% 90%, rgba(124,58,237,.045), transparent 28%) !important;
+}
+
+.aicee-chat-bubble {
+    transform-origin: bottom left;
+    transition: transform .18s var(--aicee-spring), box-shadow .22s ease;
+}
+
+.aicee-user-bubble { transform-origin: bottom right; }
+
+@media (hover: hover) {
+    .aicee-chat-bubble:hover {
+        transform: translateY(-1px) scale(1.008);
+        box-shadow: 0 12px 28px rgba(15,23,42,.10);
+    }
+}
+
+/* ---------- Diagnostic profile / progress ---------- */
+#diagnostic-history > *,
+#student-dashboard [id*="diagnostic"] > *,
+#learning-profile [class*="rounded"] {
+    animation: aiceeMiniReveal .52s var(--aicee-spring-soft) both;
+}
+
+@keyframes aiceeMiniReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* animate common progress fill bars without changing final width */
+#student-dashboard .h-2 > div,
+#student-dashboard .h-2\.5 > div,
+#learning-profile .h-2 > div,
+#diagnostic-history [class*="bg-blue"] {
+    transform-origin: left center;
+    animation: aiceeBarGrow .95s .18s var(--aicee-spring) both;
+}
+
+@keyframes aiceeBarGrow {
+    from { transform: scaleX(0); opacity: .45; }
+    to { transform: scaleX(1); opacity: 1; }
+}
+
+/* ---------- Teacher identity ---------- */
+#teacher-dashboard > section:first-child {
+    background:
+        radial-gradient(circle at 88% 16%, rgba(124,58,237,.09), transparent 25%),
+        var(--aicee-surface) !important;
+}
+
+#teacher-dashboard > section:first-child .aicee-kicker {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#teacher-dashboard > section:first-child .aicee-kicker::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #8b5cf6;
+    box-shadow: 0 0 0 5px rgba(139,92,246,.10);
+    animation: aiceeTeacherDot 2.2s ease-in-out infinite;
+}
+
+@keyframes aiceeTeacherDot {
+    50% { box-shadow: 0 0 0 9px rgba(139,92,246,.025); transform: scale(1.10); }
+}
+
+/* ---------- Admin control-center identity ---------- */
+#admin-dashboard {
+    --admin-accent: 16, 185, 129;
+}
+
+#admin-dashboard > div:first-child {
+    position: relative;
+}
+
+#admin-dashboard > div:first-child::after {
+    content: "";
+    position: absolute;
+    width: 110px;
+    height: 2px;
+    left: 0;
+    bottom: -10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(var(--admin-accent),.95), transparent);
+    transform-origin: left center;
+    animation: aiceeAdminLine .8s .18s var(--aicee-spring) both;
+}
+
+@keyframes aiceeAdminLine {
+    from { transform: scaleX(0); opacity: 0; }
+    to { transform: scaleX(1); opacity: 1; }
+}
+
+#admin-dashboard .aicee-panel:hover,
+#admin-dashboard > .grid > div:hover {
+    border-color: rgba(var(--admin-accent), .24) !important;
+    box-shadow: 0 0 0 1px rgba(var(--admin-accent),.10),
+                0 24px 68px rgba(var(--admin-accent),.10) !important;
+}
+
+/* ---------- Upload / file controls ---------- */
+input[type="file"]::file-selector-button {
+    border: 0;
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin-right: 10px;
+    color: var(--aicee-text);
+    background: rgba(var(--aicee-accent-rgb), .10);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .18s var(--aicee-spring), background-color .18s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+    transform: translateY(-1px);
+    background: rgba(var(--aicee-accent-rgb), .16);
+}
+
+/* ---------- Tables and list rows ---------- */
+tbody tr,
+[data-row],
+.divide-y > * {
+    transition: background-color .18s ease, transform .18s var(--aicee-spring);
+}
+
+@media (hover: hover) {
+    tbody tr:hover {
+        background: rgba(var(--aicee-accent-rgb), .035);
+    }
+}
+
+/* ---------- Notification / live status ---------- */
+#notification-dropdown {
+    transform-origin: top right;
+    animation: aiceeDropdownIn .34s var(--aicee-spring) both;
+    box-shadow: 0 24px 70px rgba(15,23,42,.14) !important;
+}
+
+@keyframes aiceeDropdownIn {
+    from { opacity: 0; transform: translateY(-8px) scale(.965); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+#notification-badge:not(.hidden),
+.notification-badge:not(.hidden) {
+    animation: aiceeBadgePing 2.4s ease-in-out infinite;
+}
+
+@keyframes aiceeBadgePing {
+    50% { transform: scale(1.10); box-shadow: 0 0 0 6px rgba(239,68,68,.08); }
+}
+
+/* ---------- Profile extra depth ---------- */
+.profile-hero {
+    background-size: 160% 160%;
+    animation: aiceeProfileGradient 12s ease-in-out infinite alternate;
+}
+
+@keyframes aiceeProfileGradient {
+    to { background-position: 100% 60%; }
+}
+
+.profile-online-dot::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: inherit;
+    border: 1px solid rgba(52,211,153,.38);
+    animation: aiceeOnlineRing 2.1s ease-out infinite;
+}
+
+@keyframes aiceeOnlineRing {
+    from { transform: scale(.65); opacity: .9; }
+    to { transform: scale(1.45); opacity: 0; }
+}
+
+/* ---------- Settings toggles ---------- */
+.settings-switch::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: inherit;
+    opacity: 0;
+    background: rgba(var(--aicee-accent-rgb), .08);
+    transform: scale(.8);
+    transition: opacity .25s ease, transform .25s var(--aicee-spring);
+}
+
+.settings-toggle-row:hover .settings-switch::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.settings-toggle-row input:checked + .settings-switch::after {
+    animation: aiceeSwitchPop .28s var(--aicee-spring);
+}
+
+@keyframes aiceeSwitchPop {
+    50% { scale: 1.14; }
+}
+
+/* ---------- Scrollbar ---------- */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(var(--aicee-accent-rgb), .38) transparent;
+}
+
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgba(var(--aicee-accent-rgb), .30);
+    background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--aicee-accent-rgb), .48);
+    background-clip: padding-box;
+}
+
+/* ---------- Focus visibility ---------- */
+:focus-visible {
+    outline: 2px solid rgba(var(--aicee-accent-rgb), .75);
+    outline-offset: 3px;
+}
+
+/* ---------- Mobile: premium motion without lag ---------- */
+@media (max-width: 767px) {
+    #main-app .overflow-auto::before {
+        width: 520px;
+        right: -340px;
+        opacity: .55;
+    }
+
+    #student-dashboard > section:first-child::before {
+        inset: -70%;
+    }
+
+    .aicee-panel:hover,
+    #teacher-dashboard > .grid > div:hover,
+    #admin-dashboard .grid > div:hover {
+        transform: none;
+    }
+
+    #student-dashboard:not(.hidden) > *,
+    #teacher-dashboard:not(.hidden) > *,
+    #admin-dashboard:not(.hidden) > * {
+        animation-duration: .52s;
+    }
+}
+
+/* ---------- Performance guardrails ---------- */
+@media (max-width: 480px), (update: slow) {
+    #main-app .overflow-auto::before,
+    #sidebar::after,
+    #student-dashboard > section:first-child::before,
+    #student-dashboard > section:first-child::after {
+        animation-duration: 24s;
+    }
+}
+
+/* ---------- Respect AICEE's own motion toggle + OS preference ---------- */
+:root[data-animations="off"] #main-app .overflow-auto::before,
+:root[data-animations="off"] #sidebar::after,
+:root[data-animations="off"] #student-dashboard > section:first-child,
+:root[data-animations="off"] #student-dashboard > section:first-child::before,
+:root[data-animations="off"] #student-dashboard > section:first-child::after,
+:root[data-animations="off"] .sidebar-link.is-active::before,
+:root[data-animations="off"] .profile-hero,
+:root[data-animations="off"] .profile-online-dot::after,
+:root[data-animations="off"] #ai-modal .modal::before {
+    animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #main-app .overflow-auto::before,
+    #sidebar::after,
+    #student-dashboard > section:first-child,
+    #student-dashboard > section:first-child::before,
+    #student-dashboard > section:first-child::after,
+    .sidebar-link.is-active::before,
+    .profile-hero,
+    .profile-online-dot::after,
+    #ai-modal .modal::before {
+        animation: none !important;
+    }
+
+    .aicee-panel:hover,
+    #teacher-dashboard > .grid > div:hover,
+    #admin-dashboard .grid > div:hover {
+        transform: none !important;
+    }
+}
+
+/* =====================================================
+   END — AICEE ULTRA MAX MOTION SYSTEM
+===================================================== */
