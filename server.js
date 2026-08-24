@@ -551,11 +551,26 @@ function createPersonalizedFallback(context) {
 }
 
 /* =========================================
-   HOME ROUTE
+   FRONTEND + HOME ROUTE
 ========================================= */
 
+// Serve only the frontend files needed by the browser.
+// This avoids exposing server.js, package.json, .env, and other backend files.
+app.use("/assets", express.static(path.join(__dirname, "assets")));
+
+[
+    "style.css",
+    "aicee-upgrade.css",
+    "app.js",
+    "aicee-3d.js"
+].forEach(fileName => {
+    app.get(`/${fileName}`, (req, res) => {
+        res.sendFile(path.join(__dirname, fileName));
+    });
+});
+
 app.get("/", (req, res) => {
-    res.send("Backend is working!");
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 /* =========================================
