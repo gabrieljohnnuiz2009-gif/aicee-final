@@ -554,23 +554,15 @@ function createPersonalizedFallback(context) {
    FRONTEND + HOME ROUTE
 ========================================= */
 
-// Serve only the frontend files needed by the browser.
-// This avoids exposing server.js, package.json, .env, and other backend files.
-app.use("/assets", express.static(path.join(__dirname, "assets")));
+const PUBLIC_DIR = path.join(__dirname, "public");
 
-[
-    "style.css",
-    "aicee-upgrade.css",
-    "app.js",
-    "aicee-3d.js"
-].forEach(fileName => {
-    app.get(`/${fileName}`, (req, res) => {
-        res.sendFile(path.join(__dirname, fileName));
-    });
-});
+// Serve only the browser-facing files inside /public.
+// This keeps backend files like server.js, database.js,
+// package.json, railway.json, and .env out of public access.
+app.use(express.static(PUBLIC_DIR));
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+    res.sendFile(path.join(PUBLIC_DIR, "index.html"));
 });
 
 /* =========================================
