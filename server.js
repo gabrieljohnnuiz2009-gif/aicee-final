@@ -4996,12 +4996,21 @@ app.put("/admin/sections/:sectionId", authenticateToken, requireRole("admin"), a
 });
 
 
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        success: true,
+        status: "ok"
+    });
+});
+
 async function startServer() {
     await initializeSecurityStorage();
 
-    app.listen(3000, () => {
+    const PORT = Number(process.env.PORT) || 3000;
+
+    app.listen(PORT, "0.0.0.0", () => {
         console.log(
-            "Server running securely on http://localhost:3000"
+            `AICEE running securely on port ${PORT}`
         );
     });
 }
