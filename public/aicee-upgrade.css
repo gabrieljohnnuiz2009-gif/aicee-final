@@ -1793,3 +1793,189 @@ body.aicee-compact .space-y-8 > :not([hidden]) ~ :not([hidden]) {
     background-size: cover !important;
     background-repeat: no-repeat !important;
 }
+
+/* =====================================================
+   AICEE PRE-DEFENSE UI HOTFIX — 2026-08
+   Goals:
+   1) Make login spacing feel intentional instead of empty.
+   2) Keep the 3D mascot completely inside the hero viewport.
+   3) Improve login-card scale and balance on laptops.
+   4) Let dashboard side-by-side cards keep natural heights.
+   Keep this block LAST so it overrides earlier login rules.
+===================================================== */
+
+/* Dashboard: never stretch the shorter "Your learning direction" card
+   to the same height as the diagnostic panel. */
+#student-dashboard .items-start > .aicee-panel {
+    align-self: start;
+}
+
+@media (min-width: 1024px) {
+    .login-showcase {
+        justify-content: flex-start !important;
+        gap: 0 !important;
+        padding-top: clamp(30px, 4.2vh, 58px) !important;
+        padding-bottom: clamp(28px, 4vh, 54px) !important;
+    }
+
+    /* The copy now has a deliberate vertical position instead of floating
+       in a large justify-between gap. */
+    .login-showcase-copy {
+        width: min(58%, 600px) !important;
+        max-width: min(58%, 600px) !important;
+        margin-top: clamp(34px, 7vh, 92px) !important;
+        margin-bottom: 24px !important;
+    }
+
+    .login-showcase-copy h1 {
+        font-size: clamp(2.55rem, 4.15vw, 4.7rem) !important;
+        line-height: 1.02 !important;
+        max-width: 760px;
+    }
+
+    .login-showcase-copy > p {
+        max-width: 560px !important;
+    }
+
+    /* Keep the small bottom status row at the bottom without forcing
+       the main copy to sit in the exact center of a tall screen. */
+    .login-showcase > .flex.items-center.justify-between {
+        margin-top: auto !important;
+        padding-top: 24px;
+        max-width: 60%;
+    }
+
+    /* Critical mascot fix:
+       use top + bottom bounds instead of a fixed/min height. That makes the
+       stage always fit INSIDE the showcase even on shorter laptop screens. */
+    .aicee-3d-wrap {
+        top: clamp(112px, 14vh, 150px) !important;
+        right: clamp(4px, 1.2vw, 22px) !important;
+        bottom: clamp(14px, 2vh, 24px) !important;
+        width: clamp(330px, 43%, 500px) !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .aicee-3d-stage {
+        inset: 0 !important;
+        overflow: visible !important;
+    }
+
+    .aicee-3d-stage canvas {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain;
+    }
+
+    /* Login form side: use the empty space as quiet visual framing,
+       while giving the actual card a little more presence. */
+    .login-form-side {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        padding-left: clamp(30px, 4vw, 72px) !important;
+        padding-right: clamp(30px, 4vw, 72px) !important;
+        background:
+            radial-gradient(circle at 78% 18%, rgba(var(--aicee-accent-rgb), .12), transparent 24%),
+            radial-gradient(circle at 18% 82%, rgba(124, 58, 237, .09), transparent 24%),
+            color-mix(in srgb, var(--aicee-bg) 92%, transparent) !important;
+    }
+
+    .login-form-side::before,
+    .login-form-side::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        pointer-events: none;
+        border-radius: 999px;
+        border: 1px solid rgba(var(--aicee-accent-rgb), .10);
+    }
+
+    .login-form-side::before {
+        width: min(42vw, 560px);
+        aspect-ratio: 1;
+        right: -28%;
+        top: -18%;
+        box-shadow:
+            0 0 0 52px rgba(var(--aicee-accent-rgb), .025),
+            0 0 0 104px rgba(var(--aicee-accent-rgb), .018);
+    }
+
+    .login-form-side::after {
+        width: 240px;
+        height: 240px;
+        left: -118px;
+        bottom: -98px;
+        background: rgba(var(--aicee-accent-rgb), .025);
+    }
+
+    .login-card-wrap {
+        width: min(100%, 520px) !important;
+        max-width: 520px !important;
+    }
+
+    .login-card {
+        padding: clamp(34px, 3.1vw, 46px) !important;
+        border-radius: 30px !important;
+        box-shadow:
+            0 32px 88px rgba(15, 23, 42, .13),
+            0 1px 0 rgba(255,255,255,.75) inset !important;
+    }
+}
+
+/* Short laptop screens: compress text/card spacing before the mascot
+   ever gets pushed outside the visible login panel. */
+@media (min-width: 1024px) and (max-height: 760px) {
+    .login-showcase-copy {
+        margin-top: 22px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .login-showcase-copy h1 {
+        font-size: clamp(2.25rem, 3.55vw, 3.65rem) !important;
+    }
+
+    .login-showcase-copy .login-stat-card {
+        min-height: 100px;
+        padding: 14px;
+    }
+
+    .login-showcase-copy .grid.grid-cols-3 {
+        margin-top: 24px !important;
+    }
+
+    .aicee-3d-wrap {
+        top: 96px !important;
+        bottom: 10px !important;
+        width: clamp(300px, 40%, 430px) !important;
+    }
+
+    .aicee-speech-bubble {
+        top: 3% !important;
+        left: -30px !important;
+        transform: scale(.92);
+        transform-origin: top right;
+    }
+
+    .login-card {
+        padding: 30px !important;
+    }
+}
+
+/* Narrow desktop range: undo the older negative-right positioning that
+   could make the mascot feel clipped. */
+@media (min-width: 1024px) and (max-width: 1180px) {
+    .login-showcase-copy {
+        width: 59% !important;
+        max-width: 59% !important;
+    }
+
+    .aicee-3d-wrap {
+        right: 0 !important;
+        width: 42% !important;
+        min-width: 300px;
+    }
+}
