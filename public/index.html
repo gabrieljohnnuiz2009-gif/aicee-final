@@ -200,7 +200,7 @@
                                     id="email"
                                     type="email"
                                     autocomplete="email"
-                                    placeholder="name@aicee.com"
+                                    placeholder="name@school.edu"
                                     class="aicee-input"
                                 >
                             </div>
@@ -1756,7 +1756,12 @@
                         <div class="text-xs text-gray-500">Personalized learning companion</div>
                     </div>
                 </div>
-                <button onclick="closeAIModal()" class="text-3xl leading-none text-gray-400 hover:text-gray-600">×</button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="clearAIChatHistory()" class="px-3 py-2 rounded-xl text-xs font-semibold text-gray-500 hover:text-red-600 hover:bg-red-50 transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Clear chat
+                    </button>
+                    <button onclick="closeAIModal()" class="text-3xl leading-none text-gray-400 hover:text-gray-600">×</button>
+                </div>
             </div>
             
             <div class="h-96 p-6 overflow-auto bg-gray-50" id="ai-chat-log"></div>
@@ -1765,7 +1770,7 @@
                 <div class="mb-4">
                     <label for="ai-module-select" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Teacher Learning Material</label>
                     <select id="ai-module-select" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-blue-500"><option value="">No specific learning material</option></select>
-                    <p class="text-[11px] text-gray-400 mt-2">Select a teacher-provided PDF if you want AIcee to answer using that learning material.</p>
+                    <p class="text-[11px] text-gray-400 mt-2">Select a teacher-provided PDF if you want AIcee to use that learning material as the main reference. AIcee also remembers recent study conversations for continuity.</p>
                 </div>
                 <div class="flex gap-3">
                     <input id="ai-input" onkeypress="if(event.key === 'Enter') sendAIMessage()" type="text" placeholder="Ask AIcee about what you're studying..." class="flex-1 px-6 py-4 bg-white border border-gray-200 rounded-3xl focus:outline-none focus:border-blue-500">
