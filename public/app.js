@@ -3507,30 +3507,250 @@ async function loadAIceeLearningMaterials(){
     }catch(e){console.error("Learning materials load error:",e);}
 }
 
+function appendAIChatMessage(role, text, options = {}) {
+    const chat = document.getElementById("ai-chat-log");
+    if (!chat) return;
+
+    const messageText = String(text || "").trim();
+    if (!messageText) return;
+
+    if (role === "user") {
+        const wrapper = document.createElement("div");
+        wrapper.className = "flex justify-end mb-6";
+
+        const bubble = document.createElement("div");
+        bubble.className =
+            "aicee-chat-bubble aicee-user-bubble px-5 py-3 rounded-3xl max-w-[70%] whitespace-pre-wrap break-words";
+        bubble.textContent = messageText;
+
+        if (options.moduleTitle) {
+            const material = document.createElement("div");
+            material.className = "text-[11px] opacity-70 mt-2";
+            material.textContent = `Material: ${options.moduleTitle}`;
+            bubble.appendChild(material);
+        }
+
+        wrapper.appendChild(bubble);
+        chat.appendChild(wrapper);
+        return;
+    }
+
+    const bubble = document.createElement("div");
+    bubble.className = options.warning
+        ? "aicee-chat-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words bg-amber-50 border border-amber-200 text-amber-800 mb-4"
+        : options.fallback
+            ? "aicee-chat-bubble aicee-error-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words mb-4"
+            : "aicee-chat-bubble aicee-assistant-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
+
+    bubble.textContent = messageText;
+    chat.appendChild(bubble);
+}
+
+async function loadAIChatHistory() {
+    if (currentRole !== "student" || !currentUser.id) {
+        return [];
+    }
+
+    try {
+        const response = await fetch(
+            `/chat-history/${currentUser.id}?limit=50`
+        );
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Failed to load AIcee chat history."
+            );
+        }
+
+        const messages = Array.isArray(data.messages)
+            ? data.messages
+            : [];
+
+        messages.forEach(item => {
+            appendAIChatMessage(
+                item.role === "user" ? "user" : "model",
+                item.message,
+                {
+                    moduleTitle: item.module_title || null,
+                    fallback: Boolean(item.fallback)
+                }
+            );
+        });
+
+        return messages;
+    } catch (error) {
+        console.error(
+            "AIcee chat history load error:",
+            error
+        );
+        return [];
+    }
+}
+
+async function clearAIChatHistory() {
+    if (currentRole !== "student" || !currentUser.id) {
+        return;
+    }
+
+    const confirmed = await showConfirmPopup({
+        title: "Clear AIcee chat history?",
+        message:
+            "This removes your saved AIcee conversation history from the prototype.",
+        confirmText: "Clear history",
+        cancelText: "Cancel",
+        type: "warning"
+    });
+
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch(
+            `/chat-history/${currentUser.id}`,
+            {
+                method: "DELETE"
+            }
+        );
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Failed to clear chat history."
+            );
+        }
+
+        await openAIAssistant();
+    } catch (error) {
+        console.error(
+            "AIcee chat history clear error:",
+            error
+        );
+        showLegacyAlert(
+            "Could not clear AIcee chat history."
+        );
+    }
+}
+
 async function openAIAssistant() {
-    const modal=document.getElementById("ai-modal"); if(!modal) return; modal.classList.remove("hidden");
+    const modal = document.getElementById("ai-modal");
+    if (!modal) return;
+
+    modal.classList.remove("hidden");
     await loadAIceeLearningMaterials();
-    const chat=document.getElementById("ai-chat-log"); if(!chat) return; chat.innerHTML="";
-    const greeting=document.createElement("div"); greeting.className="aicee-chat-bubble aicee-assistant-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words";
-    const firstName=String(currentUser.name||"Student").trim().split(/\s+/)[0]||"Student"; const focus=getPrototypeLearningSignals().needsFocus?.subject;
-    greeting.textContent=focus?`Hello ${firstName}! Based on your latest diagnostic profile, ${focus} may be useful to review. You can also choose a teacher-provided PDF below so I can study directly from that material.`:`Hello ${firstName}! Ask me about any lesson, or choose a teacher-provided PDF below so I can guide you using that learning material.`;
+
+    const chat = document.getElementById("ai-chat-log");
+    if (!chat) return;
+
+    chat.innerHTML = "";
+
+    const greeting = document.createElement("div");
+    greeting.className =
+        "aicee-chat-bubble aicee-assistant-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
+
+    const firstName =
+        String(currentUser.name || "Student")
+            .trim()
+            .split(/\s+/)[0] || "Student";
+
+    const focus =
+        getPrototypeLearningSignals().needsFocus?.subject;
+
+    greeting.textContent = focus
+        ? `Hello ${firstName}! Based on your latest diagnostic profile, ${focus} may be useful to review. Your recent AIcee chat history will also appear here. You can choose a teacher-provided PDF below when you want to study from a specific material.`
+        : `Hello ${firstName}! Your recent AIcee chat history will appear here. Ask me about any lesson, or choose a teacher-provided PDF below so I can guide you using that learning material.`;
+
     chat.appendChild(greeting);
+
+    await loadAIChatHistory();
+    chat.scrollTop = chat.scrollHeight;
 }
 
 function closeAIModal() {
-    const modal = document.getElementById('ai-modal');
-    if (modal) modal.classList.add('hidden');
+    const modal = document.getElementById("ai-modal");
+    if (modal) modal.classList.add("hidden");
 }
 
 async function sendAIMessage() {
-    const input=document.getElementById("ai-input"); if(!input||!input.value.trim()) return;
-    const chat=document.getElementById("ai-chat-log"); if(!chat) return;
-    const question=input.value.trim(); const select=document.getElementById("ai-module-select"); const moduleId=select?.value?Number(select.value):null;
-    const user=document.createElement("div");user.className="flex justify-end mb-6";const bubble=document.createElement("div");bubble.className="aicee-chat-bubble aicee-user-bubble px-5 py-3 rounded-3xl max-w-[70%] whitespace-pre-wrap break-words";bubble.textContent=question;user.appendChild(bubble);chat.appendChild(user);input.value="";
-    try{
-        const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:question,userId:currentUser.id,moduleId})});
-        const d=await r.json(); const m=document.createElement("div");m.className="aicee-chat-bubble aicee-assistant-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words";m.textContent=String(d.reply||"AIcee did not return a response.");chat.appendChild(m);chat.scrollTop=chat.scrollHeight;
-    }catch(e){console.error(e);const m=document.createElement("div");m.className="aicee-chat-bubble aicee-error-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words";m.textContent="Sorry, AIcee is currently unavailable.";chat.appendChild(m);}
+    const input = document.getElementById("ai-input");
+    if (!input || !input.value.trim()) return;
+
+    const chat = document.getElementById("ai-chat-log");
+    if (!chat) return;
+
+    const question = input.value.trim();
+    const select = document.getElementById("ai-module-select");
+    const moduleId = select?.value
+        ? Number(select.value)
+        : null;
+
+    const selectedMaterial = Array.isArray(aiLearningMaterials)
+        ? aiLearningMaterials.find(
+            item => Number(item.id) === Number(moduleId)
+        )
+        : null;
+
+    appendAIChatMessage(
+        "user",
+        question,
+        {
+            moduleTitle:
+                selectedMaterial?.title || null
+        }
+    );
+
+    input.value = "";
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: question,
+                userId: currentUser.id,
+                moduleId
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.warning) {
+            appendAIChatMessage(
+                "model",
+                data.warning,
+                {
+                    warning: true
+                }
+            );
+        }
+
+        appendAIChatMessage(
+            "model",
+            String(
+                data.reply ||
+                "AIcee did not return a response."
+            ),
+            {
+                fallback: Boolean(data.fallback)
+            }
+        );
+
+        chat.scrollTop = chat.scrollHeight;
+    } catch (error) {
+        console.error(error);
+
+        appendAIChatMessage(
+            "model",
+            "Sorry, AIcee is currently unavailable.",
+            {
+                fallback: true
+            }
+        );
+
+        chat.scrollTop = chat.scrollHeight;
+    }
 }
 
 async function showUploadModal() {
