@@ -13,9 +13,6 @@ const db = require("./database");
 
 const app = express();
 
-// Railway sits behind a reverse proxy.
-app.set("trust proxy", 1);
-
 /* =========================================
    SECURITY CONFIGURATION
 ========================================= */
@@ -387,7 +384,9 @@ async function initializeSecurityStorage() {
    FILE UPLOAD CONFIGURATION
 ========================================= */
 
-const uploadDirectory = path.resolve("uploads");
+const uploadDirectory = path.resolve(
+    process.env.UPLOAD_DIR || path.join(__dirname, "uploads")
+);
 
 // Railway volumes are mounted at runtime. Ensure the directory also exists
 // during local development or when no volume is attached yet.
@@ -493,7 +492,7 @@ const ai = new GoogleGenAI({
 
 const geminiModel =
     process.env.GEMINI_MODEL ||
-    "gemini-3.6-flash";
+    "gemini-2.5-flash";
 
 /*
     Separate chat history per student.
@@ -537,39 +536,220 @@ function isPdfLearningMaterial(file) {
 }
 
 async function getGeminiPdfForModule(moduleRow) {
-    if (!moduleRow?.id || !moduleRow?.file) throw new Error("Learning material file is missing.");
-    if (!isPdfLearningMaterial(moduleRow.file)) throw new Error("AIcee can currently read PDF learning materials only.");
+    if (!moduleRow?.id || !moduleRow?.file) {
+        return {
+            available: false,
+            reason: "missing_database_file_reference"
+        };
+    }
+
+    if (!isPdfLearningMaterial(moduleRow.file)) {
+        return {
+            available: false,
+            reason: "unsupported_file_type"
+        };
+    }
+
     const moduleId = Number(moduleRow.id);
     const cached = geminiModuleFileCache.get(moduleId);
-    if (cached && cached.uri && cached.mimeType && cached.expiresAt > Date.now()) return cached;
+
+    if (
+        cached &&
+        cached.uri &&
+        cached.mimeType &&
+        cached.expiresAt > Date.now()
+    ) {
+        return cached;
+    }
 
     const filePath = path.join(uploadDirectory, moduleRow.file);
-    await fs.access(filePath);
+
+    try {
+        await fs.access(filePath);
+    } catch (error) {
+        if (error?.code === "ENOENT") {
+            console.warn(
+                `Learning material file is missing from persistent storage: ${filePath}`
+            );
+
+            return {
+                available: false,
+                reason: "missing_local_file",
+                filePath
+            };
+        }
+
+        throw error;
+    }
+
     const uploaded = await ai.files.upload({
         file: filePath,
-        config: { mimeType: "application/pdf", displayName: String(moduleRow.title || path.basename(filePath)) }
+        config: {
+            mimeType: "application/pdf",
+            displayName: String(
+                moduleRow.title || path.basename(filePath)
+            )
+        }
     });
-    let processed = await ai.files.get({ name: uploaded.name });
+
+    let processed = await ai.files.get({
+        name: uploaded.name
+    });
+
     let attempts = 0;
-    while (String(processed.state || "").toUpperCase() === "PROCESSING" && attempts < 30) {
+
+    while (
+        String(processed.state || "").toUpperCase() === "PROCESSING" &&
+        attempts < 30
+    ) {
         await wait(2000);
-        processed = await ai.files.get({ name: uploaded.name });
+        processed = await ai.files.get({
+            name: uploaded.name
+        });
         attempts++;
     }
-    if (String(processed.state || "").toUpperCase() === "FAILED") throw new Error("Gemini failed to process the PDF.");
+
+    if (
+        String(processed.state || "").toUpperCase() === "FAILED"
+    ) {
+        throw new Error(
+            "Gemini failed to process the PDF."
+        );
+    }
+
     const ready = {
+        available: true,
         name: processed.name || uploaded.name,
         uri: processed.uri || uploaded.uri,
-        mimeType: processed.mimeType || uploaded.mimeType || "application/pdf",
+        mimeType:
+            processed.mimeType ||
+            uploaded.mimeType ||
+            "application/pdf",
         expiresAt: Date.now() + GEMINI_FILE_CACHE_MS
     };
-    if (!ready.uri) throw new Error("Gemini did not return a usable file URI.");
+
+    if (!ready.uri) {
+        throw new Error(
+            "Gemini did not return a usable file URI."
+        );
+    }
+
     geminiModuleFileCache.set(moduleId, ready);
     return ready;
 }
 
-const aiConversationHistory = new Map();
-const AI_HISTORY_LIMIT = 10;
+const AI_HISTORY_CONTEXT_LIMIT = Math.min(
+    30,
+    Math.max(
+        4,
+        Number(process.env.AI_HISTORY_CONTEXT_LIMIT) || 12
+    )
+);
+
+const AI_HISTORY_DISPLAY_LIMIT = Math.min(
+    100,
+    Math.max(
+        10,
+        Number(process.env.AI_HISTORY_DISPLAY_LIMIT) || 50
+    )
+);
+
+async function initializeAIStorage() {
+    await db.query(`
+        CREATE TABLE IF NOT EXISTS ai_chat_messages (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            user_id BIGINT NOT NULL,
+            role VARCHAR(10) NOT NULL,
+            message TEXT NOT NULL,
+            module_id BIGINT NULL,
+            module_title VARCHAR(255) NULL,
+            is_fallback TINYINT(1) NOT NULL DEFAULT 0,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_ai_chat_user_created (user_id, created_at),
+            INDEX idx_ai_chat_user_id (user_id, id)
+        )
+    `);
+}
+
+async function getAIConversationHistory(
+    userId,
+    limit = AI_HISTORY_CONTEXT_LIMIT
+) {
+    const safeLimit = Math.min(
+        30,
+        Math.max(2, Number(limit) || AI_HISTORY_CONTEXT_LIMIT)
+    );
+
+    const [rows] = await db.query(`
+        SELECT role, message, module_title
+        FROM ai_chat_messages
+        WHERE user_id = ?
+          AND is_fallback = 0
+          AND role IN ('user', 'model')
+        ORDER BY id DESC
+        LIMIT ${safeLimit}
+    `, [userId]);
+
+    return rows
+        .reverse()
+        .map(row => {
+            const baseMessage = String(row.message || "");
+            const materialNote =
+                row.role === "user" && row.module_title
+                    ? `\n\n[Learning material used: ${row.module_title}]`
+                    : "";
+
+            return {
+                role: row.role === "model" ? "model" : "user",
+                parts: [
+                    {
+                        text: `${baseMessage}${materialNote}`
+                    }
+                ]
+            };
+        });
+}
+
+async function saveAIChatMessage({
+    userId,
+    role,
+    message,
+    moduleId = null,
+    moduleTitle = null,
+    isFallback = false
+}) {
+    const normalizedRole =
+        role === "model" ? "model" : "user";
+
+    const normalizedMessage = String(message || "").trim();
+
+    if (!Number.isInteger(Number(userId)) || !normalizedMessage) {
+        return;
+    }
+
+    await db.query(`
+        INSERT INTO ai_chat_messages
+        (
+            user_id,
+            role,
+            message,
+            module_id,
+            module_title,
+            is_fallback
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+    `, [
+        Number(userId),
+        normalizedRole,
+        normalizedMessage,
+        Number.isInteger(Number(moduleId))
+            ? Number(moduleId)
+            : null,
+        moduleTitle ? String(moduleTitle).slice(0, 255) : null,
+        isFallback ? 1 : 0
+    ]);
+}
 
 function createPersonalizedFallback(context) {
     const lines = ["AIcee's online AI response is temporarily unavailable, but I can still use your latest diagnostic learning profile."];
@@ -594,7 +774,6 @@ function createPersonalizedFallback(context) {
 ========================================= */
 
 app.get("/api/health", (req, res) => res.json({ success: true, status: "ok" }));
-app.get("/health", (req, res) => res.json({ success: true, status: "ok" }));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 
 
@@ -630,95 +809,470 @@ app.get("/ai-learning-materials/:studentId", authenticateToken, requireRole("stu
 });
 
 /* =========================================
+   PERSISTENT AI CHAT HISTORY
+========================================= */
+
+app.get(
+    "/chat-history/:studentId",
+    authenticateToken,
+    requireRole("student"),
+    requireSelfParam("studentId"),
+    async (req, res) => {
+        try {
+            const studentId = Number(req.params.studentId);
+            const requestedLimit = Number(req.query.limit);
+            const limit = Math.min(
+                AI_HISTORY_DISPLAY_LIMIT,
+                Math.max(
+                    1,
+                    Number.isFinite(requestedLimit)
+                        ? Math.floor(requestedLimit)
+                        : AI_HISTORY_DISPLAY_LIMIT
+                )
+            );
+
+            const [rows] = await db.query(`
+                SELECT
+                    id,
+                    role,
+                    message,
+                    module_id,
+                    module_title,
+                    is_fallback,
+                    created_at
+                FROM ai_chat_messages
+                WHERE user_id = ?
+                ORDER BY id DESC
+                LIMIT ${limit}
+            `, [studentId]);
+
+            res.json({
+                success: true,
+                messages: rows.reverse().map(row => ({
+                    id: Number(row.id),
+                    role: row.role,
+                    message: row.message,
+                    module_id:
+                        row.module_id === null
+                            ? null
+                            : Number(row.module_id),
+                    module_title: row.module_title || null,
+                    fallback: Boolean(row.is_fallback),
+                    created_at: row.created_at
+                }))
+            });
+        } catch (error) {
+            console.error(
+                "AI chat history load error:",
+                error
+            );
+
+            res.status(500).json({
+                success: false,
+                message: "Failed to load AIcee chat history."
+            });
+        }
+    }
+);
+
+app.delete(
+    "/chat-history/:studentId",
+    authenticateToken,
+    requireRole("student"),
+    requireSelfParam("studentId"),
+    async (req, res) => {
+        try {
+            const studentId = Number(req.params.studentId);
+
+            await db.query(`
+                DELETE FROM ai_chat_messages
+                WHERE user_id = ?
+            `, [studentId]);
+
+            res.json({
+                success: true,
+                message: "AIcee chat history cleared."
+            });
+        } catch (error) {
+            console.error(
+                "AI chat history clear error:",
+                error
+            );
+
+            res.status(500).json({
+                success: false,
+                message: "Failed to clear AIcee chat history."
+            });
+        }
+    }
+);
+
+/* =========================================
    PERSONALIZED AI CHAT
 ========================================= */
 
 app.post("/chat", authenticateToken, requireRole("student"), requireSelfBody("userId"), async (req, res) => {
-    let studentContext = { latest_diagnostic: [], progress_trends: [] };
+    let studentContext = {
+        latest_diagnostic: [],
+        progress_trends: []
+    };
+
+    let message = "";
+    let userId = null;
+    let selectedModule = null;
+    let pdfWarning = null;
+
     try {
-        const message = String(req.body.message || "").trim();
-        const userId = Number(req.body.userId);
+        message = String(req.body.message || "").trim();
+        userId = Number(req.body.userId);
         const requestedModuleId = Number(req.body.moduleId);
-        if (!Number.isInteger(userId) || !message) return res.status(400).json({ reply: "Message and a valid student account are required." });
-        if (message.length > 2000) return res.status(400).json({ reply: "Please keep your message below 2,000 characters." });
+
+        if (!Number.isInteger(userId) || !message) {
+            return res.status(400).json({
+                reply: "Message and a valid student account are required."
+            });
+        }
+
+        if (message.length > 2000) {
+            return res.status(400).json({
+                reply: "Please keep your message below 2,000 characters."
+            });
+        }
 
         const [studentRows] = await db.query(`
-            SELECT users.id, users.name, users.role, users.bio, users.section_id, sections.section_name
-            FROM users LEFT JOIN sections ON sections.id = users.section_id
-            WHERE users.id = ? LIMIT 1
+            SELECT
+                users.id,
+                users.name,
+                users.role,
+                users.bio,
+                users.section_id,
+                sections.section_name
+            FROM users
+            LEFT JOIN sections
+                ON sections.id = users.section_id
+            WHERE users.id = ?
+            LIMIT 1
         `, [userId]);
-        if (!studentRows.length) return res.status(404).json({ reply: "Student account not found." });
+
+        if (!studentRows.length) {
+            return res.status(404).json({
+                reply: "Student account not found."
+            });
+        }
+
         const student = studentRows[0];
 
         const [latestRows] = await db.query(`
-            SELECT subject, score, total_questions,
-                   CASE WHEN total_questions>0 THEN ROUND((score/total_questions)*100,1) ELSE 0 END AS percentage
-            FROM diagnostic_results WHERE student_id = ? ORDER BY subject
+            SELECT
+                subject,
+                score,
+                total_questions,
+                CASE
+                    WHEN total_questions > 0
+                    THEN ROUND((score / total_questions) * 100, 1)
+                    ELSE 0
+                END AS percentage
+            FROM diagnostic_results
+            WHERE student_id = ?
+            ORDER BY subject
         `, [userId]);
-        const latestDiagnostic = latestRows.map(r => ({ subject: r.subject, score: Number(r.score), total_questions: Number(r.total_questions), percentage: Number(r.percentage) }));
+
+        const latestDiagnostic = latestRows.map(row => ({
+            subject: row.subject,
+            score: Number(row.score),
+            total_questions: Number(row.total_questions),
+            percentage: Number(row.percentage)
+        }));
 
         const [historyRows] = await db.query(`
-            SELECT da.id AS attempt_id, da.taken_at, dar.subject, dar.score, dar.total_questions, dar.percentage
-            FROM diagnostic_attempts da JOIN diagnostic_attempt_results dar ON dar.attempt_id=da.id
-            WHERE da.student_id=? ORDER BY da.taken_at DESC, dar.subject LIMIT 200
+            SELECT
+                da.id AS attempt_id,
+                da.taken_at,
+                dar.subject,
+                dar.score,
+                dar.total_questions,
+                dar.percentage
+            FROM diagnostic_attempts da
+            JOIN diagnostic_attempt_results dar
+                ON dar.attempt_id = da.id
+            WHERE da.student_id = ?
+            ORDER BY da.taken_at DESC, dar.subject
+            LIMIT 200
         `, [userId]);
-        const attemptsMap = new Map();
-        historyRows.forEach(r => {
-            const id = Number(r.attempt_id);
-            if (!attemptsMap.has(id)) attemptsMap.set(id, { attempt_id: id, taken_at: r.taken_at, results: [] });
-            attemptsMap.get(id).results.push({ subject: r.subject, score: Number(r.score), total_questions: Number(r.total_questions), percentage: Number(r.percentage) });
-        });
-        const recentAttempts = [...attemptsMap.values()].slice(0, 8);
-        const subjectHistory = {};
-        recentAttempts.forEach(a => a.results.forEach(r => (subjectHistory[r.subject] ||= []).push(Number(r.percentage))));
-        const progressTrends = Object.entries(subjectHistory).map(([subject, p]) => ({ subject, current: p[0], previous: p.length > 1 ? p[1] : null, change: p.length > 1 ? Number((p[0] - p[1]).toFixed(1)) : 0 }));
 
-        let selectedModule = null, geminiPdf = null;
-        if (Number.isInteger(requestedModuleId) && requestedModuleId > 0) {
-            if (!student.section_id) return res.status(400).json({ reply: "Your account does not currently have a section." });
+        const attemptsMap = new Map();
+
+        historyRows.forEach(row => {
+            const attemptId = Number(row.attempt_id);
+
+            if (!attemptsMap.has(attemptId)) {
+                attemptsMap.set(attemptId, {
+                    attempt_id: attemptId,
+                    taken_at: row.taken_at,
+                    results: []
+                });
+            }
+
+            attemptsMap.get(attemptId).results.push({
+                subject: row.subject,
+                score: Number(row.score),
+                total_questions: Number(row.total_questions),
+                percentage: Number(row.percentage)
+            });
+        });
+
+        const recentAttempts = [
+            ...attemptsMap.values()
+        ].slice(0, 8);
+
+        const subjectHistory = {};
+
+        recentAttempts.forEach(attempt => {
+            attempt.results.forEach(result => {
+                (subjectHistory[result.subject] ||= []).push(
+                    Number(result.percentage)
+                );
+            });
+        });
+
+        const progressTrends = Object.entries(
+            subjectHistory
+        ).map(([subject, percentages]) => ({
+            subject,
+            current: percentages[0],
+            previous:
+                percentages.length > 1
+                    ? percentages[1]
+                    : null,
+            change:
+                percentages.length > 1
+                    ? Number(
+                        (
+                            percentages[0] -
+                            percentages[1]
+                        ).toFixed(1)
+                    )
+                    : 0
+        }));
+
+        let geminiPdf = null;
+
+        if (
+            Number.isInteger(requestedModuleId) &&
+            requestedModuleId > 0
+        ) {
+            if (!student.section_id) {
+                return res.status(400).json({
+                    reply: "Your account does not currently have a section."
+                });
+            }
+
             const [moduleRows] = await db.query(`
-                SELECT DISTINCT modules.id, modules.title, modules.description, modules.file, modules.teacher_id
-                FROM modules JOIN module_sections ON module_sections.module_id=modules.id
-                WHERE modules.id=? AND module_sections.section_id=? LIMIT 1
-            `, [requestedModuleId, student.section_id]);
-            if (!moduleRows.length) return res.status(403).json({ reply: "That learning material is not assigned to your section." });
+                SELECT DISTINCT
+                    modules.id,
+                    modules.title,
+                    modules.description,
+                    modules.file,
+                    modules.teacher_id
+                FROM modules
+                JOIN module_sections
+                    ON module_sections.module_id = modules.id
+                WHERE modules.id = ?
+                  AND module_sections.section_id = ?
+                LIMIT 1
+            `, [
+                requestedModuleId,
+                student.section_id
+            ]);
+
+            if (!moduleRows.length) {
+                return res.status(403).json({
+                    reply: "That learning material is not assigned to your section."
+                });
+            }
+
             selectedModule = moduleRows[0];
-            if (!isPdfLearningMaterial(selectedModule.file)) return res.status(400).json({ reply: "AIcee can currently read PDF learning materials directly. Please choose a PDF module." });
-            geminiPdf = await getGeminiPdfForModule(selectedModule);
+
+            if (!isPdfLearningMaterial(selectedModule.file)) {
+                return res.status(400).json({
+                    reply: "AIcee can currently read PDF learning materials directly. Please choose a PDF module."
+                });
+            }
+
+            const pdfResult =
+                await getGeminiPdfForModule(selectedModule);
+
+            if (pdfResult?.available === false) {
+                pdfWarning =
+                    "The selected teacher PDF is currently unavailable on the server. AIcee continued without using that PDF. Please ask the teacher to re-upload the material.";
+            } else {
+                geminiPdf = pdfResult;
+            }
         }
 
         studentContext = {
-            profile: { name: student.name, section: student.section_name || "No section assigned", learning_bio: student.bio || "No learning bio provided" },
+            profile: {
+                name: student.name,
+                section:
+                    student.section_name ||
+                    "No section assigned",
+                learning_bio:
+                    student.bio ||
+                    "No learning bio provided"
+            },
             latest_diagnostic: latestDiagnostic,
             recent_diagnostic_attempts: recentAttempts,
             progress_trends: progressTrends,
-            selected_learning_material: selectedModule ? { id: Number(selectedModule.id), title: selectedModule.title, description: selectedModule.description || "" } : null
+            selected_learning_material:
+                selectedModule
+                    ? {
+                        id: Number(selectedModule.id),
+                        title: selectedModule.title,
+                        description:
+                            selectedModule.description || "",
+                        pdf_available: Boolean(geminiPdf)
+                    }
+                    : null
         };
+
+        const directAnswerSeeking =
+            /\b(just\s+(give|tell)|give\s+me\s+(the\s+)?answer|answers?\s+only|final\s+answer|sagot\s+lang|ibigay\s+(mo\s+)?(na\s+)?(yung|ang)?\s*sagot)\b/i.test(
+                message
+            );
 
         const systemInstruction = `You are AIcee, a personalized AI study companion for Senior High School students inside AICEE.
 PRIMARY PURPOSE: Help the student genuinely understand lessons instead of simply giving answers.
-TEACHING: Use Socratic guidance when appropriate; ask short guiding questions and hints before a complete solution. Adjust explanation complexity using the latest diagnostic proficiency. Recognize improvement or decline across recurring diagnostics. Match the student's language.
-DIAGNOSTICS: Recurring diagnostic assessments are the primary objective personalization signal. Never invent scores or trends.
+SOCRATIC GUARDRAIL: For problem-solving, homework-style, quiz-style, or answer-seeking requests, do not immediately provide the final answer. Start with a short hint, guiding question, worked first step, or concept check. If the student asks to "just give the answer," politely keep the learning-first approach and ask for or guide one meaningful attempt before revealing a complete worked explanation. For simple factual questions where withholding the answer would not improve learning, answer normally and explain briefly.
+DIRECT-ANSWER SIGNAL FOR THIS TURN: ${directAnswerSeeking ? "The student appears to be asking for a direct/final answer. Enforce the Socratic guardrail." : "No strong direct-answer signal detected; use normal educational judgment."}
+TEACHING: Adjust explanation complexity using the latest diagnostic proficiency. Recognize improvement or decline across recurring diagnostics. Match the student's language.
+DIAGNOSTICS: Recurring diagnostic assessments are the primary objective personalization signal. Never invent scores or trends. Diagnostic results are not official grades.
 LEARNING BIO: Treat the student's bio as self-provided context, not a verified academic measurement.
-TEACHER MATERIALS: If a teacher-provided PDF is attached to this request, use it as the primary source for questions about that material. Do not claim the file permanently trained you. If the answer is not supported by the attached material, say so.
+TEACHER MATERIALS: If a teacher-provided PDF is attached to this request, use it as the primary source for questions about that material. Do not claim the file permanently trained you. If the material is selected but pdf_available is false, clearly state that the PDF could not be loaded and do not pretend to have read it.
 PRIVACY: Never reveal another student's information or raw database/API/system details.
-AICEE STUDENT CONTEXT:\n${JSON.stringify(studentContext, null, 2)}`;
+AICEE STUDENT CONTEXT:
+${JSON.stringify(studentContext, null, 2)}`;
 
-        const previousHistory = aiConversationHistory.get(userId) || [];
+        const previousHistory =
+            await getAIConversationHistory(
+                userId,
+                AI_HISTORY_CONTEXT_LIMIT
+            );
+
         const parts = [];
-        if (geminiPdf) parts.push(createPartFromUri(geminiPdf.uri, geminiPdf.mimeType));
+
+        if (geminiPdf) {
+            parts.push(
+                createPartFromUri(
+                    geminiPdf.uri,
+                    geminiPdf.mimeType
+                )
+            );
+        }
+
         parts.push(message);
-        const requestUserMessage = createUserContent(parts);
-        const response = await ai.models.generateContent({ model: geminiModel, contents: [...previousHistory, requestUserMessage], config: { systemInstruction, temperature: 0.45, maxOutputTokens: 900 } });
-        const aiReply = String(response.text || "").trim();
-        if (!aiReply) throw new Error("Gemini returned an empty response.");
-        const historyUser = { role: "user", parts: [{ text: selectedModule ? `${message}\n\n[Learning material used: ${selectedModule.title}]` : message }] };
-        const modelMessage = { role: "model", parts: [{ text: aiReply }] };
-        aiConversationHistory.set(userId, [...previousHistory, historyUser, modelMessage].slice(-AI_HISTORY_LIMIT));
-        return res.json({ reply: aiReply, personalized: true, fallback: false, context_used: { latest_diagnostic: latestDiagnostic.length, diagnostic_attempts: recentAttempts.length, learning_bio: Boolean(student.bio), learning_material: selectedModule?.title || null } });
+
+        const requestUserMessage =
+            createUserContent(parts);
+
+        const response =
+            await ai.models.generateContent({
+                model: geminiModel,
+                contents: [
+                    ...previousHistory,
+                    requestUserMessage
+                ],
+                config: {
+                    systemInstruction,
+                    temperature: 0.45,
+                    maxOutputTokens: 900
+                }
+            });
+
+        const aiReply = String(
+            response.text || ""
+        ).trim();
+
+        if (!aiReply) {
+            throw new Error(
+                "Gemini returned an empty response."
+            );
+        }
+
+        await saveAIChatMessage({
+            userId,
+            role: "user",
+            message,
+            moduleId: selectedModule?.id || null,
+            moduleTitle: selectedModule?.title || null
+        });
+
+        await saveAIChatMessage({
+            userId,
+            role: "model",
+            message: aiReply,
+            moduleId: selectedModule?.id || null,
+            moduleTitle: selectedModule?.title || null
+        });
+
+        return res.json({
+            reply: aiReply,
+            personalized: true,
+            fallback: false,
+            warning: pdfWarning,
+            context_used: {
+                latest_diagnostic:
+                    latestDiagnostic.length,
+                diagnostic_attempts:
+                    recentAttempts.length,
+                learning_bio: Boolean(student.bio),
+                learning_material:
+                    selectedModule?.title || null,
+                learning_material_pdf_loaded:
+                    Boolean(geminiPdf),
+                chat_history_messages:
+                    previousHistory.length
+            }
+        });
     } catch (error) {
         console.error("AIcee chat error:", error);
-        return res.json({ reply: createPersonalizedFallback(studentContext), personalized: true, fallback: true });
+
+        const fallbackReply =
+            createPersonalizedFallback(studentContext);
+
+        if (Number.isInteger(userId) && message) {
+            try {
+                await saveAIChatMessage({
+                    userId,
+                    role: "user",
+                    message,
+                    moduleId: selectedModule?.id || null,
+                    moduleTitle:
+                        selectedModule?.title || null
+                });
+
+                await saveAIChatMessage({
+                    userId,
+                    role: "model",
+                    message: fallbackReply,
+                    moduleId: selectedModule?.id || null,
+                    moduleTitle:
+                        selectedModule?.title || null,
+                    isFallback: true
+                });
+            } catch (historyError) {
+                console.error(
+                    "AI chat fallback history save error:",
+                    historyError
+                );
+            }
+        }
+
+        return res.json({
+            reply: fallbackReply,
+            personalized: true,
+            fallback: true,
+            warning: pdfWarning
+        });
     }
 });
 
@@ -2495,8 +3049,7 @@ app.delete("/module/:id", authenticateToken, requireRole("teacher"), requireSelf
             );
 
             const filePath = path.join(
-                __dirname,
-                "uploads",
+                uploadDirectory,
                 safeFileName
             );
 
@@ -5160,10 +5713,13 @@ app.put("/admin/sections/:sectionId", authenticateToken, requireRole("admin"), a
 
 async function startServer() {
     await initializeSecurityStorage();
+    await initializeAIStorage();
+
+    console.log(`AIcee upload directory: ${uploadDirectory}`);
 
     const PORT = Number(process.env.PORT) || 3000;
-    app.listen(PORT, "0.0.0.0", () => {
-        console.log(`AICEE running securely on port ${PORT}`);
+    app.listen(PORT, () => {
+        console.log(`AICEE running securely on http://localhost:${PORT}`);
     });
 }
 
