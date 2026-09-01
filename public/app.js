@@ -3670,53 +3670,505 @@ function closeAIModal() {
     if (modal) modal.classList.add("hidden");
 }
 
-async function sendAIMessage() {
-    const input = document.getElementById("ai-input");
-    if (!input || !input.value.trim()) return;
 
-    const chat = document.getElementById("ai-chat-log");
-    if (!chat) return;
+/* =========================================
+   AICEE THINKING / READING INDICATOR
+========================================= */
 
-    const question = input.value.trim();
-    const select = document.getElementById("ai-module-select");
-    const moduleId = select?.value
-        ? Number(select.value)
-        : null;
-
-    const selectedMaterial = Array.isArray(aiLearningMaterials)
-        ? aiLearningMaterials.find(
-            item => Number(item.id) === Number(moduleId)
+function ensureAIceeThinkingStyles() {
+    if (
+        document.getElementById(
+            "aicee-thinking-styles"
         )
-        : null;
+    ) {
+        return;
+    }
+
+    const style =
+        document.createElement("style");
+
+    style.id =
+        "aicee-thinking-styles";
+
+    style.textContent = `
+        @keyframes aiceeTypingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.45;
+            }
+
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+
+        .aicee-thinking-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: currentColor;
+            display: inline-block;
+            animation:
+                aiceeTypingBounce
+                1.2s
+                infinite
+                ease-in-out;
+        }
+
+        .aicee-thinking-dot:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .aicee-thinking-dot:nth-child(3) {
+            animation-delay: 0.30s;
+        }
+
+        #aicee-thinking-indicator {
+            animation:
+                aiceeThinkingAppear
+                0.2s
+                ease-out;
+        }
+
+        @keyframes aiceeThinkingAppear {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+}
+
+
+function showAIceeThinkingIndicator(
+    selectedMaterial = null
+) {
+    ensureAIceeThinkingStyles();
+
+    const chat =
+        document.getElementById(
+            "ai-chat-log"
+        );
+
+    if (!chat) {
+        return null;
+    }
+
+
+    /*
+        Remove old indicator just in case.
+    */
+
+    document
+        .getElementById(
+            "aicee-thinking-indicator"
+        )
+        ?.remove();
+
+
+    const wrapper =
+        document.createElement("div");
+
+    wrapper.id =
+        "aicee-thinking-indicator";
+
+    wrapper.className =
+        "mb-4 flex justify-start";
+
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        "aicee-chat-bubble " +
+        "aicee-assistant-bubble " +
+        "px-5 py-4 " +
+        "rounded-3xl " +
+        "max-w-[85%]";
+
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "flex items-start gap-3";
+
+
+    /*
+        Animated dots
+    */
+
+    const dots =
+        document.createElement("div");
+
+    dots.className =
+        "flex items-center gap-1 " +
+        "mt-1.5 shrink-0";
+
+    for (
+        let i = 0;
+        i < 3;
+        i++
+    ) {
+        const dot =
+            document.createElement("span");
+
+        dot.className =
+            "aicee-thinking-dot";
+
+        dots.appendChild(dot);
+    }
+
+
+    /*
+        Status text
+    */
+
+    const textContainer =
+        document.createElement("div");
+
+    textContainer.className =
+        "min-w-0";
+
+
+    const title =
+        document.createElement("div");
+
+    title.className =
+        "font-semibold text-sm";
+
+
+    const subtitle =
+        document.createElement("div");
+
+    subtitle.className =
+        "text-xs opacity-70 mt-1 " +
+        "leading-relaxed";
+
+
+    if (selectedMaterial) {
+
+        title.textContent =
+            "AIcee is reading your learning material...";
+
+        subtitle.textContent =
+            `Preparing a guided response using "${selectedMaterial.title}".`;
+
+    } else {
+
+        title.textContent =
+            "AIcee is reviewing your learning context...";
+
+        subtitle.textContent =
+            "Please wait while I prepare a guided response.";
+
+    }
+
+
+    textContainer.appendChild(title);
+    textContainer.appendChild(subtitle);
+
+    row.appendChild(dots);
+    row.appendChild(textContainer);
+
+    bubble.appendChild(row);
+    wrapper.appendChild(bubble);
+
+    chat.appendChild(wrapper);
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+
+    /*
+        Change the message if Gemini
+        needs a little more time.
+    */
+
+    const timers = [];
+
+
+    timers.push(
+        setTimeout(() => {
+
+            if (!wrapper.isConnected) {
+                return;
+            }
+
+            if (selectedMaterial) {
+
+                title.textContent =
+                    "AIcee is analyzing the material...";
+
+                subtitle.textContent =
+                    "Connecting the lesson with your learning profile.";
+
+            } else {
+
+                title.textContent =
+                    "AIcee is thinking through your question...";
+
+                subtitle.textContent =
+                    "Using your recent learning context to guide the response.";
+
+            }
+
+            chat.scrollTop =
+                chat.scrollHeight;
+
+        }, 3500)
+    );
+
+
+    timers.push(
+        setTimeout(() => {
+
+            if (!wrapper.isConnected) {
+                return;
+            }
+
+            title.textContent =
+                "AIcee is preparing your personalized guidance...";
+
+            subtitle.textContent =
+                selectedMaterial
+                    ? "Almost ready — I'm organizing the material into a clearer explanation."
+                    : "Almost ready — I'm organizing the response into helpful steps.";
+
+            chat.scrollTop =
+                chat.scrollHeight;
+
+        }, 7500)
+    );
+
+
+    timers.push(
+        setTimeout(() => {
+
+            if (!wrapper.isConnected) {
+                return;
+            }
+
+            title.textContent =
+                "Still working on it...";
+
+            subtitle.textContent =
+                selectedMaterial
+                    ? "Large learning materials may take a little longer to process."
+                    : "The AI service is taking a little longer than usual.";
+
+            chat.scrollTop =
+                chat.scrollHeight;
+
+        }, 14000)
+    );
+
+
+    /*
+        Return controller so sendAIMessage()
+        can remove it safely.
+    */
+
+    return {
+        element: wrapper,
+
+        remove() {
+
+            timers.forEach(timer =>
+                clearTimeout(timer)
+            );
+
+            wrapper.remove();
+        }
+    };
+}
+
+async function sendAIMessage() {
+
+    const input =
+        document.getElementById(
+            "ai-input"
+        );
+
+    if (
+        !input ||
+        !input.value.trim()
+    ) {
+        return;
+    }
+
+
+    const chat =
+        document.getElementById(
+            "ai-chat-log"
+        );
+
+    if (!chat) {
+        return;
+    }
+
+
+    const question =
+        input.value.trim();
+
+
+    const select =
+        document.getElementById(
+            "ai-module-select"
+        );
+
+
+    const moduleId =
+        select?.value
+            ? Number(select.value)
+            : null;
+
+
+    /*
+        Find selected teacher material.
+    */
+
+    const selectedMaterial =
+        Array.isArray(
+            aiLearningMaterials
+        )
+            ? aiLearningMaterials.find(
+                item =>
+                    Number(item.id) ===
+                    Number(moduleId)
+            )
+            : null;
+
+
+    /*
+        Show student's message.
+    */
 
     appendAIChatMessage(
         "user",
         question,
         {
             moduleTitle:
-                selectedMaterial?.title || null
+                selectedMaterial?.title ||
+                null
         }
     );
 
+
+    /*
+        Clear textbox immediately.
+    */
+
     input.value = "";
-    chat.scrollTop = chat.scrollHeight;
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+
+    /*
+        Prevent accidental double send
+        while AIcee is responding.
+    */
+
+    input.disabled = true;
+
+
+    /*
+        Show AIcee loading indicator.
+    */
+
+    const thinkingIndicator =
+        showAIceeThinkingIndicator(
+            selectedMaterial
+        );
+
 
     try {
-        const response = await fetch("/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: question,
-                userId: currentUser.id,
-                moduleId
-            })
-        });
 
-        const data = await response.json();
+        const response =
+            await fetch(
+                "/chat",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            message:
+                                question,
+
+                            userId:
+                                currentUser.id,
+
+                            moduleId:
+                                moduleId
+                        })
+                }
+            );
+
+
+        /*
+            Try reading JSON response.
+        */
+
+        let data;
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch (jsonError) {
+
+            throw new Error(
+                "AIcee returned an invalid server response."
+            );
+
+        }
+
+
+        /*
+            Remove typing indicator BEFORE
+            displaying actual response.
+        */
+
+        thinkingIndicator?.remove();
+
+
+        /*
+            HTTP/backend error handling.
+        */
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.message ||
+                data?.reply ||
+                "AIcee request failed."
+            );
+
+        }
+
+
+        /*
+            Optional backend warning,
+            such as missing teacher PDF.
+        */
 
         if (data.warning) {
+
             appendAIChatMessage(
                 "model",
                 data.warning,
@@ -3724,32 +4176,89 @@ async function sendAIMessage() {
                     warning: true
                 }
             );
+
         }
+
+
+        /*
+            Actual AIcee response.
+        */
 
         appendAIChatMessage(
             "model",
+
             String(
                 data.reply ||
                 "AIcee did not return a response."
             ),
+
             {
-                fallback: Boolean(data.fallback)
+                fallback:
+                    Boolean(
+                        data.fallback
+                    )
             }
         );
 
-        chat.scrollTop = chat.scrollHeight;
+
+        chat.scrollTop =
+            chat.scrollHeight;
+
     } catch (error) {
-        console.error(error);
+
+        /*
+            Make sure indicator disappears
+            when something fails.
+        */
+
+        thinkingIndicator?.remove();
+
+
+        console.error(
+            "AIcee message error:",
+            error
+        );
+
 
         appendAIChatMessage(
             "model",
-            "Sorry, AIcee is currently unavailable.",
+
+            error?.message &&
+            !String(error.message)
+                .includes(
+                    "Failed to fetch"
+                )
+
+                ? `Sorry, something went wrong: ${error.message}`
+
+                : "Sorry, AIcee is currently unavailable. Please try again in a moment.",
+
             {
                 fallback: true
             }
         );
 
-        chat.scrollTop = chat.scrollHeight;
+
+        chat.scrollTop =
+            chat.scrollHeight;
+
+    } finally {
+
+        /*
+            Extra safety cleanup.
+        */
+
+        thinkingIndicator?.remove();
+
+
+        /*
+            Allow student to type again.
+        */
+
+        input.disabled = false;
+
+        input.focus();
+
     }
 }
 
