@@ -490,88 +490,427 @@
                         </section>
                     </div>
 
-                    <!-- INSIGHT + DIAGNOSTIC -->
-                    <div class="grid grid-cols-1 xl:grid-cols-[1.1fr_.9fr] gap-6 items-start">
-                        <section class="aicee-panel p-7 sm:p-8">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <p class="aicee-kicker">AIcee insight</p>
-                                    <h3 class="text-2xl font-bold mt-1">Your learning direction</h3>
-                                </div>
-                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
-                                    <i class="fa-solid fa-compass"></i>
-                                </div>
-                            </div>
+                   <!-- INSIGHT + DIAGNOSTIC -->
+<div class="grid grid-cols-1 xl:grid-cols-[1.1fr_.9fr] gap-6 items-start">
 
-                            <div class="mt-6 p-5 rounded-2xl bg-blue-50/70 border border-blue-100">
-                                <p id="learning-insight-text" class="text-sm sm:text-base text-gray-700 leading-relaxed">
-                                    AIcee is preparing a learning insight from your available profile and diagnostic information.
-                                </p>
-                            </div>
+    <!-- LEFT COLUMN -->
+    <div class="space-y-6">
 
-                            <div class="grid sm:grid-cols-3 gap-3 mt-6">
-                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                                    <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                                        <i class="fa-solid fa-graduation-cap text-blue-600"></i>
-                                        Teacher materials
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-2">Teacher-provided PDF materials can be selected inside AIcee.</div>
-                                </div>
+        <!-- LEARNING DIRECTION -->
+        <section class="aicee-panel p-7 sm:p-8">
 
-                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                                    <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                                        <i class="fa-solid fa-chart-simple text-violet-600"></i>
-                                        Diagnostic history
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-2">Recurring assessments show how your learning profile changes over time.</div>
-                                </div>
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="aicee-kicker">
+                        AIcee insight
+                    </p>
 
-                                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                                    <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                                        <i class="fa-solid fa-lock text-emerald-600"></i>
-                                        Private by design
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-2">Your learning profile is private and used only for personalized study guidance.</div>
-                                </div>
-                            </div>
-                        </section>
+                    <h3 class="text-2xl font-bold mt-1">
+                        Your learning direction
+                    </h3>
+                </div>
 
-                        <section class="aicee-panel p-7 sm:p-8">
-                            <div class="flex items-center gap-3 mb-5">
-                                <div class="w-11 h-11 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center">
-                                    <i class="fa-solid fa-brain"></i>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-lg">Diagnostic Learning Profile</div>
-                                    <div class="text-xs text-gray-500">A private personalization signal for AIcee</div>
-                                </div>
-                            </div>
+                <div
+                    class="
+                        w-12 h-12
+                        rounded-2xl
+                        bg-blue-50
+                        text-blue-600
+                        flex items-center justify-center
+                        text-xl
+                        shrink-0
+                    "
+                >
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+            </div>
 
-                            <div id="diagnostic-summary" class="text-sm leading-relaxed text-gray-700">
-                                Complete your diagnostic assessment so AIcee can identify your learning strengths and areas that may need support.
-                            </div>
 
-                            <div id="diagnostic-subjects" class="space-y-4 mt-6"></div>
+            <div
+                class="
+                    mt-6
+                    p-5
+                    rounded-2xl
+                    bg-blue-50/70
+                    border
+                    border-blue-100
+                "
+            >
+                <p
+                    id="learning-insight-text"
+                    class="
+                        text-sm
+                        sm:text-base
+                        text-gray-700
+                        leading-relaxed
+                    "
+                >
+                    AIcee is preparing a learning insight
+                    from your available profile and
+                    diagnostic information.
+                </p>
+            </div>
 
-                            <div class="mt-6 pt-6 border-t border-gray-100">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div><div class="text-sm font-semibold text-gray-800">Diagnostic History</div><div class="text-xs text-gray-500 mt-1">Your profile updates after each recurring assessment.</div></div>
-                                    <div class="text-right"><div class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Next Diagnostic</div><div id="diagnostic-next-date" class="text-sm font-bold text-blue-600 mt-1">Checking...</div></div>
-                                </div>
-                                <div id="diagnostic-history" class="space-y-3"></div>
-                            </div>
 
-                            <button
-                                id="diagnostic-action"
-                                type="button"
-                                onclick="openDiagnosticQuiz()"
-                                class="mt-6 w-full py-3 text-sm border border-gray-300 hover:bg-gray-50 rounded-2xl font-semibold"
-                            >
-                                Take Diagnostic Assessment
-                            </button>
-                        </section>
+            <div class="grid sm:grid-cols-3 gap-3 mt-6">
+
+                <div
+                    class="
+                        rounded-2xl
+                        border
+                        border-gray-100
+                        bg-gray-50
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            flex items-center gap-2
+                            text-sm
+                            font-semibold
+                            text-gray-700
+                        "
+                    >
+                        <i
+                            class="
+                                fa-solid
+                                fa-graduation-cap
+                                text-blue-600
+                            "
+                        ></i>
+
+                        Teacher materials
                     </div>
 
+                    <div
+                        class="
+                            text-xs
+                            text-gray-500
+                            mt-2
+                        "
+                    >
+                        Teacher-provided PDF materials
+                        can be selected inside AIcee.
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        rounded-2xl
+                        border
+                        border-gray-100
+                        bg-gray-50
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            flex items-center gap-2
+                            text-sm
+                            font-semibold
+                            text-gray-700
+                        "
+                    >
+                        <i
+                            class="
+                                fa-solid
+                                fa-chart-simple
+                                text-violet-600
+                            "
+                        ></i>
+
+                        Diagnostic history
+                    </div>
+
+                    <div
+                        class="
+                            text-xs
+                            text-gray-500
+                            mt-2
+                        "
+                    >
+                        Recurring assessments show how
+                        your learning profile changes
+                        over time.
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        rounded-2xl
+                        border
+                        border-gray-100
+                        bg-gray-50
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            flex items-center gap-2
+                            text-sm
+                            font-semibold
+                            text-gray-700
+                        "
+                    >
+                        <i
+                            class="
+                                fa-solid
+                                fa-lock
+                                text-emerald-600
+                            "
+                        ></i>
+
+                        Private by design
+                    </div>
+
+                    <div
+                        class="
+                            text-xs
+                            text-gray-500
+                            mt-2
+                        "
+                    >
+                        Your learning profile is private
+                        and used only for personalized
+                        study guidance.
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- WHAT AICEE IS -->
+        <section class="aicee-panel p-7 sm:p-8">
+
+            <div
+                class="
+                    grid
+                    md:grid-cols-[auto_1fr]
+                    gap-5
+                    items-center
+                "
+            >
+
+                <div
+                    class="
+                        w-14 h-14
+                        rounded-2xl
+                        bg-gradient-to-br
+                        from-blue-600
+                        to-violet-600
+                        text-white
+                        flex items-center justify-center
+                        text-2xl
+                        shadow-lg
+                        shadow-blue-600/20
+                    "
+                >
+                    <i class="fa-solid fa-link"></i>
+                </div>
+
+
+                <div>
+                    <h3 class="text-lg font-bold">
+                        AIcee is the bridge — not the replacement.
+                    </h3>
+
+                    <p
+                        class="
+                            text-sm
+                            text-gray-500
+                            mt-1
+                            leading-relaxed
+                        "
+                    >
+                        AIcee turns your recurring
+                        diagnostic profile, learning bio,
+                        and selected teacher materials
+                        into personalized study guidance.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                onclick="openAIAssistant()"
+                class="
+                    aicee-primary-button
+                    w-full
+                    mt-6
+                    justify-center
+                "
+            >
+                <i class="fa-solid fa-comments"></i>
+
+                Start a study session
+            </button>
+
+        </section>
+
+    </div>
+
+
+    <!-- RIGHT COLUMN -->
+    <section class="aicee-panel p-7 sm:p-8">
+
+        <div class="flex items-center gap-3 mb-5">
+
+            <div
+                class="
+                    w-11 h-11
+                    bg-violet-100
+                    text-violet-600
+                    rounded-2xl
+                    flex items-center justify-center
+                "
+            >
+                <i class="fa-solid fa-brain"></i>
+            </div>
+
+
+            <div>
+                <div class="font-bold text-lg">
+                    Diagnostic Learning Profile
+                </div>
+
+                <div class="text-xs text-gray-500">
+                    A private personalization signal for AIcee
+                </div>
+            </div>
+
+        </div>
+
+
+        <div
+            id="diagnostic-summary"
+            class="
+                text-sm
+                leading-relaxed
+                text-gray-700
+            "
+        >
+            Complete your diagnostic assessment so AIcee
+            can identify your learning strengths and areas
+            that may need support.
+        </div>
+
+
+        <div
+            id="diagnostic-subjects"
+            class="space-y-4 mt-6"
+        ></div>
+
+
+        <div
+            class="
+                mt-6
+                pt-6
+                border-t
+                border-gray-100
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                    mb-4
+                    gap-4
+                "
+            >
+
+                <div>
+                    <div
+                        class="
+                            text-sm
+                            font-semibold
+                            text-gray-800
+                        "
+                    >
+                        Diagnostic History
+                    </div>
+
+                    <div
+                        class="
+                            text-xs
+                            text-gray-500
+                            mt-1
+                        "
+                    >
+                        Your profile updates after each
+                        recurring assessment.
+                    </div>
+                </div>
+
+
+                <div class="text-right">
+
+                    <div
+                        class="
+                            text-[10px]
+                            uppercase
+                            tracking-wider
+                            text-gray-400
+                            font-semibold
+                        "
+                    >
+                        Next Diagnostic
+                    </div>
+
+                    <div
+                        id="diagnostic-next-date"
+                        class="
+                            text-sm
+                            font-bold
+                            text-blue-600
+                            mt-1
+                        "
+                    >
+                        Checking...
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="diagnostic-history"
+                class="space-y-3"
+            ></div>
+
+        </div>
+
+
+        <button
+            id="diagnostic-action"
+            type="button"
+            onclick="openDiagnosticQuiz()"
+            class="
+                mt-6
+                w-full
+                py-3
+                text-sm
+                border
+                border-gray-300
+                hover:bg-gray-50
+                rounded-2xl
+                font-semibold
+            "
+        >
+            Take Diagnostic Assessment
+        </button>
+
+    </section>
+
+</div>
                     <!-- WHAT AICEE IS -->
                     <section class="aicee-panel p-7 sm:p-8">
                         <div class="grid lg:grid-cols-[auto_1fr_auto] gap-5 items-center">
