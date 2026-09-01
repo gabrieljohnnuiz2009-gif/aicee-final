@@ -2672,12 +2672,65 @@ function enhanceInteractiveElements() {
     });
 }
 
+
+function enhanceVfxSurfaces() {
+    if (!aiceeSettings.animations) return;
+
+    document
+        .querySelectorAll(
+            ".aicee-panel, .login-card, #ai-modal .modal"
+        )
+        .forEach(surface => {
+            if (surface.dataset.vfxReady === "true") return;
+
+            surface.dataset.vfxReady = "true";
+            surface.classList.add("aicee-vfx-surface");
+
+            surface.addEventListener("pointermove", event => {
+                if (!aiceeSettings.animations) return;
+
+                const rect =
+                    surface.getBoundingClientRect();
+
+                const x =
+                    ((event.clientX - rect.left) /
+                        Math.max(rect.width, 1)) *
+                    100;
+
+                const y =
+                    ((event.clientY - rect.top) /
+                        Math.max(rect.height, 1)) *
+                    100;
+
+                surface.style.setProperty(
+                    "--aicee-vfx-x",
+                    `${x}%`
+                );
+
+                surface.style.setProperty(
+                    "--aicee-vfx-y",
+                    `${y}%`
+                );
+            });
+        });
+}
+
+function initializeAiceeVfx() {
+    enhanceVfxSurfaces();
+
+    document
+        .documentElement
+        .classList
+        .add("aicee-vfx-loaded");
+}
+
 function initializeAiceeExperience() {
     readAiceeSettings();
     applyAiceeSettings();
     setupLoginKeyboard();
     setupAiceeMascotInteractions();
     enhanceInteractiveElements();
+    initializeAiceeVfx();
 
     if (window.matchMedia) {
         const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -2690,8 +2743,18 @@ function initializeAiceeExperience() {
         }
     }
 
-    const observer = new MutationObserver(() => enhanceInteractiveElements());
-    observer.observe(document.body, { childList: true, subtree: true });
+    const observer = new MutationObserver(() => {
+        enhanceInteractiveElements();
+        enhanceVfxSurfaces();
+    });
+
+    observer.observe(
+        document.body,
+        {
+            childList: true,
+            subtree: true
+        }
+    );
 }
 
 
@@ -3509,14 +3572,14 @@ async function loadAIceeLearningMaterials(){
 
 function appendAIChatMessage(role, text, options = {}) {
     const chat = document.getElementById("ai-chat-log");
-    if (!chat) return;
+    if (!chat) return null;
 
     const messageText = String(text || "").trim();
-    if (!messageText) return;
+    if (!messageText) return null;
 
     if (role === "user") {
         const wrapper = document.createElement("div");
-        wrapper.className = "flex justify-end mb-6";
+        wrapper.className = "flex justify-end mb-6 aicee-chat-row aicee-chat-row-user";
 
         const bubble = document.createElement("div");
         bubble.className =
@@ -3525,25 +3588,176 @@ function appendAIChatMessage(role, text, options = {}) {
 
         if (options.moduleTitle) {
             const material = document.createElement("div");
-            material.className = "text-[11px] opacity-70 mt-2";
+            material.className = "aicee-material-tag text-[11px] opacity-80 mt-2";
             material.textContent = `Material: ${options.moduleTitle}`;
             bubble.appendChild(material);
         }
 
         wrapper.appendChild(bubble);
         chat.appendChild(wrapper);
-        return;
+
+        requestAnimationFrame(() => {
+            wrapper.classList.add("aicee-chat-row-visible");
+        });
+
+        return wrapper;
     }
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "flex justify-start mb-4 aicee-chat-row aicee-chat-row-model";
 
     const bubble = document.createElement("div");
     bubble.className = options.warning
-        ? "aicee-chat-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words bg-amber-50 border border-amber-200 text-amber-800 mb-4"
+        ? "aicee-chat-bubble aicee-warning-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words"
         : options.fallback
-            ? "aicee-chat-bubble aicee-error-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words mb-4"
-            : "aicee-chat-bubble aicee-assistant-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
+            ? "aicee-chat-bubble aicee-error-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words"
+            : "aicee-chat-bubble aicee-assistant-bubble p-4 rounded-3xl max-w-[80%] whitespace-pre-wrap break-words";
 
     bubble.textContent = messageText;
-    chat.appendChild(bubble);
+    wrapper.appendChild(bubble);
+    chat.appendChild(wrapper);
+
+    requestAnimationFrame(() => {
+        wrapper.classList.add("aicee-chat-row-visible");
+    });
+
+    return wrapper;
+}
+
+function showAIceeThinkingIndicator(selectedMaterial = null) {
+    const chat = document.getElementById("ai-chat-log");
+    if (!chat) return null;
+
+    document
+        .getElementById("aicee-thinking-indicator")
+        ?.remove();
+
+    const wrapper = document.createElement("div");
+    wrapper.id = "aicee-thinking-indicator";
+    wrapper.className =
+        "flex justify-start mb-4 aicee-chat-row aicee-chat-row-model aicee-chat-row-visible";
+
+    const bubble = document.createElement("div");
+    bubble.className =
+        "aicee-chat-bubble aicee-assistant-bubble aicee-thinking-bubble p-4 rounded-3xl max-w-[88%]";
+
+    const row = document.createElement("div");
+    row.className = "flex items-start gap-3";
+
+    const orb = document.createElement("div");
+    orb.className = "aicee-thinking-orb";
+    orb.innerHTML = `
+        <span></span>
+        <span></span>
+        <span></span>
+    `;
+
+    const copy = document.createElement("div");
+    copy.className = "min-w-0";
+
+    const title = document.createElement("div");
+    title.className = "aicee-thinking-title font-semibold text-sm";
+
+    const subtitle = document.createElement("div");
+    subtitle.className =
+        "aicee-thinking-subtitle text-xs opacity-70 mt-1 leading-relaxed";
+
+    function setStatus(nextTitle, nextSubtitle) {
+        title.textContent = nextTitle;
+        subtitle.textContent = nextSubtitle;
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    if (selectedMaterial) {
+        setStatus(
+            "AIcee is reading your learning material...",
+            `Preparing a guided response using "${selectedMaterial.title}".`
+        );
+    } else {
+        setStatus(
+            "AIcee is reviewing your learning context...",
+            "Please wait while I prepare a guided response."
+        );
+    }
+
+    copy.appendChild(title);
+    copy.appendChild(subtitle);
+
+    row.appendChild(orb);
+    row.appendChild(copy);
+
+    bubble.appendChild(row);
+    wrapper.appendChild(bubble);
+    chat.appendChild(wrapper);
+
+    chat.scrollTop = chat.scrollHeight;
+
+    const timers = [
+        setTimeout(() => {
+            if (!wrapper.isConnected) return;
+
+            if (selectedMaterial) {
+                setStatus(
+                    "AIcee is analyzing the material...",
+                    "Connecting the lesson with your learning profile."
+                );
+            } else {
+                setStatus(
+                    "AIcee is thinking through your question...",
+                    "Using your recent learning context to guide the response."
+                );
+            }
+        }, 3500),
+
+        setTimeout(() => {
+            if (!wrapper.isConnected) return;
+
+            setStatus(
+                "AIcee is preparing your personalized guidance...",
+                selectedMaterial
+                    ? "Almost ready — organizing the material into a clearer explanation."
+                    : "Almost ready — organizing the response into helpful steps."
+            );
+        }, 7500),
+
+        setTimeout(() => {
+            if (!wrapper.isConnected) return;
+
+            setStatus(
+                "Still working on it...",
+                selectedMaterial
+                    ? "Large learning materials may take a little longer to process."
+                    : "The AI service is taking a little longer than usual."
+            );
+        }, 14000)
+    ];
+
+    return {
+        element: wrapper,
+        remove() {
+            timers.forEach(timer => clearTimeout(timer));
+            wrapper.classList.add("aicee-thinking-out");
+
+            setTimeout(() => {
+                wrapper.remove();
+            }, 180);
+        }
+    };
+}
+
+function setAIceeComposerBusy(isBusy) {
+    const input = document.getElementById("ai-input");
+    const select = document.getElementById("ai-module-select");
+    const sendButton =
+        document.getElementById("ai-send-button") ||
+        document.querySelector('#ai-modal button[onclick*="sendAIMessage"]');
+
+    if (input) input.disabled = Boolean(isBusy);
+    if (select) select.disabled = Boolean(isBusy);
+    if (sendButton) {
+        sendButton.disabled = Boolean(isBusy);
+        sendButton.classList.toggle("aicee-send-busy", Boolean(isBusy));
+    }
 }
 
 async function loadAIChatHistory() {
@@ -3636,6 +3850,10 @@ async function openAIAssistant() {
     if (!modal) return;
 
     modal.classList.remove("hidden");
+    modal.classList.remove("aicee-ai-modal-open");
+    void modal.offsetWidth;
+    modal.classList.add("aicee-ai-modal-open");
+
     await loadAIceeLearningMaterials();
 
     const chat = document.getElementById("ai-chat-log");
@@ -3645,7 +3863,7 @@ async function openAIAssistant() {
 
     const greeting = document.createElement("div");
     greeting.className =
-        "aicee-chat-bubble aicee-assistant-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
+        "aicee-chat-bubble aicee-assistant-bubble aicee-greeting-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
 
     const firstName =
         String(currentUser.name || "Student")
@@ -3663,383 +3881,52 @@ async function openAIAssistant() {
 
     await loadAIChatHistory();
     chat.scrollTop = chat.scrollHeight;
+
+    const input = document.getElementById("ai-input");
+    setTimeout(() => input?.focus(), 180);
 }
 
 function closeAIModal() {
     const modal = document.getElementById("ai-modal");
-    if (modal) modal.classList.add("hidden");
-}
-
-
-/* =========================================
-   AICEE THINKING / READING INDICATOR
-========================================= */
-
-function ensureAIceeThinkingStyles() {
-    if (
-        document.getElementById(
-            "aicee-thinking-styles"
-        )
-    ) {
-        return;
-    }
-
-    const style =
-        document.createElement("style");
-
-    style.id =
-        "aicee-thinking-styles";
-
-    style.textContent = `
-        @keyframes aiceeTypingBounce {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.45;
-            }
-
-            30% {
-                transform: translateY(-5px);
-                opacity: 1;
-            }
-        }
-
-        .aicee-thinking-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 999px;
-            background: currentColor;
-            display: inline-block;
-            animation:
-                aiceeTypingBounce
-                1.2s
-                infinite
-                ease-in-out;
-        }
-
-        .aicee-thinking-dot:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-
-        .aicee-thinking-dot:nth-child(3) {
-            animation-delay: 0.30s;
-        }
-
-        #aicee-thinking-indicator {
-            animation:
-                aiceeThinkingAppear
-                0.2s
-                ease-out;
-        }
-
-        @keyframes aiceeThinkingAppear {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    `;
-
-    document.head.appendChild(style);
-}
-
-
-function showAIceeThinkingIndicator(
-    selectedMaterial = null
-) {
-    ensureAIceeThinkingStyles();
-
-    const chat =
-        document.getElementById(
-            "ai-chat-log"
-        );
-
-    if (!chat) {
-        return null;
-    }
-
-
-    /*
-        Remove old indicator just in case.
-    */
-
-    document
-        .getElementById(
-            "aicee-thinking-indicator"
-        )
-        ?.remove();
-
-
-    const wrapper =
-        document.createElement("div");
-
-    wrapper.id =
-        "aicee-thinking-indicator";
-
-    wrapper.className =
-        "mb-4 flex justify-start";
-
-
-    const bubble =
-        document.createElement("div");
-
-    bubble.className =
-        "aicee-chat-bubble " +
-        "aicee-assistant-bubble " +
-        "px-5 py-4 " +
-        "rounded-3xl " +
-        "max-w-[85%]";
-
-
-    const row =
-        document.createElement("div");
-
-    row.className =
-        "flex items-start gap-3";
-
-
-    /*
-        Animated dots
-    */
-
-    const dots =
-        document.createElement("div");
-
-    dots.className =
-        "flex items-center gap-1 " +
-        "mt-1.5 shrink-0";
-
-    for (
-        let i = 0;
-        i < 3;
-        i++
-    ) {
-        const dot =
-            document.createElement("span");
-
-        dot.className =
-            "aicee-thinking-dot";
-
-        dots.appendChild(dot);
-    }
-
-
-    /*
-        Status text
-    */
-
-    const textContainer =
-        document.createElement("div");
-
-    textContainer.className =
-        "min-w-0";
-
-
-    const title =
-        document.createElement("div");
-
-    title.className =
-        "font-semibold text-sm";
-
-
-    const subtitle =
-        document.createElement("div");
-
-    subtitle.className =
-        "text-xs opacity-70 mt-1 " +
-        "leading-relaxed";
-
-
-    if (selectedMaterial) {
-
-        title.textContent =
-            "AIcee is reading your learning material...";
-
-        subtitle.textContent =
-            `Preparing a guided response using "${selectedMaterial.title}".`;
-
-    } else {
-
-        title.textContent =
-            "AIcee is reviewing your learning context...";
-
-        subtitle.textContent =
-            "Please wait while I prepare a guided response.";
-
-    }
-
-
-    textContainer.appendChild(title);
-    textContainer.appendChild(subtitle);
-
-    row.appendChild(dots);
-    row.appendChild(textContainer);
-
-    bubble.appendChild(row);
-    wrapper.appendChild(bubble);
-
-    chat.appendChild(wrapper);
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
-
-    /*
-        Change the message if Gemini
-        needs a little more time.
-    */
-
-    const timers = [];
-
-
-    timers.push(
-        setTimeout(() => {
-
-            if (!wrapper.isConnected) {
-                return;
-            }
-
-            if (selectedMaterial) {
-
-                title.textContent =
-                    "AIcee is analyzing the material...";
-
-                subtitle.textContent =
-                    "Connecting the lesson with your learning profile.";
-
-            } else {
-
-                title.textContent =
-                    "AIcee is thinking through your question...";
-
-                subtitle.textContent =
-                    "Using your recent learning context to guide the response.";
-
-            }
-
-            chat.scrollTop =
-                chat.scrollHeight;
-
-        }, 3500)
-    );
-
-
-    timers.push(
-        setTimeout(() => {
-
-            if (!wrapper.isConnected) {
-                return;
-            }
-
-            title.textContent =
-                "AIcee is preparing your personalized guidance...";
-
-            subtitle.textContent =
-                selectedMaterial
-                    ? "Almost ready — I'm organizing the material into a clearer explanation."
-                    : "Almost ready — I'm organizing the response into helpful steps.";
-
-            chat.scrollTop =
-                chat.scrollHeight;
-
-        }, 7500)
-    );
-
-
-    timers.push(
-        setTimeout(() => {
-
-            if (!wrapper.isConnected) {
-                return;
-            }
-
-            title.textContent =
-                "Still working on it...";
-
-            subtitle.textContent =
-                selectedMaterial
-                    ? "Large learning materials may take a little longer to process."
-                    : "The AI service is taking a little longer than usual.";
-
-            chat.scrollTop =
-                chat.scrollHeight;
-
-        }, 14000)
-    );
-
-
-    /*
-        Return controller so sendAIMessage()
-        can remove it safely.
-    */
-
-    return {
-        element: wrapper,
-
-        remove() {
-
-            timers.forEach(timer =>
-                clearTimeout(timer)
-            );
-
-            wrapper.remove();
-        }
-    };
+    if (!modal) return;
+
+    modal.classList.remove("aicee-ai-modal-open");
+    modal.classList.add("aicee-ai-modal-closing");
+
+    setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("aicee-ai-modal-closing");
+        document
+            .getElementById("aicee-thinking-indicator")
+            ?.remove();
+        setAIceeComposerBusy(false);
+    }, 180);
 }
 
 async function sendAIMessage() {
-
-    const input =
-        document.getElementById(
-            "ai-input"
-        );
+    const input = document.getElementById("ai-input");
 
     if (
         !input ||
+        input.disabled ||
         !input.value.trim()
     ) {
         return;
     }
 
+    const chat = document.getElementById("ai-chat-log");
+    if (!chat) return;
 
-    const chat =
-        document.getElementById(
-            "ai-chat-log"
-        );
-
-    if (!chat) {
-        return;
-    }
-
-
-    const question =
-        input.value.trim();
-
-
-    const select =
-        document.getElementById(
-            "ai-module-select"
-        );
-
+    const question = input.value.trim();
+    const select = document.getElementById("ai-module-select");
 
     const moduleId =
         select?.value
             ? Number(select.value)
             : null;
 
-
-    /*
-        Find selected teacher material.
-    */
-
     const selectedMaterial =
-        Array.isArray(
-            aiLearningMaterials
-        )
+        Array.isArray(aiLearningMaterials)
             ? aiLearningMaterials.find(
                 item =>
                     Number(item.id) ===
@@ -4047,52 +3934,26 @@ async function sendAIMessage() {
             )
             : null;
 
-
-    /*
-        Show student's message.
-    */
-
     appendAIChatMessage(
         "user",
         question,
         {
             moduleTitle:
-                selectedMaterial?.title ||
-                null
+                selectedMaterial?.title || null
         }
     );
 
-
-    /*
-        Clear textbox immediately.
-    */
-
     input.value = "";
+    chat.scrollTop = chat.scrollHeight;
 
-    chat.scrollTop =
-        chat.scrollHeight;
-
-
-    /*
-        Prevent accidental double send
-        while AIcee is responding.
-    */
-
-    input.disabled = true;
-
-
-    /*
-        Show AIcee loading indicator.
-    */
+    setAIceeComposerBusy(true);
 
     const thinkingIndicator =
         showAIceeThinkingIndicator(
             selectedMaterial
         );
 
-
     try {
-
         const response =
             await fetch(
                 "/chat",
@@ -4118,57 +3979,27 @@ async function sendAIMessage() {
                 }
             );
 
-
-        /*
-            Try reading JSON response.
-        */
-
         let data;
 
         try {
-
-            data =
-                await response.json();
-
+            data = await response.json();
         } catch (jsonError) {
-
             throw new Error(
                 "AIcee returned an invalid server response."
             );
-
         }
-
-
-        /*
-            Remove typing indicator BEFORE
-            displaying actual response.
-        */
 
         thinkingIndicator?.remove();
 
-
-        /*
-            HTTP/backend error handling.
-        */
-
         if (!response.ok) {
-
             throw new Error(
                 data?.message ||
                 data?.reply ||
                 "AIcee request failed."
             );
-
         }
 
-
-        /*
-            Optional backend warning,
-            such as missing teacher PDF.
-        */
-
         if (data.warning) {
-
             appendAIChatMessage(
                 "model",
                 data.warning,
@@ -4176,13 +4007,7 @@ async function sendAIMessage() {
                     warning: true
                 }
             );
-
         }
-
-
-        /*
-            Actual AIcee response.
-        */
 
         appendAIChatMessage(
             "model",
@@ -4194,43 +4019,28 @@ async function sendAIMessage() {
 
             {
                 fallback:
-                    Boolean(
-                        data.fallback
-                    )
+                    Boolean(data.fallback)
             }
         );
-
 
         chat.scrollTop =
             chat.scrollHeight;
 
     } catch (error) {
-
-        /*
-            Make sure indicator disappears
-            when something fails.
-        */
-
         thinkingIndicator?.remove();
-
 
         console.error(
             "AIcee message error:",
             error
         );
 
-
         appendAIChatMessage(
             "model",
 
             error?.message &&
             !String(error.message)
-                .includes(
-                    "Failed to fetch"
-                )
-
+                .includes("Failed to fetch")
                 ? `Sorry, something went wrong: ${error.message}`
-
                 : "Sorry, AIcee is currently unavailable. Please try again in a moment.",
 
             {
@@ -4238,27 +4048,14 @@ async function sendAIMessage() {
             }
         );
 
-
         chat.scrollTop =
             chat.scrollHeight;
 
     } finally {
-
-        /*
-            Extra safety cleanup.
-        */
-
         thinkingIndicator?.remove();
-
-
-        /*
-            Allow student to type again.
-        */
-
-        input.disabled = false;
+        setAIceeComposerBusy(false);
 
         input.focus();
-
     }
 }
 
@@ -5393,15 +5190,31 @@ async function updateModuleProgress(moduleId, progress) {
 }
 
 function animatePage(element) {
-
     if (!element) return;
 
     element.classList.remove("page-enter");
 
+    const children =
+        Array.from(element.children || []);
+
+    children.forEach((child, index) => {
+        child.classList.remove(
+            "aicee-stagger-item"
+        );
+
+        child.style.setProperty(
+            "--aicee-stagger-delay",
+            `${Math.min(index, 10) * 45}ms`
+        );
+
+        child.classList.add(
+            "aicee-stagger-item"
+        );
+    });
+
     void element.offsetWidth;
 
     element.classList.add("page-enter");
-
 }
 
 async function showProfileMenu() {
