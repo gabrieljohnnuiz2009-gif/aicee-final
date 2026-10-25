@@ -324,6 +324,16 @@ async function initializeSecurityStorage() {
         );
     }
 
+   const [dbInfo] = await db.query(`
+    SELECT DATABASE() AS db, @@hostname AS host
+`);
+console.log("DATABASE CHECK:", dbInfo[0]);
+
+const [tableCheck] = await db.query(`
+    SHOW TABLES LIKE 'users'
+`);
+console.log("USERS TABLE CHECK:", tableCheck);
+
     await db.query(`
         ALTER TABLE users
         MODIFY COLUMN password VARCHAR(255) NOT NULL
