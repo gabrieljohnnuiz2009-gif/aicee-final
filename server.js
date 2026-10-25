@@ -5896,5 +5896,8 @@ startServer().catch(error => {
         error
     );
 
+   console.error("ERROR MESSAGE:", error.message);
+console.error("ERROR CODE:", error.code);
+
     process.exit(1);
 });
