@@ -505,9 +505,9 @@ const geminiModel =
     "gemini-2.5-flash";
 
 /*
-    Separate chat history per student.
-    This prevents one student's conversation from being mixed
-    with another student's conversation.
+   Separate chat history per student.
+   This prevents one student's conversation from being mixed
+   with another student's conversation.
 */
 
 
@@ -2469,8 +2469,8 @@ app.get("/sections", authenticateToken, requireRole("teacher"), requireSelfQuery
 ========================================= */
 
 /*
-    Get all students under the sections
-    handled by a specific teacher.
+   Get all students under the sections
+   handled by a specific teacher.
 */
 
 app.get(
@@ -2548,7 +2548,7 @@ app.get(
 
 
 /*
-    Teacher creates a new student account.
+   Teacher creates a new student account.
 */
 
 app.post(
@@ -2731,7 +2731,7 @@ VALUES
 
 
 /*
-    Teacher resets a student's password.
+   Teacher resets a student's password.
 */
 
 app.put(
@@ -5906,8 +5906,8 @@ startServer().catch(error => {
         error
     );
 
-   console.error("ERROR MESSAGE:", error.message);
-console.error("ERROR CODE:", error.code);
+    console.error("ERROR MESSAGE:", error.message);
+    console.error("ERROR CODE:", error.code);
 
     process.exit(1);
 });
