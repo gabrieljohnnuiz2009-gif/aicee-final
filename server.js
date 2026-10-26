@@ -1,4 +1,4 @@
-require("dotenv").config();
+frequire("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
@@ -500,7 +500,7 @@ const ai = new GoogleGenAI({
 
 const geminiModel =
     process.env.GEMINI_MODEL ||
-    "gemini-3.8-flash";
+    "gemini-1.5-pro";
 
 /*
    Separate chat history per student.
