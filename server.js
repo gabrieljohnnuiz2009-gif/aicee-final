@@ -500,7 +500,7 @@ const ai = new GoogleGenAI({
 
 const geminiModel =
     process.env.GEMINI_MODEL ||
-    "gemini-1.5-pro";
+    "gemini-2.5-flash";
 
 /*
    Separate chat history per student.
