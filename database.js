@@ -2,8 +2,7 @@ const mysql = require("mysql2/promise");
 
 /*
     AICEE database connection
-    - Local development: DB_HOST / DB_PORT / DB_USER / DB_PASSWORD / DB_NAME
-    - Railway MySQL: MYSQLHOST / MYSQLPORT / MYSQLUSER / MYSQLPASSWORD / MYSQLDATABASE
+    - Local development / Aiven Cloud / Railway
 */
 const db = mysql.createPool({
     host: process.env.DB_HOST || process.env.MYSQLHOST,
@@ -13,7 +12,10 @@ const db = mysql.createPool({
     port: Number(process.env.DB_PORT || process.env.MYSQLPORT || 3306),
     waitForConnections: true,
     connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 5),
-    queueLimit: 0
+    queueLimit: 0,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 async function testConnection() {
