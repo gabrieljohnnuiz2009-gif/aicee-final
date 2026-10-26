@@ -45,17 +45,15 @@ function isAllowedOrigin(origin) {
         return true;
     }
 
-    // Railway exposes the deployed domain through RAILWAY_PUBLIC_DOMAIN.
-    // Allow the app's own HTTPS origin automatically so same-site API calls work
-    // without manually editing ALLOWED_ORIGINS after every Railway domain change.
-    const railwayPublicDomain = String(
-        process.env.RAILWAY_PUBLIC_DOMAIN || ""
-    ).trim();
+    // Para sa Render (Automatic na babasahin ang Render URL mo)
+    const renderExternalUrl = String(process.env.RENDER_EXTERNAL_URL || "").trim();
+    if (renderExternalUrl && origin === renderExternalUrl) {
+        return true;
+    }
 
-    if (
-        railwayPublicDomain &&
-        origin === `https://${railwayPublicDomain}`
-    ) {
+    // Para sa Railway (Dati mong ginagamit)
+    const railwayPublicDomain = String(process.env.RAILWAY_PUBLIC_DOMAIN || "").trim();
+    if (railwayPublicDomain && origin === `https://${railwayPublicDomain}`) {
         return true;
     }
 
