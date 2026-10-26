@@ -1349,19 +1349,35 @@ ${JSON.stringify(studentContext, null, 2)}
         const requestUserMessage =
             createUserContent(parts);
 
-        const response =
-            await ai.models.generateContent({
-                model: geminiModel,
-                contents: [
-                    ...previousHistory,
-                    requestUserMessage
-                ],
-                config: {
-                    systemInstruction,
-                    temperature: 0.45,
-                    maxOutputTokens: 900
+        let response;
+        let attempts = 0;
+        const maxRetries = 3;
+
+        while (attempts < maxRetries) {
+            try {
+                response = await ai.models.generateContent({
+                    model: geminiModel,
+                    contents: [
+                        ...previousHistory,
+                        requestUserMessage
+                    ],
+                    config: {
+                        systemInstruction,
+                        temperature: 0.45,
+                        maxOutputTokens: 900
+                    }
+                });
+                break; // Kung nagtagumpay, itigil ang loop
+            } catch (apiError) {
+                attempts++;
+                if (apiError.status === 503 && attempts < maxRetries) {
+                    console.warn(`Gemini 503 High Demand. Retrying attempt ${attempts} in 2 seconds...`);
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // Maghintay ng 2 segundo bago ulitin
+                } else {
+                    throw apiError; // Kung ibang error o naubos na ang retries, ibato ang error
                 }
-            });
+            }
+        }
 
         const aiReply = String(
             response.text || ""
