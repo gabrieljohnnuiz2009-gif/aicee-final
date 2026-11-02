@@ -823,23 +823,22 @@ ${JSON.stringify(studentContext, null, 2)}
                 role: msg.role === 'model' ? 'assistant' : msg.role,
                 content: msg.parts[0].text
             }));
-            
             const completion = await openai.chat.completions.create({
-                model: "gpt-5.5", // Gumagamit ng mabilis at murang OpenAI model
-                messages: [
-                    {
-                        role: "system",
-                        content: systemInstruction
-                    },
-                    ...formattedHistory,
-                    {
-                        role: "user",
-                        content: message
-                    }
-                ],
-                temperature: 0.45,
-                max_tokens: 700
-            });
+    model: "gpt-4o-mini",
+    messages: [
+        {
+            role: "system",
+            content: systemInstruction
+        },
+        ...formattedHistory,
+        {
+            role: "user",
+            content: message
+        }
+    ],
+    temperature: 0.45,
+    max_completion_tokens: 700
+});
 
             const aiReply = String(completion.choices[0].message.content || "").trim();
 
