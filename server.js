@@ -2619,6 +2619,92 @@ app.post(
     }
 );
 
+
+/* =========================================
+   STUDENT - AICEE LEARNING MATERIALS
+   Modules assigned to the student's section
+========================================= */
+
+app.get(
+    "/ai-learning-materials/:studentId",
+    authenticateToken,
+    requireRole("student"),
+    requireSelfParam("studentId"),
+    async (req, res) => {
+        try {
+            const studentId = Number(req.params.studentId);
+
+            const [students] = await db.query(`
+                SELECT section_id
+                FROM users
+                WHERE id = ?
+                LIMIT 1
+            `, [studentId]);
+
+            if (students.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Student not found."
+                });
+            }
+
+            const sectionId = students[0].section_id;
+
+            if (!sectionId) {
+                return res.json({
+                    success: true,
+                    modules: []
+                });
+            }
+
+            const [rows] = await db.query(`
+                SELECT DISTINCT
+                    modules.id,
+                    modules.title,
+                    modules.description,
+                    modules.file,
+                    modules.created_at,
+                    teachers.name AS teacher_name
+                FROM modules
+                JOIN module_sections
+                    ON module_sections.module_id = modules.id
+                LEFT JOIN users AS teachers
+                    ON teachers.id = modules.teacher_id
+                WHERE module_sections.section_id = ?
+                ORDER BY modules.created_at DESC
+            `, [sectionId]);
+
+            const modules = rows.map(module => ({
+                id: module.id,
+                title: module.title,
+                description: module.description || "",
+                created_at: module.created_at,
+                teacher_name: module.teacher_name || "Teacher",
+                ai_readable:
+                    path
+                        .extname(String(module.file || ""))
+                        .toLowerCase() === ".pdf"
+            }));
+
+            res.json({
+                success: true,
+                modules
+            });
+
+        } catch (error) {
+            console.error(
+                "AI learning materials error:",
+                error
+            );
+
+            res.status(500).json({
+                success: false,
+                message: "Failed to load learning materials."
+            });
+        }
+    }
+);
+
 /* =========================================
    EDIT MODULE
 
