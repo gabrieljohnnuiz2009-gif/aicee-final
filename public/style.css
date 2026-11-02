@@ -1814,3 +1814,23 @@ body.aicee-compact .space-y-8 > :not([hidden]) ~ :not([hidden]) {
     background-size: cover !important;
     background-repeat: no-repeat !important;
 }
+
+/* ULTRA-FORCE MOBILE OVERFLOW FIX */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+#main-app {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
