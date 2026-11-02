@@ -605,6 +605,7 @@ app.post("/chat", authenticateToken, requireRole("student"), requireSelfBody("us
                     modules.id,
                     modules.title,
                     modules.description,
+                    modules.created_at,
 
                     COALESCE(
                         student_module_progress.progress,
