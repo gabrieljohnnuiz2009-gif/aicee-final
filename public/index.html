@@ -1,12 +1,12 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIcee</title>
 
-
     <link rel="icon" type="image/png" href="/assets/aicee-favicon.png">
-<link rel="apple-touch-icon" href="/assets/aicee-favicon.png">
+    <link rel="apple-touch-icon" href="/assets/aicee-favicon.png">
     <script>
         try {
             const saved = JSON.parse(localStorage.getItem("aicee_ui_settings") || "{}");
@@ -27,35 +27,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- DataTables CSS -->
-<link
-    rel="stylesheet"
-    href="https://cdn.datatables.net/3.0.1/css/dataTables.dataTables.css"
->
-
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="aicee-upgrade.css">
-
-<!-- DataTables JavaScript -->
-<script
-    src="https://cdn.datatables.net/3.0.1/js/dataTables.js"
-    defer
-></script>
-
-<script type="importmap">
-{
-    "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    <link rel="stylesheet" href="https://cdn.datatables.net/3.0.1/css/dataTables.dataTables.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="aicee-upgrade.css">
+    <!-- DataTables JavaScript -->
+    <script src="https://cdn.datatables.net/3.0.1/js/dataTables.js" defer></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
     }
-}
-</script>
-<script type="module" src="./aicee-3d.js"></script>
-<script src="app.js" defer></script>
-    
+    </script>
+    <script type="module" src="./aicee-3d.js"></script>
+    <script src="app.js" defer></script>
 </head>
-<body class="tail-container bg-gray-50 text-gray-900 overflow-hidden">
+<body class="tail-container bg-gray-50 text-gray-900 overflow-hidden w-full max-w-full h-[100dvh]">
    <!-- LOGIN PAGE -->
-<div id="login-page" class="aicee-login min-h-screen overflow-hidden">
+<div id="login-page" class="aicee-login min-h-[100dvh] w-full overflow-hidden">
 
     <div class="login-ambient" aria-hidden="true">
         <span class="login-blob login-blob-one"></span>
@@ -64,7 +54,7 @@
         <span class="login-grid"></span>
     </div>
 
-    <div class="relative z-10 min-h-screen grid lg:grid-cols-[1.08fr_.92fr]">
+    <div class="relative z-10 min-h-[100dvh] grid lg:grid-cols-[1.08fr_.92fr]">
 
         <section class="login-showcase hidden lg:flex flex-col justify-between p-12 xl:p-16 text-white relative overflow-hidden">
             <div class="login-showcase-shine" aria-hidden="true"></div>
@@ -166,7 +156,7 @@
             </div>
         </section>
 
-        <section class="login-form-side flex items-center justify-center px-5 py-10 sm:px-10 lg:px-12">
+        <section class="login-form-side flex items-center justify-center px-5 py-10 sm:px-10 lg:px-12 w-full max-w-full">
             <div class="w-full max-w-md login-card-wrap login-reveal login-delay-2">
 
                 <div class="lg:hidden flex items-center gap-3 justify-center mb-8">
@@ -274,7 +264,7 @@
 </div>
 <!-- END LOGIN PAGE -->
     <!-- MAIN APP -->
-    <div id="main-app" class="hidden h-screen flex overflow-hidden">
+    <div id="main-app" class="hidden h-[100dvh] flex overflow-hidden w-full max-w-full">
         <div
             id="mobile-sidebar-overlay"
             onclick="closeMobileSidebar()"
@@ -284,7 +274,7 @@
         <!-- SIDEBAR -->
         <div
             id="sidebar"
-            class="w-72 max-w-[85vw] bg-white border-r border-gray-200 flex flex-col h-screen fixed inset-y-0 left-0 z-[200] -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out"
+            class="w-72 max-w-[85vw] bg-white border-r border-gray-200 flex flex-col h-[100dvh] fixed inset-y-0 left-0 z-[200] -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out"
         >
             <div class="p-6 border-b border-gray-100 flex items-center gap-3">
                 <img
@@ -315,7 +305,7 @@
             
             <div class="px-6 py-4 bg-gray-50 border-b flex items-center gap-3">
                 <div id="role-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700"></div>
-                <div id="user-name" class="font-medium text-sm"></div>
+                <div id="user-name" class="font-medium text-sm truncate"></div>
             </div>
             
             <nav id="nav-student" class="flex-1 overflow-y-auto p-4 space-y-1"></nav>
@@ -331,18 +321,18 @@
         </div>
         
         <!-- MAIN CONTENT -->
-        <div class="flex-1 min-w-0 w-full">
+        <div class="flex-1 min-w-0 w-full flex flex-col h-[100dvh]">
             <!-- Topbar -->
-            <header class="bg-white border-b h-16 flex items-center px-4 sm:px-6 lg:px-8 justify-between sticky top-0 z-50">
+            <header class="bg-white border-b h-16 flex items-center px-4 sm:px-6 lg:px-8 justify-between sticky top-0 z-50 w-full shrink-0">
                 <div class="flex items-center">
                     <button onclick="toggleMobileSidebar()" class="lg:hidden mr-4 text-2xl text-gray-500">
                         <i class="fa-solid fa-bars"></i>
                     </button>
-                    <div id="current-page-title" class="font-semibold text-xl">Dashboard</div>
+                    <div id="current-page-title" class="font-semibold text-xl truncate">Dashboard</div>
                 </div>
                 
-                <div class="flex items-center gap-6">
-                    <button onclick="openAIAssistant()" class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-2 rounded-2xl text-sm font-medium hover:shadow-lg transition-all">
+                <div class="flex items-center gap-3 sm:gap-6">
+                    <button onclick="openAIAssistant()" class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 sm:px-5 py-2 rounded-2xl text-sm font-medium hover:shadow-lg transition-all">
                         <i class="fa-solid fa-sparkles"></i>
                         <span class="hidden sm:inline">AI Assistant</span>
                     </button>
@@ -365,7 +355,7 @@
 
     <div
         id="notification-dropdown"
-        class="hidden absolute right-0 mt-3 w-96 max-w-[90vw] bg-white border border-gray-200 rounded-3xl shadow-2xl overflow-hidden z-[150]"
+        class="hidden absolute right-0 mt-3 w-80 sm:w-96 max-w-[90vw] bg-white border border-gray-200 rounded-3xl shadow-2xl overflow-hidden z-[150]"
     >
 
         <div class="px-5 py-4 border-b">
@@ -380,7 +370,7 @@
 
         <div
             id="notification-list"
-            class="max-h-96 overflow-y-auto"
+            class="max-h-80 overflow-y-auto"
         >
             <div class="p-6 text-sm text-gray-500 text-center">
                 Loading notifications...
@@ -392,8 +382,8 @@
 </div>
                     
                     <div onclick="showProfileMenu()" class="flex items-center gap-3 cursor-pointer">
-                        <div class="text-right">
-                            <div id="header-name" class="font-medium text-sm"></div>
+                        <div class="text-right hidden sm:block">
+                            <div id="header-name" class="font-medium text-sm truncate max-w-[120px]"></div>
                             <div id="header-role" class="text-xs text-gray-500"></div>
                         </div>
                         <div id="header-avatar-initials" class="w-10 h-10 aicee-header-avatar rounded-2xl flex items-center justify-center font-bold">SJ</div>
@@ -402,13 +392,13 @@
             </header>
             
             <!-- Content Area -->
-            <div class="p-4 sm:p-6 lg:p-8 overflow-auto" style="height: calc(100vh - 64px)">
+            <div class="p-4 sm:p-6 lg:p-8 overflow-x-hidden overflow-y-auto w-full max-w-full flex-1" style="height: calc(100dvh - 64px)">
                 
                 <!-- STUDENT DASHBOARD -->
-                <div id="student-dashboard" class="space-y-8">
+                <div id="student-dashboard" class="space-y-6 sm:space-y-8 max-w-full">
 
                     <!-- AI-CENTERED HERO -->
-                    <section class="relative overflow-hidden rounded-[32px] border border-blue-100 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 p-7 sm:p-9 text-white shadow-xl shadow-blue-900/10">
+                    <section class="relative overflow-hidden rounded-[24px] sm:rounded-[32px] border border-blue-100 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 p-6 sm:p-9 text-white shadow-xl shadow-blue-900/10 w-full">
                         <div class="absolute -top-24 -right-20 w-72 h-72 rounded-full bg-white/10 blur-2xl" aria-hidden="true"></div>
                         <div class="absolute -bottom-28 left-1/3 w-64 h-64 rounded-full bg-cyan-300/10 blur-3xl" aria-hidden="true"></div>
 
@@ -419,11 +409,11 @@
                                     Personalized learning bridge
                                 </div>
 
-                                <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mt-5">
+                                <h2 class="text-2xl sm:text-4xl font-bold tracking-tight mt-5">
                                     Hi, <span id="learning-welcome-name">Student</span>. AIcee is learning how you learn.
                                 </h2>
 
-                                <p class="mt-3 text-white/75 max-w-2xl leading-relaxed">
+                                <p class="mt-3 text-white/75 max-w-2xl text-sm sm:text-base leading-relaxed">
                                     AIcee uses your recurring diagnostic results, learning bio, and study conversations to personalize guidance. You can also study from teacher-provided PDF learning materials.
                                 </p>
 
@@ -461,43 +451,43 @@
                     </section>
 
                     <!-- LEARNING SUMMARY -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <section class="aicee-panel p-6 relative overflow-hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 w-full">
+                        <section class="aicee-panel p-5 sm:p-6 relative overflow-hidden">
                             <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-arrow-trend-up"></i>
                             </div>
                             <div class="text-xs uppercase tracking-[.14em] text-gray-400 font-bold mt-5">Strongest area</div>
-                            <div id="learning-strongest-area" class="text-2xl font-bold mt-2 text-gray-900">Analyzing...</div>
+                            <div id="learning-strongest-area" class="text-xl sm:text-2xl font-bold mt-2 text-gray-900">Analyzing...</div>
                             <p class="text-xs text-gray-500 mt-2">Based on your latest diagnostic assessment.</p>
                         </section>
 
-                        <section class="aicee-panel p-6 relative overflow-hidden">
+                        <section class="aicee-panel p-5 sm:p-6 relative overflow-hidden">
                             <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-bullseye"></i>
                             </div>
                             <div class="text-xs uppercase tracking-[.14em] text-gray-400 font-bold mt-5">Needs focus</div>
-                            <div id="learning-needs-focus" class="text-2xl font-bold mt-2 text-gray-900">Analyzing...</div>
+                            <div id="learning-needs-focus" class="text-xl sm:text-2xl font-bold mt-2 text-gray-900">Analyzing...</div>
                             <p class="text-xs text-gray-500 mt-2">AIcee can prioritize this area during study conversations.</p>
                         </section>
 
-                        <section class="aicee-panel p-6 relative overflow-hidden">
+                        <section class="aicee-panel p-5 sm:p-6 relative overflow-hidden">
                             <div class="w-11 h-11 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-fingerprint"></i>
                             </div>
                             <div class="text-xs uppercase tracking-[.14em] text-gray-400 font-bold mt-5">Personalization</div>
-                            <div id="learning-personalization-label" class="text-2xl font-bold mt-2 text-gray-900">Ready</div>
+                            <div id="learning-personalization-label" class="text-xl sm:text-2xl font-bold mt-2 text-gray-900">Ready</div>
                             <p id="learning-personalization-copy" class="text-xs text-gray-500 mt-2">Complete your diagnostic assessment to improve AIcee's guidance.</p>
                         </section>
                     </div>
 
                    <!-- INSIGHT + DIAGNOSTIC -->
-<div class="grid grid-cols-1 xl:grid-cols-[1.1fr_.9fr] gap-6 items-start">
+<div class="grid grid-cols-1 xl:grid-cols-[1.1fr_.9fr] gap-6 items-start w-full max-w-full">
 
     <!-- LEFT COLUMN -->
-    <div class="space-y-6">
+    <div class="space-y-6 w-full max-w-full">
 
         <!-- LEARNING DIRECTION -->
-        <section class="aicee-panel p-7 sm:p-8">
+        <section class="aicee-panel p-5 sm:p-7 w-full">
 
             <div class="flex items-start justify-between gap-4">
                 <div>
@@ -505,19 +495,19 @@
                         AIcee insight
                     </p>
 
-                    <h3 class="text-2xl font-bold mt-1">
+                    <h3 class="text-xl sm:text-2xl font-bold mt-1">
                         Your learning direction
                     </h3>
                 </div>
 
                 <div
                     class="
-                        w-12 h-12
+                        w-10 h-10 sm:w-12 sm:h-12
                         rounded-2xl
                         bg-blue-50
                         text-blue-600
                         flex items-center justify-center
-                        text-xl
+                        text-lg sm:text-xl
                         shrink-0
                     "
                 >
@@ -529,7 +519,7 @@
             <div
                 class="
                     mt-6
-                    p-5
+                    p-4 sm:p-5
                     rounded-2xl
                     bg-blue-50/70
                     border
@@ -684,27 +674,27 @@
 
 
         <!-- WHAT AICEE IS -->
-        <section class="aicee-panel p-7 sm:p-8">
+        <section class="aicee-panel p-5 sm:p-7 w-full">
 
             <div
                 class="
                     grid
                     md:grid-cols-[auto_1fr]
-                    gap-5
+                    gap-4 sm:gap-5
                     items-center
                 "
             >
 
                 <div
                     class="
-                        w-14 h-14
+                        w-12 h-12 sm:w-14 sm:h-14
                         rounded-2xl
                         bg-gradient-to-br
                         from-blue-600
                         to-violet-600
                         text-white
                         flex items-center justify-center
-                        text-2xl
+                        text-xl sm:text-2xl
                         shadow-lg
                         shadow-blue-600/20
                     "
@@ -714,13 +704,13 @@
 
 
                 <div>
-                    <h3 class="text-lg font-bold">
+                    <h3 class="text-base sm:text-lg font-bold">
                         AIcee is the bridge — not the replacement.
                     </h3>
 
                     <p
                         class="
-                            text-sm
+                            text-xs sm:text-sm
                             text-gray-500
                             mt-1
                             leading-relaxed
@@ -757,13 +747,13 @@
 
 
     <!-- RIGHT COLUMN -->
-    <section class="aicee-panel p-7 sm:p-8">
+    <section class="aicee-panel p-5 sm:p-7 w-full max-w-full">
 
         <div class="flex items-center gap-3 mb-5">
 
             <div
                 class="
-                    w-11 h-11
+                    w-10 h-10 sm:w-11 sm:h-11
                     bg-violet-100
                     text-violet-600
                     rounded-2xl
@@ -775,11 +765,11 @@
 
 
             <div>
-                <div class="font-bold text-lg">
+                <div class="font-bold text-base sm:text-lg">
                     Diagnostic Learning Profile
                 </div>
 
-                <div class="text-xs text-gray-500">
+                <div class="text-[11px] sm:text-xs text-gray-500">
                     A private personalization signal for AIcee
                 </div>
             </div>
@@ -803,7 +793,7 @@
 
         <div
             id="diagnostic-subjects"
-            class="space-y-4 mt-6"
+            class="space-y-4 mt-6 w-full"
         ></div>
 
 
@@ -819,7 +809,8 @@
             <div
                 class="
                     flex
-                    items-center
+                    flex-col sm:flex-row
+                    sm:items-center
                     justify-between
                     mb-4
                     gap-4
@@ -850,7 +841,7 @@
                 </div>
 
 
-                <div class="text-right">
+                <div class="sm:text-right">
 
                     <div
                         class="
@@ -883,7 +874,7 @@
 
             <div
                 id="diagnostic-history"
-                class="space-y-3"
+                class="space-y-3 w-full"
             ></div>
 
         </div>
@@ -912,55 +903,41 @@
 
 </div>
                     <!-- WHAT AICEE IS -->
-                    <section class="aicee-panel p-7 sm:p-8">
-                        <div class="grid lg:grid-cols-[auto_1fr_auto] gap-5 items-center">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-600/20">
-                                <i class="fa-solid fa-link"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold">AIcee is the bridge — not the replacement.</h3>
-                                <p class="text-sm text-gray-500 mt-1 leading-relaxed">
-                                    AIcee turns your recurring diagnostic profile, learning bio, and selected teacher materials into personalized study guidance.
-                                </p>
-                            </div>
-                            <button type="button" onclick="openAIAssistant()" class="aicee-primary-button whitespace-nowrap">
-                                <i class="fa-solid fa-comments"></i>
-                                Start a study session
-                            </button>
-                        </div>
+                    <section class="aicee-panel p-5 sm:p-7 hidden">
+                        <!-- Intentionally hidden as duplicate of above block for cleanliness -->
                     </section>
                 </div>
 
                 <!-- TEACHER DASHBOARD -->
-<div id="teacher-dashboard" class="hidden space-y-8">
-    <section class="aicee-panel p-7 sm:p-8 overflow-hidden relative">
+<div id="teacher-dashboard" class="hidden space-y-6 sm:space-y-8 w-full max-w-full">
+    <section class="aicee-panel p-5 sm:p-8 overflow-hidden relative w-full">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div><p class="aicee-kicker">Teacher workspace</p><h2 class="text-3xl font-bold tracking-tight mt-1">Learning materials + diagnostic-guided AI</h2><p class="text-sm text-gray-500 mt-2 max-w-3xl leading-relaxed">Upload learning materials for your handled sections. Students build their AIcee learning profile through recurring diagnostic assessments and can use assigned PDF materials during AI-assisted study sessions.</p></div>
+            <div><p class="aicee-kicker">Teacher workspace</p><h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">Learning materials + diagnostic-guided AI</h2><p class="text-sm text-gray-500 mt-2 max-w-3xl leading-relaxed">Upload learning materials for your handled sections. Students build their AIcee learning profile through recurring diagnostic assessments and can use assigned PDF materials during AI-assisted study sessions.</p></div>
             <button type="button" onclick="showUploadModal()" class="aicee-primary-button whitespace-nowrap"><i class="fa-solid fa-file-arrow-up"></i>Upload Learning Material</button>
         </div>
     </section>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-3xl p-6 border border-gray-100"><div class="text-sm text-gray-500">Total Students</div><div id="teacher-total-students" class="text-5xl font-semibold mt-3 text-blue-600">0</div><div class="text-xs text-gray-400 mt-2">Learners handled by this teacher</div></div>
-        <div class="bg-white rounded-3xl p-6 border border-gray-100"><div class="text-sm text-gray-500">Diagnostic Profiles Ready</div><div id="teacher-diagnostic-completed" class="text-5xl font-semibold mt-3 text-emerald-600">0</div><div class="text-xs text-gray-400 mt-2">Students with a diagnostic learning profile</div></div>
-        <div class="bg-white rounded-3xl p-6 border border-gray-100"><div class="text-sm text-gray-500">AI Profiles Ready</div><div id="teacher-ai-profiles-ready" class="text-5xl font-semibold mt-3 text-violet-600">0</div><div class="text-xs text-gray-400 mt-2">Ready for personalized AIcee guidance</div></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 w-full">
+        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-gray-100"><div class="text-sm text-gray-500">Total Students</div><div id="teacher-total-students" class="text-4xl sm:text-5xl font-semibold mt-3 text-blue-600">0</div><div class="text-xs text-gray-400 mt-2">Learners handled by this teacher</div></div>
+        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-gray-100"><div class="text-sm text-gray-500">Diagnostic Profiles Ready</div><div id="teacher-diagnostic-completed" class="text-4xl sm:text-5xl font-semibold mt-3 text-emerald-600">0</div><div class="text-xs text-gray-400 mt-2">Students with a diagnostic learning profile</div></div>
+        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-gray-100"><div class="text-sm text-gray-500">AI Profiles Ready</div><div id="teacher-ai-profiles-ready" class="text-4xl sm:text-5xl font-semibold mt-3 text-violet-600">0</div><div class="text-xs text-gray-400 mt-2">Ready for personalized AIcee guidance</div></div>
         <div id="teacher-needs-support" class="hidden">0</div>
     </div>
-    <section class="aicee-panel p-7">
-        <div class="grid md:grid-cols-3 gap-4">
+    <section class="aicee-panel p-5 sm:p-7 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
             <div class="rounded-2xl bg-violet-50 border border-violet-100 p-5"><div class="text-violet-600 font-semibold"><i class="fa-solid fa-file-pdf mr-2"></i>Teacher Materials</div><p class="text-xs text-gray-500 mt-2 leading-relaxed">PDF learning materials can be assigned to sections and selected by students inside AIcee.</p></div>
             <div class="rounded-2xl bg-blue-50 border border-blue-100 p-5"><div class="text-blue-600 font-semibold"><i class="fa-solid fa-clipboard-question mr-2"></i>Recurring Diagnostics</div><p class="text-xs text-gray-500 mt-2 leading-relaxed">Weekly diagnostic history updates each student's strengths, focus areas, and progress trend.</p></div>
             <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-5"><div class="text-emerald-600 font-semibold"><i class="fa-solid fa-robot mr-2"></i>AIcee</div><p class="text-xs text-gray-500 mt-2 leading-relaxed">Uses diagnostic context, learning bio, recent chat context, and a selected teacher PDF for personalized guidance.</p></div>
         </div>
     </section>
-    <div id="at-risk-students" class="hidden"></div><canvas id="classPerfChart" class="hidden"></canvas>
+    <div id="at-risk-students" class="hidden"></div><canvas id="classPerfChart" class="hidden w-full max-w-full"></canvas>
 </div>
 
 <!-- ADMIN DASHBOARD -->
-<div id="admin-dashboard" class="hidden space-y-8">
+<div id="admin-dashboard" class="hidden space-y-6 sm:space-y-8 w-full max-w-full">
     <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
         <div>
             <p class="text-sm font-semibold text-blue-600 uppercase tracking-[0.18em]">AICEE Control Center</p>
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mt-2">System Dashboard</h2>
+            <h2 class="text-2xl sm:text-4xl font-bold text-gray-900 mt-2">System Dashboard</h2>
             <p class="text-sm text-gray-500 mt-2 max-w-2xl">Manage accounts, sections, and the prototype data-source layer without turning AIcee into a full LMS.</p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -973,72 +950,72 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-        <div class="aicee-panel p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 w-full">
+        <div class="aicee-panel p-5 sm:p-6 w-full">
             <div class="flex justify-between items-start gap-4">
-                <div><p class="text-sm text-gray-500">Students</p><div id="admin-total-students" class="text-5xl font-bold text-blue-600 mt-3">0</div></div>
-                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-user-graduate"></i></div>
+                <div><p class="text-sm text-gray-500">Students</p><div id="admin-total-students" class="text-4xl sm:text-5xl font-bold text-blue-600 mt-3">0</div></div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-user-graduate"></i></div>
             </div>
         </div>
-        <div class="aicee-panel p-6">
+        <div class="aicee-panel p-5 sm:p-6 w-full">
             <div class="flex justify-between items-start gap-4">
-                <div><p class="text-sm text-gray-500">Teachers</p><div id="admin-total-teachers" class="text-5xl font-bold text-violet-600 mt-3">0</div></div>
-                <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <div><p class="text-sm text-gray-500">Teachers</p><div id="admin-total-teachers" class="text-4xl sm:text-5xl font-bold text-violet-600 mt-3">0</div></div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
             </div>
         </div>
-        <div class="aicee-panel p-6">
+        <div class="aicee-panel p-5 sm:p-6 w-full">
             <div class="flex justify-between items-start gap-4">
-                <div><p class="text-sm text-gray-500">Sections</p><div id="admin-total-sections" class="text-5xl font-bold text-emerald-600 mt-3">0</div></div>
-                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-rectangle"></i></div>
+                <div><p class="text-sm text-gray-500">Sections</p><div id="admin-total-sections" class="text-4xl sm:text-5xl font-bold text-emerald-600 mt-3">0</div></div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-rectangle"></i></div>
             </div>
         </div>
-        <div class="aicee-panel p-6">
+        <div class="aicee-panel p-5 sm:p-6 w-full">
             <div class="flex justify-between items-start gap-4">
-                <div><p class="text-sm text-gray-500">AI Profiles Ready</p><div id="admin-ai-profiles-ready" class="text-5xl font-bold text-amber-600 mt-3">0</div></div>
-                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-brain"></i></div>
+                <div><p class="text-sm text-gray-500">AI Profiles Ready</p><div id="admin-ai-profiles-ready" class="text-4xl sm:text-5xl font-bold text-amber-600 mt-3">0</div></div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-brain"></i></div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <button type="button" onclick="navigateTo('admin-accounts')" class="aicee-panel p-6 text-left group">
-            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-gear"></i></div>
-            <h3 class="font-bold text-xl mt-5">Account Management</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full">
+        <button type="button" onclick="navigateTo('admin-accounts')" class="aicee-panel p-5 sm:p-6 text-left group w-full">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-gear"></i></div>
+            <h3 class="font-bold text-lg sm:text-xl mt-5">Account Management</h3>
             <p class="text-sm text-gray-500 mt-2 leading-relaxed">Create student and teacher accounts, update records, assign student sections, and reset temporary passwords.</p>
             <span class="inline-flex items-center gap-2 mt-5 text-blue-600 font-semibold text-sm">Open accounts <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
         </button>
-        <button type="button" onclick="navigateTo('admin-sections')" class="aicee-panel p-6 text-left group">
-            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-school"></i></div>
-            <h3 class="font-bold text-xl mt-5">Section Management</h3>
+        <button type="button" onclick="navigateTo('admin-sections')" class="aicee-panel p-5 sm:p-6 text-left group w-full">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-school"></i></div>
+            <h3 class="font-bold text-lg sm:text-xl mt-5">Section Management</h3>
             <p class="text-sm text-gray-500 mt-2 leading-relaxed">Create and rename sections, then assign the teacher responsible for each class.</p>
             <span class="inline-flex items-center gap-2 mt-5 text-emerald-600 font-semibold text-sm">Open sections <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
         </button>
-        <button type="button" onclick="navigateTo('admin-data-sources')" class="aicee-panel p-6 text-left group">
-            <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-diagram-project"></i></div>
-            <h3 class="font-bold text-xl mt-5">Data Sources</h3>
+        <button type="button" onclick="navigateTo('admin-data-sources')" class="aicee-panel p-5 sm:p-6 text-left group w-full">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-diagram-project"></i></div>
+            <h3 class="font-bold text-lg sm:text-xl mt-5">Data Sources</h3>
             <p class="text-sm text-gray-500 mt-2 leading-relaxed">Clearly show which learning signals are live inside AIcee and which Moodle/Portal connections are simulated for the prototype.</p>
             <span class="inline-flex items-center gap-2 mt-5 text-violet-600 font-semibold text-sm">View data flow <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
         </button>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-[1.25fr_.75fr] gap-6">
-        <section class="aicee-panel p-7">
+    <div class="grid grid-cols-1 xl:grid-cols-[1.25fr_.75fr] gap-6 w-full">
+        <section class="aicee-panel p-5 sm:p-7 w-full">
             <div class="flex items-center justify-between gap-4 mb-6">
                 <div>
                     <p class="aicee-kicker">Prototype architecture</p>
-                    <h3 class="text-xl font-bold mt-1">AIcee stays the bridge</h3>
+                    <h3 class="text-lg sm:text-xl font-bold mt-1">AIcee stays the bridge</h3>
                 </div>
                 <i class="fa-solid fa-link text-blue-600 text-xl"></i>
             </div>
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
                 <div class="rounded-2xl bg-violet-50 border border-violet-100 p-5"><div class="font-semibold text-violet-700">Moodle Context</div><div class="text-xs text-violet-600 mt-2">SIMULATED</div><p class="text-xs text-gray-500 mt-3">Sample learning resources supplied invisibly to AIcee.</p></div>
                 <div class="rounded-2xl bg-blue-50 border border-blue-100 p-5"><div class="font-semibold text-blue-700">Portal Context</div><div class="text-xs text-blue-600 mt-2">SIMULATED</div><p class="text-xs text-gray-500 mt-3">Sample academic records used as background learning signals.</p></div>
                 <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-5"><div class="font-semibold text-emerald-700">Diagnostic</div><div class="text-xs text-emerald-600 mt-2">LIVE IN AICEE</div><p class="text-xs text-gray-500 mt-3">Student diagnostic results stored and used by the current prototype.</p></div>
             </div>
         </section>
-        <section class="rounded-3xl p-7 bg-gradient-to-br from-slate-950 to-blue-950 text-white">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-xl"><i class="fa-solid fa-shield-halved"></i></div>
-            <h3 class="text-xl font-bold mt-5">Admin boundaries</h3>
+        <section class="rounded-[24px] sm:rounded-3xl p-5 sm:p-7 bg-gradient-to-br from-slate-950 to-blue-950 text-white w-full">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/10 flex items-center justify-center text-xl"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3 class="text-lg sm:text-xl font-bold mt-5">Admin boundaries</h3>
             <p class="text-sm text-white/65 mt-3 leading-relaxed">Admins manage system records. They cannot create or edit other administrator accounts from the website, and academic tutoring remains centered on AIcee.</p>
             <div class="mt-6 text-sm text-emerald-300 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Role-based protection enabled</div>
         </section>
@@ -1047,39 +1024,39 @@
 <!-- END ADMIN DASHBOARD -->
 
 <!-- ADMIN ACCOUNT MANAGEMENT -->
-<div id="admin-accounts-view" class="hidden space-y-7">
+<div id="admin-accounts-view" class="hidden space-y-5 sm:space-y-7 w-full max-w-full">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div><p class="aicee-kicker">System users</p><h2 class="text-3xl font-bold mt-1">Account Management</h2><p class="text-sm text-gray-500 mt-2">Manage student and teacher accounts. Admin accounts are intentionally protected.</p></div>
-        <button type="button" onclick="openAdminAccountModal()" class="aicee-primary-button lg:w-auto px-6"><i class="fa-solid fa-user-plus"></i> New Account</button>
+        <div><p class="aicee-kicker">System users</p><h2 class="text-2xl sm:text-3xl font-bold mt-1">Account Management</h2><p class="text-sm text-gray-500 mt-2">Manage student and teacher accounts. Admin accounts are intentionally protected.</p></div>
+        <button type="button" onclick="openAdminAccountModal()" class="aicee-primary-button w-full sm:w-auto px-6 justify-center"><i class="fa-solid fa-user-plus"></i> New Account</button>
     </div>
-    <section class="aicee-panel p-6">
-        <div class="grid md:grid-cols-[1fr_180px] gap-4 mb-6">
-            <div class="aicee-input-shell"><i class="fa-solid fa-magnifying-glass"></i><input id="admin-account-search" class="aicee-input" type="search" placeholder="Search name, email, or section..." oninput="renderAdminAccounts()"></div>
-            <select id="admin-account-role-filter" class="aicee-input-shell px-4" onchange="renderAdminAccounts()"><option value="all">All roles</option><option value="student">Students</option><option value="teacher">Teachers</option></select>
+    <section class="aicee-panel p-4 sm:p-6 w-full max-w-full overflow-hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_180px] gap-4 mb-6">
+            <div class="aicee-input-shell"><i class="fa-solid fa-magnifying-glass"></i><input id="admin-account-search" class="aicee-input w-full" type="search" placeholder="Search name, email, or section..." oninput="renderAdminAccounts()"></div>
+            <select id="admin-account-role-filter" class="aicee-input-shell px-4 w-full" onchange="renderAdminAccounts()"><option value="all">All roles</option><option value="student">Students</option><option value="teacher">Teachers</option></select>
         </div>
-        <div id="admin-accounts-list" class="space-y-3"><div class="text-sm text-gray-500 text-center py-10">Loading accounts...</div></div>
+        <div id="admin-accounts-list" class="space-y-3 w-full"><div class="text-sm text-gray-500 text-center py-10">Loading accounts...</div></div>
     </section>
 </div>
 
 <!-- ADMIN SECTION MANAGEMENT -->
-<div id="admin-sections-view" class="hidden space-y-7">
+<div id="admin-sections-view" class="hidden space-y-5 sm:space-y-7 w-full max-w-full">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div><p class="aicee-kicker">Academic structure</p><h2 class="text-3xl font-bold mt-1">Section Management</h2><p class="text-sm text-gray-500 mt-2">Create sections and assign a teacher to each class.</p></div>
-        <button type="button" onclick="openAdminSectionModal()" class="aicee-primary-button lg:w-auto px-6"><i class="fa-solid fa-plus"></i> New Section</button>
+        <div><p class="aicee-kicker">Academic structure</p><h2 class="text-2xl sm:text-3xl font-bold mt-1">Section Management</h2><p class="text-sm text-gray-500 mt-2">Create sections and assign a teacher to each class.</p></div>
+        <button type="button" onclick="openAdminSectionModal()" class="aicee-primary-button w-full sm:w-auto px-6 justify-center"><i class="fa-solid fa-plus"></i> New Section</button>
     </div>
-    <div id="admin-sections-list" class="grid md:grid-cols-2 xl:grid-cols-3 gap-5"><div class="aicee-panel p-6 text-gray-500">Loading sections...</div></div>
+    <div id="admin-sections-list" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 w-full"><div class="aicee-panel p-6 text-gray-500">Loading sections...</div></div>
 </div>
 
 <!-- ADMIN DATA SOURCES -->
-<div id="admin-data-sources-view" class="hidden space-y-7">
-    <div><p class="aicee-kicker">Prototype transparency</p><h2 class="text-3xl font-bold mt-1">AI Data Sources</h2><p class="text-sm text-gray-500 mt-2 max-w-3xl">This page documents what AIcee is designed to receive from external school systems and what is already live inside the prototype.</p></div>
-    <div class="grid lg:grid-cols-3 gap-6">
-        <section class="aicee-panel p-7"><div class="flex items-center justify-between"><div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-book-open"></i></div><span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold">SIMULATED</span></div><h3 class="text-xl font-bold mt-5">Moodle Learning Context</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">Represents module/topic information that a future Moodle integration could provide to AIcee. The current prototype uses sample context instead of a live Moodle API connection.</p></section>
-        <section class="aicee-panel p-7"><div class="flex items-center justify-between"><div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chart-line"></i></div><span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold">SIMULATED</span></div><h3 class="text-xl font-bold mt-5">Portal Academic Context</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">Represents grade and academic-performance information that a future school portal integration could supply. It is presented as prototype context, not a claimed live connection.</p></section>
-        <section class="aicee-panel p-7"><div class="flex items-center justify-between"><div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-question"></i></div><span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">LIVE</span></div><h3 class="text-xl font-bold mt-5">AICEE Diagnostic</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">The diagnostic assessment is part of AICEE itself and can produce student-specific learning signals used for strengths, weaknesses, and personalized guidance.</p></section>
+<div id="admin-data-sources-view" class="hidden space-y-5 sm:space-y-7 w-full max-w-full">
+    <div><p class="aicee-kicker">Prototype transparency</p><h2 class="text-2xl sm:text-3xl font-bold mt-1">AI Data Sources</h2><p class="text-sm text-gray-500 mt-2 max-w-3xl">This page documents what AIcee is designed to receive from external school systems and what is already live inside the prototype.</p></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full">
+        <section class="aicee-panel p-5 sm:p-7 w-full"><div class="flex items-center justify-between"><div class="w-10 h-10 sm:w-12 sm:h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-book-open"></i></div><span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] sm:text-xs font-bold">SIMULATED</span></div><h3 class="text-lg sm:text-xl font-bold mt-5">Moodle Learning Context</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">Represents module/topic information that a future Moodle integration could provide to AIcee. The current prototype uses sample context instead of a live Moodle API connection.</p></section>
+        <section class="aicee-panel p-5 sm:p-7 w-full"><div class="flex items-center justify-between"><div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chart-line"></i></div><span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] sm:text-xs font-bold">SIMULATED</span></div><h3 class="text-lg sm:text-xl font-bold mt-5">Portal Academic Context</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">Represents grade and academic-performance information that a future school portal integration could supply. It is presented as prototype context, not a claimed live connection.</p></section>
+        <section class="aicee-panel p-5 sm:p-7 w-full"><div class="flex items-center justify-between"><div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-question"></i></div><span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] sm:text-xs font-bold">LIVE</span></div><h3 class="text-lg sm:text-xl font-bold mt-5">AICEE Diagnostic</h3><p class="text-sm text-gray-500 mt-3 leading-relaxed">The diagnostic assessment is part of AICEE itself and can produce student-specific learning signals used for strengths, weaknesses, and personalized guidance.</p></section>
     </div>
-    <section class="rounded-3xl bg-slate-950 text-white p-7 sm:p-9">
-        <div class="grid md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-5 text-center">
+    <section class="rounded-3xl bg-slate-950 text-white p-5 sm:p-9 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-4 sm:gap-5 text-center w-full">
             <div class="rounded-2xl bg-white/5 border border-white/10 p-5"><i class="fa-solid fa-book-open text-violet-300 text-2xl"></i><div class="font-bold mt-3">Moodle</div><div class="text-xs text-white/50 mt-1">sample learning context</div></div>
             <i class="fa-solid fa-arrow-right text-white/30 hidden md:block"></i>
             <div class="rounded-2xl bg-blue-500/15 border border-blue-400/20 p-5"><i class="fa-solid fa-robot text-blue-300 text-2xl"></i><div class="font-bold mt-3">AIcee</div><div class="text-xs text-white/50 mt-1">interprets learning signals</div></div>
@@ -1092,49 +1069,47 @@
 
 <!-- ADMIN ACCOUNT MODAL -->
 <div id="admin-account-modal" class="hidden fixed inset-0 z-[120] bg-slate-950/55 backdrop-blur-sm p-4 flex items-center justify-center">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
-        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Administrator</p><h3 id="admin-account-modal-title" class="text-2xl font-bold mt-1">Create Account</h3></div><button type="button" onclick="closeAdminAccountModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100"><i class="fa-solid fa-xmark"></i></button></div>
-        <form id="admin-account-form" onsubmit="submitAdminAccount(event)" class="space-y-5 mt-7">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90dvh] overflow-y-auto p-5 sm:p-8">
+        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Administrator</p><h3 id="admin-account-modal-title" class="text-xl sm:text-2xl font-bold mt-1">Create Account</h3></div><button type="button" onclick="closeAdminAccountModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>
+        <form id="admin-account-form" onsubmit="submitAdminAccount(event)" class="space-y-4 sm:space-y-5 mt-5 sm:mt-7">
             <input id="admin-account-id" type="hidden">
-            <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-name">Full name</label><div class="aicee-input-shell"><i class="fa-regular fa-user"></i><input id="admin-account-name" class="aicee-input" required maxlength="100"></div></div>
-            <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-email">Email</label><div class="aicee-input-shell"><i class="fa-regular fa-envelope"></i><input id="admin-account-email" class="aicee-input" type="email" required maxlength="150"></div></div>
-            <div class="grid sm:grid-cols-2 gap-4">
+            <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-name">Full name</label><div class="aicee-input-shell"><i class="fa-regular fa-user"></i><input id="admin-account-name" class="aicee-input w-full" required maxlength="100"></div></div>
+            <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-email">Email</label><div class="aicee-input-shell"><i class="fa-regular fa-envelope"></i><input id="admin-account-email" class="aicee-input w-full" type="email" required maxlength="150"></div></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="aicee-field-group"><label class="aicee-field-label" for="admin-account-role">Role</label><select id="admin-account-role" class="aicee-input-shell px-4 w-full" onchange="syncAdminAccountSectionField()"><option value="student">Student</option><option value="teacher">Teacher</option></select></div>
                 <div id="admin-account-section-wrap" class="aicee-field-group"><label class="aicee-field-label" for="admin-account-section">Section</label><select id="admin-account-section" class="aicee-input-shell px-4 w-full"></select></div>
             </div>
-            <div id="admin-account-password-wrap" class="aicee-field-group"><label class="aicee-field-label" for="admin-account-password">Temporary password</label><div class="aicee-input-shell"><i class="fa-solid fa-key"></i><input id="admin-account-password" class="aicee-input" type="password" minlength="6" maxlength="72" autocomplete="new-password"></div><p class="text-xs text-gray-400 mt-2">Required only when creating a new account.</p></div>
+            <div id="admin-account-password-wrap" class="aicee-field-group"><label class="aicee-field-label" for="admin-account-password">Temporary password</label><div class="aicee-input-shell"><i class="fa-solid fa-key"></i><input id="admin-account-password" class="aicee-input w-full" type="password" minlength="6" maxlength="72" autocomplete="new-password"></div><p class="text-xs text-gray-400 mt-2">Required only when creating a new account.</p></div>
             <p id="admin-account-form-status" class="text-sm min-h-[20px]"></p>
-            <button id="admin-account-save" type="submit" class="aicee-primary-button w-full"><i class="fa-regular fa-floppy-disk"></i> Save Account</button>
+            <button id="admin-account-save" type="submit" class="aicee-primary-button w-full justify-center"><i class="fa-regular fa-floppy-disk"></i> Save Account</button>
         </form>
     </div>
 </div>
 
 <!-- ADMIN RESET PASSWORD MODAL -->
 <div id="admin-reset-modal" class="hidden fixed inset-0 z-[125] bg-slate-950/55 backdrop-blur-sm p-4 flex items-center justify-center">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8">
-        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Security</p><h3 class="text-2xl font-bold mt-1">Reset Password</h3></div><button type="button" onclick="closeAdminResetModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100"><i class="fa-solid fa-xmark"></i></button></div>
-        <form onsubmit="submitAdminPasswordReset(event)" class="space-y-5 mt-7"><input id="admin-reset-account-id" type="hidden"><p id="admin-reset-account-label" class="text-sm text-gray-500"></p><div class="aicee-field-group"><label class="aicee-field-label" for="admin-reset-password">New temporary password</label><div class="aicee-input-shell"><i class="fa-solid fa-key"></i><input id="admin-reset-password" class="aicee-input" type="password" required minlength="6" maxlength="72"></div></div><p id="admin-reset-status" class="text-sm min-h-[20px]"></p><button type="submit" class="aicee-primary-button w-full"><i class="fa-solid fa-rotate"></i> Reset Password</button></form>
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-8">
+        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Security</p><h3 class="text-xl sm:text-2xl font-bold mt-1">Reset Password</h3></div><button type="button" onclick="closeAdminResetModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>
+        <form onsubmit="submitAdminPasswordReset(event)" class="space-y-5 mt-7"><input id="admin-reset-account-id" type="hidden"><p id="admin-reset-account-label" class="text-sm text-gray-500"></p><div class="aicee-field-group"><label class="aicee-field-label" for="admin-reset-password">New temporary password</label><div class="aicee-input-shell"><i class="fa-solid fa-key"></i><input id="admin-reset-password" class="aicee-input w-full" type="password" required minlength="6" maxlength="72"></div></div><p id="admin-reset-status" class="text-sm min-h-[20px]"></p><button type="submit" class="aicee-primary-button w-full justify-center"><i class="fa-solid fa-rotate"></i> Reset Password</button></form>
     </div>
 </div>
 
 <!-- ADMIN SECTION MODAL -->
 <div id="admin-section-modal" class="hidden fixed inset-0 z-[120] bg-slate-950/55 backdrop-blur-sm p-4 flex items-center justify-center">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8">
-        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Academic structure</p><h3 id="admin-section-modal-title" class="text-2xl font-bold mt-1">Create Section</h3></div><button type="button" onclick="closeAdminSectionModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100"><i class="fa-solid fa-xmark"></i></button></div>
-        <form onsubmit="submitAdminSection(event)" class="space-y-5 mt-7"><input id="admin-section-id" type="hidden"><div class="aicee-field-group"><label class="aicee-field-label" for="admin-section-name">Section name</label><div class="aicee-input-shell"><i class="fa-solid fa-users-rectangle"></i><input id="admin-section-name" class="aicee-input" required maxlength="100" placeholder="e.g. ICT 12-1"></div></div><div class="aicee-field-group"><label class="aicee-field-label" for="admin-section-teacher">Assigned teacher</label><select id="admin-section-teacher" class="aicee-input-shell px-4 w-full" required></select></div><p id="admin-section-status" class="text-sm min-h-[20px]"></p><button type="submit" class="aicee-primary-button w-full"><i class="fa-regular fa-floppy-disk"></i> Save Section</button></form>
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-8">
+        <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Academic structure</p><h3 id="admin-section-modal-title" class="text-xl sm:text-2xl font-bold mt-1">Create Section</h3></div><button type="button" onclick="closeAdminSectionModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>
+        <form onsubmit="submitAdminSection(event)" class="space-y-5 mt-7"><input id="admin-section-id" type="hidden"><div class="aicee-field-group"><label class="aicee-field-label" for="admin-section-name">Section name</label><div class="aicee-input-shell"><i class="fa-solid fa-users-rectangle"></i><input id="admin-section-name" class="aicee-input w-full" required maxlength="100" placeholder="e.g. ICT 12-1"></div></div><div class="aicee-field-group"><label class="aicee-field-label" for="admin-section-teacher">Assigned teacher</label><select id="admin-section-teacher" class="aicee-input-shell px-4 w-full" required></select></div><p id="admin-section-status" class="text-sm min-h-[20px]"></p><button type="submit" class="aicee-primary-button w-full justify-center"><i class="fa-regular fa-floppy-disk"></i> Save Section</button></form>
     </div>
 </div>
                 
-
-                
                 <!-- MANAGE STUDENTS VIEW -->
-<div id="students-view" class="hidden space-y-6">
+<div id="students-view" class="hidden space-y-6 w-full max-w-full overflow-hidden">
 
     <!-- PAGE HEADER -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
         <div>
-            <h2 class="text-3xl font-semibold text-gray-900">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-gray-900">
                 Student Learning Profiles
             </h2>
 
@@ -1143,7 +1118,7 @@
             </p>
         </div>
 
-        <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-blue-50 text-blue-700 text-sm font-semibold">
+        <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-blue-50 text-blue-700 text-sm font-semibold w-fit">
             <i class="fa-solid fa-shield-halved"></i>
             Learning overview only
         </div>
@@ -1151,9 +1126,9 @@
     </div>
 
     <!-- STUDENT SUMMARY -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
 
-        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+        <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
 
             <div class="text-sm text-gray-500">
                 Total Students
@@ -1161,14 +1136,14 @@
 
             <div
                 id="managed-student-count"
-                class="text-4xl font-bold text-blue-600 mt-2"
+                class="text-3xl sm:text-4xl font-bold text-blue-600 mt-2"
             >
                 0
             </div>
 
         </div>
 
-        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+        <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
 
             <div class="text-sm text-gray-500">
                 Completed Diagnostic
@@ -1176,14 +1151,14 @@
 
             <div
                 id="diagnostic-completed-count"
-                class="text-4xl font-bold text-emerald-600 mt-2"
+                class="text-3xl sm:text-4xl font-bold text-emerald-600 mt-2"
             >
                 0
             </div>
 
         </div>
 
-        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+        <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
 
             <div class="text-sm text-gray-500">
                 Pending Diagnostic
@@ -1191,7 +1166,7 @@
 
             <div
                 id="diagnostic-pending-count"
-                class="text-4xl font-bold text-amber-600 mt-2"
+                class="text-3xl sm:text-4xl font-bold text-amber-600 mt-2"
             >
                 0
             </div>
@@ -1201,11 +1176,11 @@
     </div>
 
     <!-- SEARCH AND FILTER -->
-    <div class="bg-white border border-gray-100 rounded-3xl p-5">
+    <div class="bg-white border border-gray-100 rounded-3xl p-4 sm:p-5 w-full">
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            <div class="relative">
+            <div class="relative w-full">
 
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
@@ -1234,35 +1209,35 @@
     </div>
 
     <!-- STUDENT TABLE -->
-    <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden">
+    <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden w-full">
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto w-full">
 
             <table
     id="managed-students-table"
-    class="w-full min-w-[850px]"
+    class="w-full min-w-[700px] sm:min-w-[850px]"
 >
                 <thead class="bg-gray-50 border-b border-gray-100">
 
                     <tr class="text-xs uppercase tracking-wide text-gray-500">
 
-                        <th class="px-6 py-4 text-left">
+                        <th class="px-4 sm:px-6 py-4 text-left">
                             Student
                         </th>
 
-                        <th class="px-6 py-4 text-left">
+                        <th class="px-4 sm:px-6 py-4 text-left">
                             Email
                         </th>
 
-                        <th class="px-6 py-4 text-left">
+                        <th class="px-4 sm:px-6 py-4 text-left">
                             Section
                         </th>
 
-                        <th class="px-6 py-4 text-center">
+                        <th class="px-4 sm:px-6 py-4 text-center">
                             Diagnostic
                         </th>
 
-                        <th class="px-6 py-4 text-center">
+                        <th class="px-4 sm:px-6 py-4 text-center">
                             AI Profile
                         </th>
 
@@ -1279,7 +1254,7 @@
 
                         <td
                             colspan="5"
-                            class="px-6 py-12 text-center text-gray-500"
+                            class="px-4 sm:px-6 py-12 text-center text-gray-500"
                         >
                             Open this page to load student accounts.
                         </td>
@@ -1298,90 +1273,90 @@
 
 
 <!-- TEACHER AI LEARNING INSIGHTS VIEW -->
-<div id="teacher-ai-insights-view" class="hidden space-y-7">
+<div id="teacher-ai-insights-view" class="hidden space-y-6 sm:space-y-7 w-full max-w-full">
     <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
         <div>
             <p class="aicee-kicker">AI-supported teaching view</p>
-            <h2 class="text-3xl font-bold tracking-tight mt-1">AI Learning Insights</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">AI Learning Insights</h2>
             <p class="text-sm text-gray-500 mt-2 max-w-3xl leading-relaxed">
                 This page summarizes learning signals available to AIcee. It does not expose student AI conversations and it is not a replacement for Moodle or the official school Portal.
             </p>
         </div>
-        <button type="button" onclick="navigateTo('teacher-context')" class="aicee-secondary-button whitespace-nowrap">
+        <button type="button" onclick="navigateTo('teacher-context')" class="aicee-secondary-button w-full lg:w-auto justify-center whitespace-nowrap">
             <i class="fa-solid fa-database"></i>
             View prototype context
         </button>
     </div>
 
-    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">Students</div><div id="teacher-insights-total" class="text-4xl font-bold text-blue-600 mt-2">0</div></div>
-        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">AI Profiles Ready</div><div id="teacher-insights-ready" class="text-4xl font-bold text-emerald-600 mt-2">0</div></div>
-        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">Diagnostic Pending</div><div id="teacher-insights-pending" class="text-4xl font-bold text-violet-600 mt-2">0</div></div>
-        <div class="aicee-panel p-5"><div class="text-xs text-gray-500">Needs Attention</div><div id="teacher-insights-support" class="text-4xl font-bold text-amber-600 mt-2">0</div></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 w-full">
+        <div class="aicee-panel p-5 w-full"><div class="text-xs text-gray-500">Students</div><div id="teacher-insights-total" class="text-3xl sm:text-4xl font-bold text-blue-600 mt-2">0</div></div>
+        <div class="aicee-panel p-5 w-full"><div class="text-xs text-gray-500">AI Profiles Ready</div><div id="teacher-insights-ready" class="text-3xl sm:text-4xl font-bold text-emerald-600 mt-2">0</div></div>
+        <div class="aicee-panel p-5 w-full"><div class="text-xs text-gray-500">Diagnostic Pending</div><div id="teacher-insights-pending" class="text-3xl sm:text-4xl font-bold text-violet-600 mt-2">0</div></div>
+        <div class="aicee-panel p-5 w-full"><div class="text-xs text-gray-500">Needs Attention</div><div id="teacher-insights-support" class="text-3xl sm:text-4xl font-bold text-amber-600 mt-2">0</div></div>
     </div>
 
-    <div class="grid lg:grid-cols-[1.3fr_.7fr] gap-6">
-        <section class="aicee-panel p-6 sm:p-7">
+    <div class="grid grid-cols-1 lg:grid-cols-[1.3fr_.7fr] gap-6 w-full">
+        <section class="aicee-panel p-5 sm:p-7 w-full">
             <div class="flex items-center gap-3 mb-5">
-                <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-lightbulb"></i></div>
-                <div><h3 class="font-bold">Learning-priority signals</h3><p class="text-xs text-gray-500 mt-1">Students who may benefit from additional AI-guided support.</p></div>
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-lightbulb"></i></div>
+                <div><h3 class="font-bold text-sm sm:text-base">Learning-priority signals</h3><p class="text-xs text-gray-500 mt-1">Students who may benefit from additional AI-guided support.</p></div>
             </div>
-            <div id="teacher-insights-student-list" class="space-y-3">
+            <div id="teacher-insights-student-list" class="space-y-3 w-full">
                 <div class="text-sm text-gray-500">Loading insights...</div>
             </div>
         </section>
 
-        <aside class="aicee-panel p-6 sm:p-7">
+        <aside class="aicee-panel p-5 sm:p-7 w-full">
             <p class="aicee-kicker">How to interpret this</p>
-            <h3 class="text-xl font-bold mt-1">Teacher sees signals, not private chats.</h3>
+            <h3 class="text-lg sm:text-xl font-bold mt-1">Teacher sees signals, not private chats.</h3>
             <div class="space-y-4 mt-5 text-sm text-gray-600 leading-relaxed">
-                <p><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i>Diagnostic completion helps AIcee build a stronger learner profile.</p>
-                <p><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i>Academic performance can indicate subjects that need more support.</p>
-                <p><i class="fa-solid fa-lock text-blue-500 mr-2"></i>Student-AI conversations are not shown here.</p>
-                <p><i class="fa-solid fa-flask text-violet-500 mr-2"></i>Moodle and Portal information on this prototype is simulated/sample context.</p>
+                <p class="flex gap-2"><i class="fa-solid fa-circle-check text-emerald-500 mt-1 shrink-0"></i><span>Diagnostic completion helps AIcee build a stronger learner profile.</span></p>
+                <p class="flex gap-2"><i class="fa-solid fa-circle-check text-emerald-500 mt-1 shrink-0"></i><span>Academic performance can indicate subjects that need more support.</span></p>
+                <p class="flex gap-2"><i class="fa-solid fa-lock text-blue-500 mt-1 shrink-0"></i><span>Student-AI conversations are not shown here.</span></p>
+                <p class="flex gap-2"><i class="fa-solid fa-flask text-violet-500 mt-1 shrink-0"></i><span>Moodle and Portal information on this prototype is simulated/sample context.</span></p>
             </div>
         </aside>
     </div>
 </div>
 
 <!-- TEACHER AI CONTEXT DATA VIEW -->
-<div id="teacher-context-view" class="hidden space-y-7">
+<div id="teacher-context-view" class="hidden space-y-6 sm:space-y-7 w-full max-w-full">
     <div>
         <p class="aicee-kicker">Prototype integration layer</p>
-        <h2 class="text-3xl font-bold tracking-tight mt-1">AI Context Data</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">AI Context Data</h2>
         <p class="text-sm text-gray-500 mt-2 max-w-3xl leading-relaxed">
             These sample records simulate the kind of information AIcee could receive from Moodle and the school Portal. They are intentionally separate from the student-facing interface.
         </p>
     </div>
 
-    <div class="rounded-3xl border border-amber-200 bg-amber-50 p-5 flex gap-4">
-        <div class="text-amber-600 text-xl"><i class="fa-solid fa-flask"></i></div>
+    <div class="rounded-3xl border border-amber-200 bg-amber-50 p-4 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
+        <div class="text-amber-600 text-xl shrink-0"><i class="fa-solid fa-flask"></i></div>
         <div>
             <div class="font-semibold text-amber-800">Prototype / simulated data</div>
             <p class="text-sm text-amber-800/80 mt-1 leading-relaxed">AIcee is not literally connected to the school's real Moodle or Portal in this prototype. This page demonstrates the intended bridge concept for the research system.</p>
         </div>
     </div>
 
-    <div class="grid xl:grid-cols-2 gap-6">
-        <section class="aicee-panel p-6 sm:p-7">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 w-full">
+        <section class="aicee-panel p-5 sm:p-7 w-full overflow-x-auto">
             <div class="flex items-center gap-3 mb-5">
-                <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-chart-simple"></i></div>
-                <div><h3 class="font-bold">Simulated Portal Academic Data</h3><p class="text-xs text-gray-500 mt-1">Sample grades available to AIcee in the background.</p></div>
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-chart-simple"></i></div>
+                <div><h3 class="font-bold text-sm sm:text-base">Simulated Portal Academic Data</h3><p class="text-xs text-gray-500 mt-1">Sample grades available to AIcee in the background.</p></div>
             </div>
-            <div id="teacher-context-portal-list"></div>
+            <div id="teacher-context-portal-list" class="w-full min-w-[500px]"></div>
         </section>
 
-        <section class="aicee-panel p-6 sm:p-7">
+        <section class="aicee-panel p-5 sm:p-7 w-full overflow-x-auto">
             <div class="flex items-center gap-3 mb-5">
-                <div class="w-11 h-11 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center"><i class="fa-solid fa-book-open"></i></div>
-                <div><h3 class="font-bold">Simulated Moodle Learning Resources</h3><p class="text-xs text-gray-500 mt-1">One sample learning resource for each prototype subject.</p></div>
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-book-open"></i></div>
+                <div><h3 class="font-bold text-sm sm:text-base">Simulated Moodle Learning Resources</h3><p class="text-xs text-gray-500 mt-1">One sample learning resource for each prototype subject.</p></div>
             </div>
-            <div id="teacher-context-moodle-list" class="space-y-3"></div>
+            <div id="teacher-context-moodle-list" class="space-y-3 w-full min-w-[500px]"></div>
         </section>
     </div>
 
-    <section class="aicee-panel p-6 sm:p-7">
-        <div class="grid md:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 items-center text-center">
+    <section class="aicee-panel p-5 sm:p-7 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 items-center text-center w-full">
             <div class="rounded-2xl bg-violet-50 p-5"><i class="fa-solid fa-book text-violet-600 text-2xl"></i><div class="font-semibold mt-2">Moodle</div><div class="text-xs text-gray-500 mt-1">Learning resources</div></div>
             <i class="fa-solid fa-arrow-right text-gray-300 hidden md:block"></i>
             <div class="rounded-2xl bg-blue-50 p-5"><i class="fa-solid fa-robot text-blue-600 text-2xl"></i><div class="font-semibold mt-2">AIcee</div><div class="text-xs text-gray-500 mt-1">Interprets context</div></div>
@@ -1392,33 +1367,30 @@
     </section>
 </div>
 
-                <div id="modules-view" class="hidden">
-                    <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-3xl font-semibold">Learning Modules</h2>
+                <div id="modules-view" class="hidden w-full">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 w-full">
+                        <h2 class="text-2xl sm:text-3xl font-semibold">Learning Modules</h2>
                         <button
                             id="upload-button"
                             type="button"
                             onclick="showUploadModal()"
-                            class="hidden items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl"
+                            class="hidden items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl w-full sm:w-auto"
                         >
                             <i class="fa-solid fa-upload"></i>
                             <span>Upload New</span>
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modules-grid"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full" id="modules-grid"></div>
                 </div>
-
-                <!-- ASSIGNMENTS VIEW -->
-
 
     <!-- TEACHER SUBMISSIONS VIEW -->
 <div
     id="submissions-view"
-    class="hidden space-y-6"
+    class="hidden space-y-6 w-full max-w-full"
 >
 
     <div>
-        <h2 class="text-3xl font-semibold text-gray-900">
+        <h2 class="text-2xl sm:text-3xl font-semibold text-gray-900">
             Student Submissions
         </h2>
 
@@ -1427,42 +1399,42 @@
         </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
 
-        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+        <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
             <div class="text-sm text-gray-500">
                 Total Submissions
             </div>
 
             <div
                 id="submission-total-count"
-                class="text-4xl font-bold text-blue-600 mt-2"
+                class="text-3xl sm:text-4xl font-bold text-blue-600 mt-2"
             >
                 0
             </div>
         </div>
 
-        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+        <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
             <div class="text-sm text-gray-500">
                 Pending Review
             </div>
 
             <div
                 id="submission-pending-count"
-                class="text-4xl font-bold text-amber-600 mt-2"
+                class="text-3xl sm:text-4xl font-bold text-amber-600 mt-2"
             >
                 0
             </div>
         </div>
 
-        <div class="bg-white border border-gray-100 rounded-3xl p-5">
+        <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
             <div class="text-sm text-gray-500">
                 Graded
             </div>
 
             <div
                 id="submission-graded-count"
-                class="text-4xl font-bold text-emerald-600 mt-2"
+                class="text-3xl sm:text-4xl font-bold text-emerald-600 mt-2"
             >
                 0
             </div>
@@ -1472,9 +1444,9 @@
 
     <div
         id="teacher-submissions-list"
-        class="space-y-4"
+        class="space-y-4 w-full"
     >
-        <div class="bg-white border rounded-3xl p-8 text-gray-500">
+        <div class="bg-white border rounded-3xl p-6 sm:p-8 text-gray-500 text-center">
             Loading submissions...
         </div>
     </div>
@@ -1482,12 +1454,12 @@
 </div>
 
 <!-- ASSIGNMENTS VIEW -->
-<div id="assignments-view" class="hidden space-y-6">
+<div id="assignments-view" class="hidden space-y-6 w-full">
 
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4 w-full">
 
         <div>
-            <h2 class="text-3xl font-semibold">
+            <h2 class="text-2xl sm:text-3xl font-semibold">
                 Assignments & Tasks
             </h2>
 
@@ -1500,7 +1472,7 @@
             id="new-assignment-button"
             type="button"
             onclick="showAssignmentModal()"
-            class="hidden bg-blue-600 text-white px-5 py-2.5 rounded-2xl font-medium text-sm items-center gap-2"
+            class="hidden bg-blue-600 text-white px-5 py-3 sm:py-2.5 rounded-2xl font-medium text-sm items-center justify-center gap-2 w-full sm:w-auto"
         >
             <i class="fa-solid fa-plus"></i>
             New Task
@@ -1510,18 +1482,18 @@
 
     <div
         id="assignments-list"
-        class="space-y-4"
+        class="space-y-4 w-full"
     >
     </div>
 
 </div>
 
 <!-- OFFICIAL GRADEBOOK VIEW -->
-<div id="gradebook-view" class="hidden space-y-6">
+<div id="gradebook-view" class="hidden space-y-6 w-full max-w-full">
 
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 w-full">
         <div>
-            <h2 class="text-3xl font-semibold text-gray-900">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-gray-900">
                 Official Gradebook
             </h2>
             <p class="text-sm text-gray-500 mt-1">
@@ -1533,17 +1505,17 @@
             id="gradebook-save-button"
             type="button"
             onclick="saveOfficialGrades()"
-            class="hidden items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-medium"
+            class="hidden items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-medium w-full lg:w-auto"
         >
             <i class="fa-solid fa-floppy-disk"></i>
             Save All Grades
         </button>
     </div>
 
-    <div class="bg-white border border-gray-100 rounded-3xl p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+    <div class="bg-white border border-gray-100 rounded-3xl p-5 sm:p-6 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 w-full">
 
-            <div>
+            <div class="w-full">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Section
                 </label>
@@ -1555,7 +1527,7 @@
                 </select>
             </div>
 
-            <div>
+            <div class="w-full">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Subject
                 </label>
@@ -1567,7 +1539,7 @@
                 >
             </div>
 
-            <div>
+            <div class="w-full">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Grading Period
                 </label>
@@ -1584,7 +1556,7 @@
                 </select>
             </div>
 
-            <div>
+            <div class="w-full">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     School Year
                 </label>
@@ -1596,7 +1568,7 @@
                 >
             </div>
 
-            <div>
+            <div class="w-full">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Semester
                 </label>
@@ -1611,11 +1583,11 @@
 
         </div>
 
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4 mt-5">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 mt-5 w-full">
             <button
                 type="button"
                 onclick="loadOfficialGradebook()"
-                class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-medium"
+                class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-medium w-full sm:w-auto"
             >
                 <i class="fa-solid fa-rotate"></i>
                 Load Students
@@ -1623,23 +1595,23 @@
 
             <div
                 id="gradebook-message"
-                class="hidden flex-1 rounded-2xl px-4 py-3 text-sm"
+                class="hidden flex-1 w-full rounded-2xl px-4 py-3 text-sm"
             ></div>
         </div>
     </div>
 
-    <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden">
-        <div class="overflow-x-auto">
+    <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden w-full">
+        <div class="overflow-x-auto w-full">
             <table
                 id="official-gradebook-table"
-                class="w-full min-w-[850px]"
+                class="w-full min-w-[700px] sm:min-w-[850px]"
             >
                 <thead class="bg-gray-50 border-b border-gray-100">
                     <tr class="text-xs uppercase tracking-wide text-gray-500">
-                        <th class="px-6 py-4 text-left">Student</th>
-                        <th class="px-6 py-4 text-left">Email</th>
-                        <th class="px-6 py-4 text-left">Section</th>
-                        <th class="px-6 py-4 text-center">Official Grade</th>
+                        <th class="px-4 sm:px-6 py-4 text-left">Student</th>
+                        <th class="px-4 sm:px-6 py-4 text-left">Email</th>
+                        <th class="px-4 sm:px-6 py-4 text-left">Section</th>
+                        <th class="px-4 sm:px-6 py-4 text-center">Official Grade</th>
                     </tr>
                 </thead>
 
@@ -1650,7 +1622,7 @@
                     <tr>
                         <td
                             colspan="4"
-                            class="px-6 py-12 text-center text-gray-500"
+                            class="px-4 sm:px-6 py-12 text-center text-gray-500"
                         >
                             Select the gradebook details, then click Load Students.
                         </td>
@@ -1663,106 +1635,77 @@
 </div>
 
           <!-- GRADES VIEW -->
-<div id="grades-view" class="hidden space-y-6">
+<div id="grades-view" class="hidden space-y-6 w-full max-w-full">
 
-    <div class="flex justify-between items-center mb-4">
-
-        <h2 class="text-3xl font-semibold">
+    <div class="flex justify-between items-center mb-4 w-full">
+        <h2 class="text-2xl sm:text-3xl font-semibold">
             Academic Report Card
         </h2>
-
     </div>
 
-    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+    <div class="bg-white rounded-3xl p-5 sm:p-8 border border-gray-100 shadow-sm w-full overflow-hidden">
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 border-b pb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 border-b pb-8 w-full">
 
-            <div>
-
-                <div class="text-xs text-gray-400 font-medium uppercase">
+            <div class="w-full">
+                <div class="text-[11px] sm:text-xs text-gray-400 font-medium uppercase">
                     Overall Average
                 </div>
-
                 <div
                     id="report-overall-grade"
-                    class="text-4xl font-bold text-blue-600 mt-1"
+                    class="text-3xl sm:text-4xl font-bold text-blue-600 mt-1"
                 >
                     —
                 </div>
-
             </div>
 
-            <div>
-
-                <div class="text-xs text-gray-400 font-medium uppercase">
+            <div class="w-full">
+                <div class="text-[11px] sm:text-xs text-gray-400 font-medium uppercase">
                     Modules Completed
                 </div>
-
                 <div
                     id="report-modules-completed"
-                    class="text-4xl font-bold text-emerald-600 mt-1"
+                    class="text-3xl sm:text-4xl font-bold text-emerald-600 mt-1"
                 >
                     0 / 0
                 </div>
-
             </div>
 
-            <div>
-
-                <div class="text-xs text-gray-400 font-medium uppercase">
+            <div class="w-full">
+                <div class="text-[11px] sm:text-xs text-gray-400 font-medium uppercase">
                     Academic Status
                 </div>
-
                 <div
                     id="report-status"
-                    class="text-4xl font-bold text-gray-800 mt-1"
+                    class="text-2xl sm:text-4xl font-bold text-gray-800 mt-1"
                 >
                     No Grades
                 </div>
-
             </div>
 
         </div>
 
-        <h3 class="font-semibold text-xl mb-4">
+        <h3 class="font-semibold text-lg sm:text-xl mb-4">
             Current Subject Performance
         </h3>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto w-full">
 
-            <table class="w-full text-left">
+            <table class="w-full text-left min-w-[500px]">
 
                 <thead>
-
-                    <tr class="border-b text-xs font-semibold text-gray-400 uppercase tracking-wider">
-
-                        <th class="pb-3">
-                            Subject Name
-                        </th>
-
-                        <th class="pb-3">
-                            Instructor
-                        </th>
-
-                        <th class="pb-3">
-                            Percentage
-                        </th>
-
-                        <th class="pb-3">
-                            Letter Grade
-                        </th>
-
-                        <th class="pb-3">
-                            Status
-                        </th>
-
+                    <tr class="border-b text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <th class="pb-3 px-2">Subject Name</th>
+                        <th class="pb-3 px-2">Instructor</th>
+                        <th class="pb-3 px-2">Percentage</th>
+                        <th class="pb-3 px-2">Letter Grade</th>
+                        <th class="pb-3 px-2">Status</th>
                     </tr>
-
                 </thead>
 
                 <tbody
                     id="full-grades-tbody"
-                    class="text-sm divide-y divide-gray-100"
+                    class="text-xs sm:text-sm divide-y divide-gray-100"
                 >
                 </tbody>
 
@@ -1775,31 +1718,31 @@
 </div>
 
                 <!-- PROFILE VIEW -->
-                <div id="profile-view" class="hidden space-y-7">
+                <div id="profile-view" class="hidden space-y-6 sm:space-y-7 w-full max-w-full">
 
-                    <section class="profile-hero overflow-hidden">
+                    <section class="profile-hero overflow-hidden w-full">
                         <div class="profile-cover-pattern" aria-hidden="true"></div>
 
-                        <div class="profile-hero-content">
-                            <div class="profile-avatar-wrap">
+                        <div class="profile-hero-content flex-col sm:flex-row">
+                            <div class="profile-avatar-wrap mx-auto sm:mx-0">
                                 <div id="profile-avatar-initials" class="profile-avatar">SJ</div>
                                 <span class="profile-online-dot" title="Active account"></span>
                             </div>
 
-                            <div class="min-w-0 flex-1">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <h2 id="profile-name" class="text-3xl sm:text-4xl font-bold tracking-tight truncate">Student Name</h2>
-                                    <span id="profile-role-badge" class="profile-role-badge">Student</span>
+                            <div class="min-w-0 flex-1 text-center sm:text-left mt-4 sm:mt-0">
+                                <div class="flex flex-col sm:flex-row sm:flex-wrap items-center gap-2 sm:gap-3 justify-center sm:justify-start">
+                                    <h2 id="profile-name" class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight truncate w-full sm:w-auto text-center sm:text-left">Student Name</h2>
+                                    <span id="profile-role-badge" class="profile-role-badge mt-1 sm:mt-0">Student</span>
                                 </div>
-                                <p id="profile-bio-preview" class="text-white/75 mt-2 max-w-2xl leading-relaxed">
+                                <p id="profile-bio-preview" class="text-white/75 mt-2 max-w-2xl leading-relaxed text-sm sm:text-base mx-auto sm:mx-0">
                                     Add a short learning note so AIcee can understand you better.
                                 </p>
-                                <div class="flex flex-wrap gap-x-5 gap-y-2 mt-4 text-sm text-white/70">
-                                    <span class="flex items-center gap-2">
+                                <div class="flex flex-col sm:flex-row sm:flex-wrap gap-x-5 gap-y-2 mt-4 text-xs sm:text-sm text-white/70 justify-center sm:justify-start">
+                                    <span class="flex items-center justify-center sm:justify-start gap-2">
                                         <i class="fa-regular fa-envelope"></i>
                                         <span id="profile-email">No email</span>
                                     </span>
-                                    <span class="flex items-center gap-2">
+                                    <span class="flex items-center justify-center sm:justify-start gap-2">
                                         <i class="fa-solid fa-users-rectangle"></i>
                                         <span id="profile-section">No section assigned</span>
                                     </span>
@@ -1809,7 +1752,7 @@
                             <button
                                 type="button"
                                 onclick="navigateTo('settings')"
-                                class="profile-settings-button"
+                                class="profile-settings-button mt-4 sm:mt-0 w-full sm:w-auto justify-center"
                             >
                                 <i class="fa-solid fa-sliders"></i>
                                 Settings
@@ -1817,57 +1760,57 @@
                         </div>
                     </section>
 
-                    <section id="profile-ai-privacy-note" class="aicee-panel p-5 sm:p-6 border-blue-100 bg-blue-50/50">
-                        <div class="flex items-start gap-4">
-                            <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                    <section id="profile-ai-privacy-note" class="aicee-panel p-5 border-blue-100 bg-blue-50/50 w-full">
+                        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+                            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
                                 <i class="fa-solid fa-user-lock"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-900">Private to your AI learning experience</h3>
-                                <p class="text-sm text-gray-600 mt-1 leading-relaxed">
+                                <h3 class="font-bold text-gray-900 text-sm sm:text-base">Private to your AI learning experience</h3>
+                                <p class="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
                                     Other students cannot browse this profile. For student accounts, AIcee may use the learning bio together with recurring diagnostic results and relevant study conversations to personalize guidance.
                                 </p>
                             </div>
                         </div>
                     </section>
 
-                    <div class="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-7">
+                    <div class="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-5 sm:gap-7 w-full">
 
-                        <section class="aicee-panel p-6 sm:p-8">
-                            <div class="flex items-start justify-between gap-5 mb-7">
+                        <section class="aicee-panel p-5 sm:p-8 w-full">
+                            <div class="flex items-start justify-between gap-5 mb-5 sm:mb-7">
                                 <div>
                                     <p class="aicee-kicker">Personal information</p>
-                                    <h3 class="text-2xl font-bold mt-1">Edit your profile</h3>
-                                    <p class="text-sm text-gray-500 mt-2">Keep your account information accurate and recognizable.</p>
+                                    <h3 class="text-xl sm:text-2xl font-bold mt-1">Edit your profile</h3>
+                                    <p class="text-[11px] sm:text-sm text-gray-500 mt-2">Keep your account information accurate and recognizable.</p>
                                 </div>
-                                <div class="hidden sm:flex w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 items-center justify-center text-xl">
+                                <div class="hidden sm:flex w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 items-center justify-center text-xl shrink-0">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </div>
                             </div>
 
-                            <form id="profile-form" onsubmit="updateProfile(event)" class="space-y-6">
-                                <div class="grid md:grid-cols-2 gap-5">
-                                    <div class="aicee-field-group">
+                            <form id="profile-form" onsubmit="updateProfile(event)" class="space-y-5 sm:space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 w-full">
+                                    <div class="aicee-field-group w-full">
                                         <label for="edit-name" class="aicee-field-label">Full name</label>
-                                        <div class="aicee-input-shell">
+                                        <div class="aicee-input-shell w-full">
                                             <i class="fa-regular fa-user"></i>
-                                            <input id="edit-name" type="text" class="aicee-input" maxlength="100" required>
+                                            <input id="edit-name" type="text" class="aicee-input w-full" maxlength="100" required>
                                         </div>
                                     </div>
 
-                                    <div class="aicee-field-group">
+                                    <div class="aicee-field-group w-full">
                                         <label for="edit-email" class="aicee-field-label">Email address</label>
-                                        <div class="aicee-input-shell">
+                                        <div class="aicee-input-shell w-full">
                                             <i class="fa-regular fa-envelope"></i>
-                                            <input id="edit-email" type="email" class="aicee-input" maxlength="150" required>
+                                            <input id="edit-email" type="email" class="aicee-input w-full" maxlength="150" required>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="aicee-field-group">
+                                <div class="aicee-field-group w-full">
                                     <div class="flex items-center justify-between gap-4">
                                         <label for="edit-bio" class="aicee-field-label">Learning note for AIcee</label>
-                                        <span id="profile-bio-count" class="text-xs text-gray-400">0 / 240</span>
+                                        <span id="profile-bio-count" class="text-[10px] sm:text-xs text-gray-400">0 / 240</span>
                                     </div>
                                     <textarea
                                         id="edit-bio"
@@ -1875,13 +1818,13 @@
                                         maxlength="240"
                                         oninput="updateProfileBioCount()"
                                         placeholder="Example: I learn better with examples, I want to improve in math, and I enjoy programming..."
-                                        class="aicee-textarea"
+                                        class="aicee-textarea w-full"
                                     ></textarea>
                                 </div>
 
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-                                    <p id="profile-save-status" class="text-sm text-gray-500 min-h-[20px]"></p>
-                                    <button id="profile-save-button" type="submit" class="aicee-primary-button sm:w-auto px-8">
+                                    <p id="profile-save-status" class="text-xs sm:text-sm text-gray-500 min-h-[20px] text-center sm:text-left"></p>
+                                    <button id="profile-save-button" type="submit" class="aicee-primary-button w-full sm:w-auto px-8 justify-center">
                                         <span class="flex items-center justify-center gap-2">
                                             <i class="fa-regular fa-floppy-disk"></i>
                                             Save changes
@@ -1891,44 +1834,44 @@
                             </form>
                         </section>
 
-                        <aside class="space-y-6">
-                            <section class="aicee-panel p-6">
-                                <div class="flex items-center justify-between gap-4">
+                        <aside class="space-y-5 sm:space-y-6 w-full">
+                            <section class="aicee-panel p-5 sm:p-6 w-full flex flex-col items-center sm:items-start text-center sm:text-left">
+                                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
                                     <div>
                                         <p class="aicee-kicker">Profile completion</p>
-                                        <div class="text-3xl font-bold mt-1"><span id="profile-completion-value">0</span>%</div>
+                                        <div class="text-2xl sm:text-3xl font-bold mt-1"><span id="profile-completion-value">0</span>%</div>
                                     </div>
-                                    <div class="profile-progress-ring" id="profile-progress-ring">
+                                    <div class="profile-progress-ring shrink-0" id="profile-progress-ring">
                                         <span id="profile-progress-ring-text">0%</span>
                                     </div>
                                 </div>
-                                <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden mt-5">
+                                <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden mt-5 w-full">
                                     <div id="profile-completion-bar" class="h-full rounded-full transition-all duration-700" style="width:0%"></div>
                                 </div>
-                                <p id="profile-completion-message" class="text-xs text-gray-500 leading-relaxed mt-3">
+                                <p id="profile-completion-message" class="text-[11px] sm:text-xs text-gray-500 leading-relaxed mt-3 w-full">
                                     Complete your basic information to finish your profile.
                                 </p>
                             </section>
 
-                            <section class="aicee-panel p-6">
-                                <p class="aicee-kicker mb-4">Account details</p>
-                                <div class="profile-detail-list">
-                                    <div>
-                                        <span><i class="fa-solid fa-fingerprint"></i> Account ID</span>
-                                        <strong id="profile-account-id">—</strong>
+                            <section class="aicee-panel p-5 sm:p-6 w-full">
+                                <p class="aicee-kicker mb-4 text-center sm:text-left">Account details</p>
+                                <div class="profile-detail-list w-full text-sm">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start gap-1 sm:gap-0">
+                                        <span class="text-gray-500"><i class="fa-solid fa-fingerprint"></i> Account ID</span>
+                                        <strong id="profile-account-id" class="break-all">—</strong>
                                     </div>
-                                    <div>
-                                        <span><i class="fa-solid fa-user-shield"></i> Account type</span>
-                                        <strong id="profile-role">Student</strong>
+                                    <div class="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start gap-1 sm:gap-0">
+                                        <span class="text-gray-500"><i class="fa-solid fa-user-shield"></i> Account type</span>
+                                        <strong id="profile-role">—</strong>
                                     </div>
-                                    <div>
-                                        <span><i class="fa-regular fa-calendar"></i> Member since</span>
+                                    <div class="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start gap-1 sm:gap-0">
+                                        <span class="text-gray-500"><i class="fa-regular fa-calendar"></i> Member since</span>
                                         <strong id="profile-member-since">—</strong>
                                     </div>
                                 </div>
                             </section>
 
-                            <button type="button" onclick="navigateTo('settings')" class="aicee-secondary-button w-full">
+                            <button type="button" onclick="navigateTo('settings')" class="aicee-secondary-button w-full justify-center">
                                 <i class="fa-solid fa-palette"></i>
                                 Personalize appearance
                             </button>
@@ -1938,47 +1881,47 @@
                 </div>
 
                 <!-- SETTINGS VIEW -->
-                <div id="settings-view" class="hidden space-y-7">
-                    <div class="settings-heading">
+                <div id="settings-view" class="hidden space-y-5 sm:space-y-7 w-full max-w-full">
+                    <div class="settings-heading flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-start">
                         <div>
                             <p class="aicee-kicker">Personalize AICEE</p>
-                            <h2 class="text-3xl font-bold tracking-tight mt-1">Settings</h2>
-                            <p class="text-gray-500 mt-2">Choose how your learning workspace looks and moves on this device.</p>
+                            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">Settings</h2>
+                            <p class="text-sm sm:text-base text-gray-500 mt-2">Choose how your learning workspace looks and moves on this device.</p>
                         </div>
-                        <button type="button" onclick="resetAiceeSettings()" class="aicee-secondary-button">
+                        <button type="button" onclick="resetAiceeSettings()" class="aicee-secondary-button w-full sm:w-auto justify-center whitespace-nowrap">
                             <i class="fa-solid fa-rotate-left"></i>
                             Reset defaults
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-7">
-                        <div class="space-y-6">
-                            <section class="aicee-panel p-6 sm:p-8">
-                                <div class="settings-section-title">
-                                    <span class="settings-icon"><i class="fa-solid fa-circle-half-stroke"></i></span>
+                    <div class="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-5 sm:gap-7 w-full">
+                        <div class="space-y-5 sm:space-y-6 w-full">
+                            <section class="aicee-panel p-5 sm:p-8 w-full">
+                                <div class="settings-section-title flex gap-3">
+                                    <span class="settings-icon shrink-0"><i class="fa-solid fa-circle-half-stroke"></i></span>
                                     <div>
-                                        <h3>Appearance</h3>
-                                        <p>Switch between light, dark, or your device preference.</p>
+                                        <h3 class="font-bold">Appearance</h3>
+                                        <p class="text-xs sm:text-sm text-gray-500">Switch between light, dark, or your device preference.</p>
                                     </div>
                                 </div>
 
-                                <div class="theme-choice-grid mt-6">
-                                    <button type="button" data-theme-choice="light" onclick="setThemePreference('light')" class="theme-choice-card">
-                                        <span class="theme-preview theme-preview-light">
+                                <div class="theme-choice-grid mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+                                    <button type="button" data-theme-choice="light" onclick="setThemePreference('light')" class="theme-choice-card w-full">
+                                        <span class="theme-preview theme-preview-light w-full">
                                             <i></i><b></b><em></em>
                                         </span>
                                         <strong>Light</strong>
                                         <small>Bright and clean</small>
                                     </button>
-                                    <button type="button" data-theme-choice="dark" onclick="setThemePreference('dark')" class="theme-choice-card">
-                                        <span class="theme-preview theme-preview-dark">
+                                    <button type="button" data-theme-choice="dark" onclick="setThemePreference('dark')" class="theme-choice-card w-full">
+                                        <span class="theme-preview theme-preview-dark w-full">
                                             <i></i><b></b><em></em>
                                         </span>
                                         <strong>Dark</strong>
                                         <small>Easy on the eyes</small>
                                     </button>
-                                    <button type="button" data-theme-choice="system" onclick="setThemePreference('system')" class="theme-choice-card">
-                                        <span class="theme-preview theme-preview-system">
+                                    <button type="button" data-theme-choice="system" onclick="setThemePreference('system')" class="theme-choice-card w-full">
+                                        <span class="theme-preview theme-preview-system w-full">
                                             <i></i><b></b><em></em>
                                         </span>
                                         <strong>System</strong>
@@ -1987,16 +1930,16 @@
                                 </div>
                             </section>
 
-                            <section class="aicee-panel p-6 sm:p-8">
-                                <div class="settings-section-title">
-                                    <span class="settings-icon"><i class="fa-solid fa-droplet"></i></span>
+                            <section class="aicee-panel p-5 sm:p-8 w-full">
+                                <div class="settings-section-title flex gap-3">
+                                    <span class="settings-icon shrink-0"><i class="fa-solid fa-droplet"></i></span>
                                     <div>
-                                        <h3>Accent color</h3>
-                                        <p>Pick the main color used for buttons, highlights, and focus states.</p>
+                                        <h3 class="font-bold">Accent color</h3>
+                                        <p class="text-xs sm:text-sm text-gray-500">Pick the main color used for buttons, highlights, and focus states.</p>
                                     </div>
                                 </div>
 
-                                <div class="accent-choice-row mt-6">
+                                <div class="accent-choice-row mt-6 flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-start w-full">
                                     <button type="button" data-accent-choice="blue" onclick="setAccentPreference('blue')" class="accent-choice accent-blue" aria-label="Blue accent"></button>
                                     <button type="button" data-accent-choice="violet" onclick="setAccentPreference('violet')" class="accent-choice accent-violet" aria-label="Violet accent"></button>
                                     <button type="button" data-accent-choice="emerald" onclick="setAccentPreference('emerald')" class="accent-choice accent-emerald" aria-label="Emerald accent"></button>
@@ -2005,48 +1948,48 @@
                                 </div>
                             </section>
 
-                            <section class="aicee-panel p-6 sm:p-8">
-                                <div class="settings-section-title">
-                                    <span class="settings-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                            <section class="aicee-panel p-5 sm:p-8 w-full">
+                                <div class="settings-section-title flex gap-3">
+                                    <span class="settings-icon shrink-0"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
                                     <div>
-                                        <h3>Interface behavior</h3>
-                                        <p>Fine-tune animation and spacing preferences.</p>
+                                        <h3 class="font-bold">Interface behavior</h3>
+                                        <p class="text-xs sm:text-sm text-gray-500">Fine-tune animation and spacing preferences.</p>
                                     </div>
                                 </div>
 
-                                <div class="settings-toggle-list mt-6">
-                                    <label class="settings-toggle-row">
-                                        <span>
-                                            <strong>Interface animations</strong>
-                                            <small>Animate pages, buttons, cards, and login elements.</small>
+                                <div class="settings-toggle-list mt-6 w-full space-y-4">
+                                    <label class="settings-toggle-row flex items-center justify-between w-full gap-4">
+                                        <span class="flex-1">
+                                            <strong class="block text-sm sm:text-base">Interface animations</strong>
+                                            <small class="block text-[11px] sm:text-xs text-gray-500">Animate pages, buttons, cards, and login elements.</small>
                                         </span>
-                                        <input id="setting-animations" type="checkbox" onchange="setBooleanSetting('animations', this.checked)">
-                                        <i class="settings-switch"></i>
+                                        <input id="setting-animations" type="checkbox" onchange="setBooleanSetting('animations', this.checked)" class="shrink-0">
+                                        <i class="settings-switch shrink-0"></i>
                                     </label>
 
-                                    <label class="settings-toggle-row">
-                                        <span>
-                                            <strong>Compact layout</strong>
-                                            <small>Reduce spacing to display more content at once.</small>
+                                    <label class="settings-toggle-row flex items-center justify-between w-full gap-4">
+                                        <span class="flex-1">
+                                            <strong class="block text-sm sm:text-base">Compact layout</strong>
+                                            <small class="block text-[11px] sm:text-xs text-gray-500">Reduce spacing to display more content at once.</small>
                                         </span>
-                                        <input id="setting-compact" type="checkbox" onchange="setBooleanSetting('compact', this.checked)">
-                                        <i class="settings-switch"></i>
+                                        <input id="setting-compact" type="checkbox" onchange="setBooleanSetting('compact', this.checked)" class="shrink-0">
+                                        <i class="settings-switch shrink-0"></i>
                                     </label>
 
-                                    <label class="settings-toggle-row">
-                                        <span>
-                                            <strong>Animated login background</strong>
-                                            <small>Show ambient movement on the sign-in page.</small>
+                                    <label class="settings-toggle-row flex items-center justify-between w-full gap-4">
+                                        <span class="flex-1">
+                                            <strong class="block text-sm sm:text-base">Animated login background</strong>
+                                            <small class="block text-[11px] sm:text-xs text-gray-500">Show ambient movement on the sign-in page.</small>
                                         </span>
-                                        <input id="setting-login-animation" type="checkbox" onchange="setBooleanSetting('loginAnimation', this.checked)">
-                                        <i class="settings-switch"></i>
+                                        <input id="setting-login-animation" type="checkbox" onchange="setBooleanSetting('loginAnimation', this.checked)" class="shrink-0">
+                                        <i class="settings-switch shrink-0"></i>
                                     </label>
                                 </div>
                             </section>
                         </div>
 
-                        <aside class="space-y-6">
-                            <section class="settings-preview-card">
+                        <aside class="space-y-5 sm:space-y-6 w-full">
+                            <section class="settings-preview-card w-full hidden sm:block">
                                 <div class="settings-preview-top">
                                     <span></span><span></span><span></span>
                                 </div>
@@ -2063,16 +2006,16 @@
                                 </div>
                             </section>
 
-                            <section class="aicee-panel p-6">
+                            <section class="aicee-panel p-5 sm:p-6 w-full">
                                 <div class="flex items-center gap-3">
-                                    <span class="settings-icon"><i class="fa-solid fa-floppy-disk"></i></span>
+                                    <span class="settings-icon shrink-0"><i class="fa-solid fa-floppy-disk"></i></span>
                                     <div>
-                                        <h3 class="font-bold">Saved automatically</h3>
-                                        <p class="text-xs text-gray-500 mt-1">These preferences stay on this browser and device.</p>
+                                        <h3 class="font-bold text-sm sm:text-base">Saved automatically</h3>
+                                        <p class="text-[11px] sm:text-xs text-gray-500 mt-1">These preferences stay on this browser and device.</p>
                                     </div>
                                 </div>
-                                <p id="settings-save-status" class="settings-saved-status">
-                                    <i class="fa-solid fa-circle-check"></i>
+                                <p id="settings-save-status" class="settings-saved-status text-xs sm:text-sm mt-3 flex items-center gap-2 justify-center sm:justify-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500"></i>
                                     Settings are up to date
                                 </p>
                             </section>
@@ -2085,35 +2028,35 @@
     </div>
     
     <!-- AI ASSISTANT MODAL -->
-    <div id="ai-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
-        <div class="bg-white w-full max-w-2xl mx-4 rounded-3xl shadow-2xl modal">
-            <div class="flex items-center justify-between border-b px-6 py-5">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-sparkles text-amber-500 text-2xl"></i>
+    <div id="ai-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-0 sm:p-4">
+        <div class="bg-white w-full max-w-2xl mx-0 sm:mx-4 rounded-none sm:rounded-3xl shadow-2xl modal flex flex-col h-[100dvh] sm:h-auto sm:max-h-[95dvh]">
+            <div class="flex items-center justify-between border-b px-4 sm:px-6 py-4 sm:py-5 shrink-0">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <i class="fa-solid fa-sparkles text-amber-500 text-xl sm:text-2xl shrink-0"></i>
                     <div>
-                        <div class="font-semibold">AIcee Study Assistant</div>
-                        <div class="text-xs text-gray-500">Personalized learning companion</div>
+                        <div class="font-semibold text-sm sm:text-base">AIcee Study Assistant</div>
+                        <div class="text-[10px] sm:text-xs text-gray-500 hidden sm:block">Personalized learning companion</div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="clearAIChatHistory()" class="px-3 py-2 rounded-xl text-xs font-semibold text-gray-500 hover:text-red-600 hover:bg-red-50 transition">
-                        <i class="fa-solid fa-trash-can mr-1"></i> Clear chat
+                <div class="flex items-center gap-1 sm:gap-2">
+                    <button type="button" onclick="clearAIChatHistory()" class="px-2 sm:px-3 py-2 rounded-xl text-[10px] sm:text-xs font-semibold text-gray-500 hover:text-red-600 hover:bg-red-50 transition whitespace-nowrap">
+                        <i class="fa-solid fa-trash-can sm:mr-1"></i> <span class="hidden sm:inline">Clear chat</span>
                     </button>
-                    <button onclick="closeAIModal()" class="text-3xl leading-none text-gray-400 hover:text-gray-600">×</button>
+                    <button onclick="closeAIModal()" class="text-2xl sm:text-3xl leading-none text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">×</button>
                 </div>
             </div>
             
-            <div class="h-96 p-6 overflow-auto bg-gray-50" id="ai-chat-log"></div>
+            <div class="flex-1 min-h-[200px] p-4 sm:p-6 overflow-y-auto bg-gray-50 w-full" id="ai-chat-log"></div>
             
-            <div class="p-5 border-t bg-white">
-                <div class="mb-4">
-                    <label for="ai-module-select" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Teacher Learning Material</label>
-                    <select id="ai-module-select" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-blue-500"><option value="">No specific learning material</option></select>
-                    <p class="text-[11px] text-gray-400 mt-2">Select a teacher-provided PDF if you want AIcee to use that learning material as the main reference. AIcee also remembers recent study conversations for continuity.</p>
+            <div class="p-4 sm:p-5 border-t bg-white shrink-0 w-full">
+                <div class="mb-3 sm:mb-4">
+                    <label for="ai-module-select" class="block text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 sm:mb-2">Teacher Learning Material</label>
+                    <select id="ai-module-select" class="w-full px-3 py-2 sm:px-4 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-blue-500"><option value="">No specific learning material</option></select>
+                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-1 sm:mt-2 hidden sm:block">Select a teacher-provided PDF if you want AIcee to use that learning material as the main reference. AIcee also remembers recent study conversations for continuity.</p>
                 </div>
-                <div class="flex gap-3">
-                    <input id="ai-input" onkeypress="if(event.key === 'Enter') sendAIMessage()" type="text" placeholder="Ask AIcee about what you're studying..." class="flex-1 px-6 py-4 bg-white border border-gray-200 rounded-3xl focus:outline-none focus:border-blue-500">
-                    <button onclick="sendAIMessage()" class="px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-medium transition">Send</button>
+                <div class="flex gap-2 sm:gap-3 w-full">
+                    <input id="ai-input" onkeypress="if(event.key === 'Enter') sendAIMessage()" type="text" placeholder="Ask AIcee..." class="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-white border border-gray-200 rounded-full sm:rounded-3xl text-sm focus:outline-none focus:border-blue-500 w-full">
+                    <button onclick="sendAIMessage()" class="px-5 sm:px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full sm:rounded-3xl font-medium transition text-sm whitespace-nowrap"><i class="fa-solid fa-paper-plane sm:hidden"></i><span class="hidden sm:inline">Send</span></button>
                 </div>
             </div>
         </div>
@@ -2124,15 +2067,14 @@
         id="upload-modal"
         class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4"
     >
-        <div class="bg-white rounded-3xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-3xl w-full max-w-lg p-5 sm:p-8 max-h-[90dvh] overflow-y-auto">
 
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-5 sm:mb-6">
                 <div>
-                    <h3 class="text-2xl font-semibold">
+                    <h3 class="text-xl sm:text-2xl font-semibold">
                         Upload Learning Material
                     </h3>
-
-                    <p class="text-sm text-gray-500 mt-1">
+                    <p class="text-[11px] sm:text-sm text-gray-500 mt-1">
                         Upload a learning material and assign it to selected sections. PDF files can be read directly by AIcee when a student selects them.
                     </p>
                 </div>
@@ -2140,1063 +2082,342 @@
                 <button
                     type="button"
                     onclick="closeUploadModal()"
-                    class="text-3xl leading-none text-gray-400 hover:text-gray-600"
+                    class="text-2xl sm:text-3xl leading-none text-gray-400 hover:text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 shrink-0"
                 >
                     ×
                 </button>
             </div>
 
-            <div class="space-y-5">
-
-                <div>
-                    <label
-                        for="module-title"
-                        class="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                        Module Title
-                    </label>
-
-                    <input
-                        id="module-title"
-                        type="text"
-                        placeholder="Enter the module title"
-                        class="w-full border border-gray-200 px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500"
-                    >
+            <div class="space-y-4 sm:space-y-5 w-full">
+                <div class="w-full">
+                    <label for="module-title" class="block text-sm font-medium text-gray-700 mb-2">Module Title</label>
+                    <input id="module-title" type="text" placeholder="Enter the module title" class="w-full border border-gray-200 px-4 sm:px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500">
                 </div>
 
-                <div>
-                    <label
-                        for="module-description"
-                        class="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                        Description
-                    </label>
-
-                    <textarea
-                        id="module-description"
-                        rows="4"
-                        placeholder="Enter a short description"
-                        class="w-full border border-gray-200 px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500"
-                    ></textarea>
+                <div class="w-full">
+                    <label for="module-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="module-description" rows="3" placeholder="Enter a short description" class="w-full border border-gray-200 px-4 sm:px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500"></textarea>
                 </div>
 
-                <div>
-                    <label
-                        for="module-file"
-                        class="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                        Module File
-                    </label>
-
-                    <input
-                        id="module-file"
-                        type="file"
-                        class="w-full border border-gray-200 p-3 rounded-2xl"
-                    >
+                <div class="w-full">
+                    <label for="module-file" class="block text-sm font-medium text-gray-700 mb-2">Module File</label>
+                    <input id="module-file" type="file" class="w-full border border-gray-200 p-2 sm:p-3 rounded-2xl text-sm">
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Assign to Sections
-                    </label>
-
-                    <div
-                        id="section-list"
-                        class="border border-gray-200 rounded-2xl p-4 max-h-52 overflow-y-auto space-y-3"
-                    >
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Assign to Sections</label>
+                    <div id="section-list" class="border border-gray-200 rounded-2xl p-4 max-h-40 sm:max-h-52 overflow-y-auto space-y-3 w-full">
                         Loading sections...
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 pt-3">
-                    <button
-                        type="button"
-                        onclick="closeUploadModal()"
-                        class="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-2xl"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="button"
-                        onclick="fakeUpload()"
-                        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
-                    >
-                        Upload
-                    </button>
+                <div class="flex justify-end gap-3 pt-3 w-full">
+                    <button type="button" onclick="closeUploadModal()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-2xl text-sm font-medium border border-gray-200 sm:border-transparent">Cancel</button>
+                    <button type="button" onclick="fakeUpload()" class="flex-1 sm:flex-none px-6 sm:px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-medium">Upload</button>
                 </div>
-
             </div>
 
         </div>
     </div>
 
 <!-- CREATE ASSIGNMENT MODAL -->
-<div
-    id="assignment-modal"
-    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4"
->
-
-    <div class="bg-white rounded-3xl w-full max-w-xl p-8 max-h-[90vh] overflow-y-auto">
-
-        <div class="flex items-center justify-between mb-6">
-
+<div id="assignment-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4">
+    <div class="bg-white rounded-3xl w-full max-w-xl p-5 sm:p-8 max-h-[90dvh] overflow-y-auto w-full">
+        <div class="flex items-center justify-between mb-5 sm:mb-6">
             <div>
-                <h3 class="text-2xl font-semibold">
-                    Create Assignment
-                </h3>
-
-                <p class="text-sm text-gray-500 mt-1">
-                    Assign a task to selected sections.
-                </p>
+                <h3 class="text-xl sm:text-2xl font-semibold">Create Assignment</h3>
+                <p class="text-[11px] sm:text-sm text-gray-500 mt-1">Assign a task to selected sections.</p>
             </div>
-
-            <button
-                type="button"
-                onclick="closeAssignmentModal()"
-                class="text-3xl text-gray-400 hover:text-gray-600"
-            >
-                ×
-            </button>
-
+            <button type="button" onclick="closeAssignmentModal()" class="text-2xl sm:text-3xl text-gray-400 hover:text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 shrink-0">×</button>
         </div>
 
-        <form
-            id="assignment-form"
-            onsubmit="createAssignment(event)"
-        >
-
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Assignment Title
-                </label>
-
-                <input
-                    id="assignment-title"
-                    type="text"
-                    required
-                    placeholder="Example: Programming Quiz #1"
-                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
-
+        <form id="assignment-form" onsubmit="createAssignment(event)" class="space-y-4 sm:space-y-5 w-full">
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Assignment Title</label>
+                <input id="assignment-title" type="text" required placeholder="Example: Programming Quiz #1" class="w-full px-4 sm:px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
 
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                </label>
-
-                <textarea
-                    id="assignment-description"
-                    rows="4"
-                    placeholder="Instructions for the students..."
-                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                ></textarea>
-
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea id="assignment-description" rows="3" placeholder="Instructions for the students..." class="w-full px-4 sm:px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"></textarea>
             </div>
 
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Related Module
-                </label>
-
-                <select
-                    id="assignment-module"
-                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
-                    <option value="">
-                        No related module
-                    </option>
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Related Module</label>
+                <select id="assignment-module" class="w-full px-4 sm:px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
+                    <option value="">No related module</option>
                 </select>
-
             </div>
 
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Due Date
-                </label>
-
-                <input
-                    id="assignment-due-date"
-                    type="datetime-local"
-                    required
-                    class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
-
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                <input id="assignment-due-date" type="datetime-local" required class="w-full px-4 sm:px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
 
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Assign to Sections
-                </label>
-
-                <div
-                    id="assignment-section-list"
-                    class="border border-gray-200 rounded-2xl p-4 max-h-52 overflow-y-auto space-y-3"
-                >
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Assign to Sections</label>
+                <div id="assignment-section-list" class="border border-gray-200 rounded-2xl p-4 max-h-40 sm:max-h-52 overflow-y-auto space-y-3 w-full">
                     Loading sections...
                 </div>
-
             </div>
 
-            <div class="flex justify-end gap-3 pt-4">
-
-                <button
-                    type="button"
-                    onclick="closeAssignmentModal()"
-                    class="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-2xl"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    id="create-assignment-submit"
-                    type="submit"
-                    class="px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium"
-                >
-                    Create Assignment
-                </button>
-
+            <div class="flex justify-end gap-3 pt-4 w-full">
+                <button type="button" onclick="closeAssignmentModal()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-2xl border border-gray-200 sm:border-transparent font-medium">Cancel</button>
+                <button id="create-assignment-submit" type="submit" class="flex-1 sm:flex-none px-6 sm:px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium">Create Assignment</button>
             </div>
-
         </form>
-
     </div>
-
 </div>
 
-<div
-    id="diagnostic-modal"
-    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
->
-    <div class="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-8">
-
-        <div class="mb-6">
-
-            <h2 class="text-2xl font-bold text-gray-900">
-                Let’s Personalize Your Learning
-            </h2>
-
-            <p class="text-sm text-gray-500 mt-2">
-                This short quiz is not graded. It helps AIcee understand what you already know and where you may need more guidance.
-            </p>
-
+<div id="diagnostic-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl max-h-[90dvh] overflow-y-auto rounded-3xl p-5 sm:p-8 w-full">
+        <div class="mb-5 sm:mb-6 text-center sm:text-left">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Let’s Personalize Your Learning</h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-2">This short quiz is not graded. It helps AIcee understand what you already know and where you may need more guidance.</p>
         </div>
 
-        <form id="diagnostic-form">
-
-            <div
-                id="diagnostic-questions-container"
-                class="space-y-8"
-            >
-                <p class="text-gray-500">
-                    Loading questions...
-                </p>
+        <form id="diagnostic-form" class="w-full">
+            <div id="diagnostic-questions-container" class="space-y-6 sm:space-y-8 w-full">
+                <p class="text-gray-500">Loading questions...</p>
             </div>
 
-            <div class="mt-8 space-y-3">
-
-                <button
-                    type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-semibold"
-                >
-                    Start My Learning Profile
-                </button>
-
-                <button
-                    type="button"
-                    onclick="skipDiagnosticQuiz()"
-                    class="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 py-3 rounded-2xl font-semibold"
-                >
-                    Maybe Later
-                </button>
-
-                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-
-                    <p class="text-sm text-amber-800">
-                        ⚠️ Completing this quiz helps AIcee identify your strengths and subjects that may need more support.
-                    </p>
-
+            <div class="mt-6 sm:mt-8 space-y-3 w-full">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-semibold text-sm sm:text-base">Start My Learning Profile</button>
+                <button type="button" onclick="skipDiagnosticQuiz()" class="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 py-3 rounded-2xl font-semibold text-sm sm:text-base">Maybe Later</button>
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 w-full">
+                    <p class="text-[11px] sm:text-sm text-amber-800">⚠️ Completing this quiz helps AIcee identify your strengths and subjects that may need more support.</p>
                 </div>
-
             </div>
-
         </form>
-
     </div>
 </div>
+
 <!-- CUSTOM CONFIRMATION POPUP -->
-<div
-    id="confirm-popup"
-    class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
->
-    <div
-        id="confirm-popup-box"
-        class="bg-white w-full max-w-md rounded-3xl p-7 shadow-2xl popup-enter"
-    >
-        <div class="flex items-start gap-4">
-
-            <div
-                id="confirm-popup-icon"
-                class="w-12 h-12 shrink-0 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl"
-            >
-                <i class="fa-solid fa-circle-question"></i>
-            </div>
-
+<div id="confirm-popup" class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="confirm-popup-box" class="bg-white w-full max-w-md rounded-3xl p-5 sm:p-7 shadow-2xl popup-enter">
+        <div class="flex items-start gap-3 sm:gap-4">
+            <div id="confirm-popup-icon" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg sm:text-xl"><i class="fa-solid fa-circle-question"></i></div>
             <div class="flex-1">
-
-                <h3
-                    id="confirm-popup-title"
-                    class="text-xl font-bold text-gray-900"
-                >
-                    Confirmation
-                </h3>
-
-                <p
-                    id="confirm-popup-message"
-                    class="text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line"
-                >
-                    Are you sure you want to continue?
-                </p>
-
+                <h3 id="confirm-popup-title" class="text-lg sm:text-xl font-bold text-gray-900">Confirmation</h3>
+                <p id="confirm-popup-message" class="text-xs sm:text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line">Are you sure you want to continue?</p>
             </div>
-
         </div>
-
-        <div class="grid grid-cols-2 gap-3 mt-7">
-
-            <button
-                id="confirm-popup-cancel"
-                type="button"
-                class="py-3 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-2xl font-semibold transition-all"
-            >
-                Cancel
-            </button>
-
-            <button
-                id="confirm-popup-confirm"
-                type="button"
-                class="py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all"
-            >
-                Continue
-            </button>
-
+        <div class="grid grid-cols-2 gap-3 mt-5 sm:mt-7">
+            <button id="confirm-popup-cancel" type="button" class="py-2.5 sm:py-3 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-2xl font-semibold transition-all text-sm">Cancel</button>
+            <button id="confirm-popup-confirm" type="button" class="py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all text-sm">Continue</button>
         </div>
-
     </div>
 </div>
-
 
 <!-- CUSTOM MESSAGE POPUP -->
-<div
-    id="message-popup"
-    class="hidden fixed inset-0 z-[310] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
->
-    <div
-        id="message-popup-box"
-        class="bg-white w-full max-w-md rounded-3xl p-7 shadow-2xl popup-enter"
-    >
-        <div class="flex items-start gap-4">
-
-            <div
-                id="message-popup-icon"
-                class="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center text-xl"
-            >
-            </div>
-
+<div id="message-popup" class="hidden fixed inset-0 z-[310] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="message-popup-box" class="bg-white w-full max-w-md rounded-3xl p-5 sm:p-7 shadow-2xl popup-enter">
+        <div class="flex items-start gap-3 sm:gap-4">
+            <div id="message-popup-icon" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-2xl flex items-center justify-center text-lg sm:text-xl"></div>
             <div class="flex-1">
-
-                <h3
-                    id="message-popup-title"
-                    class="text-xl font-bold text-gray-900"
-                >
-                    Message
-                </h3>
-
-                <p
-                    id="message-popup-text"
-                    class="text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line"
-                >
-                Your action was completed.
-                </p>
-
+                <h3 id="message-popup-title" class="text-lg sm:text-xl font-bold text-gray-900">Message</h3>
+                <p id="message-popup-text" class="text-xs sm:text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line">Your action was completed.</p>
             </div>
-
         </div>
-
-        <button
-            id="message-popup-button"
-            type="button"
-            onclick="closeMessagePopup()"
-            class="mt-7 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all"
-        >
-            Okay
-        </button>
-
+        <button id="message-popup-button" type="button" onclick="closeMessagePopup()" class="mt-5 sm:mt-7 w-full py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all text-sm">Okay</button>
     </div>
 </div>
 
-
 <!-- CUSTOM INPUT POPUP -->
-<div
-    id="prompt-popup"
-    class="hidden fixed inset-0 z-[320] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
->
-    <div
-        id="prompt-popup-box"
-        class="bg-white w-full max-w-lg rounded-3xl p-7 shadow-2xl popup-enter"
-    >
-        <div class="flex items-start gap-4">
-            <div
-                id="prompt-popup-icon"
-                class="w-12 h-12 shrink-0 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl"
-            >
-                <i class="fa-solid fa-pen-to-square"></i>
-            </div>
-
+<div id="prompt-popup" class="hidden fixed inset-0 z-[320] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="prompt-popup-box" class="bg-white w-full max-w-lg rounded-3xl p-5 sm:p-7 shadow-2xl popup-enter w-full">
+        <div class="flex items-start gap-3 sm:gap-4">
+            <div id="prompt-popup-icon" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg sm:text-xl"><i class="fa-solid fa-pen-to-square"></i></div>
             <div class="flex-1 min-w-0">
-                <h3
-                    id="prompt-popup-title"
-                    class="text-xl font-bold text-gray-900"
-                >
-                    Enter Information
-                </h3>
-
-                <p
-                    id="prompt-popup-message"
-                    class="text-sm leading-relaxed text-gray-600 mt-2 whitespace-pre-line"
-                ></p>
+                <h3 id="prompt-popup-title" class="text-lg sm:text-xl font-bold text-gray-900">Enter Information</h3>
+                <p id="prompt-popup-message" class="text-xs sm:text-sm leading-relaxed text-gray-600 mt-1 sm:mt-2 whitespace-pre-line"></p>
             </div>
         </div>
-
-        <input
-            id="prompt-popup-input"
-            type="text"
-            class="mt-6 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-        >
-
-        <textarea
-            id="prompt-popup-textarea"
-            rows="5"
-            class="hidden mt-6 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-y"
-        ></textarea>
-
-        <p
-            id="prompt-popup-error"
-            class="hidden text-sm text-red-600 mt-3"
-        ></p>
-
-        <div class="grid grid-cols-2 gap-3 mt-7">
-            <button
-                id="prompt-popup-cancel"
-                type="button"
-                class="py-3 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-2xl font-semibold transition-all"
-            >
-                Cancel
-            </button>
-
-            <button
-                id="prompt-popup-confirm"
-                type="button"
-                class="py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all"
-            >
-                Save
-            </button>
+        <input id="prompt-popup-input" type="text" class="mt-4 sm:mt-6 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 w-full text-sm">
+        <textarea id="prompt-popup-textarea" rows="4" class="hidden mt-4 sm:mt-6 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-y w-full text-sm"></textarea>
+        <p id="prompt-popup-error" class="hidden text-xs sm:text-sm text-red-600 mt-2 sm:mt-3"></p>
+        <div class="grid grid-cols-2 gap-3 mt-5 sm:mt-7 w-full">
+            <button id="prompt-popup-cancel" type="button" class="py-2.5 sm:py-3 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-2xl font-semibold transition-all text-sm">Cancel</button>
+            <button id="prompt-popup-confirm" type="button" class="py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-all text-sm">Save</button>
         </div>
     </div>
 </div>
 
 <!-- ADD STUDENT MODAL -->
-<div
-    id="add-student-modal"
-    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[120] p-4"
->
-
-    <div class="bg-white rounded-3xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
-
-        <div class="flex items-start justify-between mb-6">
-
+<div id="add-student-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[120] p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg p-5 sm:p-8 max-h-[90dvh] overflow-y-auto w-full">
+        <div class="flex items-start justify-between mb-5 sm:mb-6">
             <div>
-
-                <h3 class="text-2xl font-semibold text-gray-900">
-                    Create Student Account
-                </h3>
-
-                <p class="text-sm text-gray-500 mt-1">
-                    The student will use the temporary password to sign in.
-                </p>
-
+                <h3 class="text-xl sm:text-2xl font-semibold text-gray-900">Create Student Account</h3>
+                <p class="text-[11px] sm:text-sm text-gray-500 mt-1">The student will use the temporary password to sign in.</p>
             </div>
-
-            <button
-                type="button"
-                onclick="closeAddStudentModal()"
-                class="text-3xl text-gray-400 hover:text-gray-600 leading-none"
-            >
-                ×
-            </button>
-
+            <button type="button" onclick="closeAddStudentModal()" class="text-2xl sm:text-3xl text-gray-400 hover:text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 shrink-0 leading-none">×</button>
         </div>
 
-        <form
-            id="add-student-form"
-            onsubmit="createStudentAccount(event)"
-            class="space-y-5"
-        >
-
-            <div>
-
-                <label
-                    for="new-student-name"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Full Name
-                </label>
-
-                <input
-                    id="new-student-name"
-                    type="text"
-                    required
-                    placeholder="Example: Juan Dela Cruz"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
-
+        <form id="add-student-form" onsubmit="createStudentAccount(event)" class="space-y-4 sm:space-y-5 w-full">
+            <div class="w-full">
+                <label for="new-student-name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input id="new-student-name" type="text" required placeholder="Example: Juan Dela Cruz" class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
 
-            <div>
-
-                <label
-                    for="new-student-email"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Email Address
-                </label>
-
-                <input
-                    id="new-student-email"
-                    type="email"
-                    required
-                    placeholder="student@example.com"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
-
+            <div class="w-full">
+                <label for="new-student-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <input id="new-student-email" type="email" required placeholder="student@example.com" class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
 
-            <div>
-
-                <label
-                    for="new-student-section"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Section
-                </label>
-
-                <select
-                    id="new-student-section"
-                    required
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
-
-                    <option value="">
-                        Select a section
-                    </option>
-
+            <div class="w-full">
+                <label for="new-student-section" class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+                <select id="new-student-section" required class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
+                    <option value="">Select a section</option>
                 </select>
-
             </div>
 
-            <div>
-
-                <label
-                    for="new-student-password"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Temporary Password
-                </label>
-
-                <div class="flex gap-3">
-
-                    <input
-                        id="new-student-password"
-                        type="text"
-                        required
-                        minlength="4"
-                        placeholder="Temporary password"
-                        class="flex-1 px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                    >
-
-                    <button
-                        type="button"
-                        onclick="generateTemporaryPassword()"
-                        class="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl text-sm font-medium whitespace-nowrap"
-                    >
-                        Generate
-                    </button>
-
+            <div class="w-full">
+                <label for="new-student-password" class="block text-sm font-medium text-gray-700 mb-2">Temporary Password</label>
+                <div class="flex gap-2 sm:gap-3 w-full">
+                    <input id="new-student-password" type="text" required minlength="4" placeholder="Temporary password" class="flex-1 px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 w-full min-w-0">
+                    <button type="button" onclick="generateTemporaryPassword()" class="px-3 sm:px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl text-[11px] sm:text-sm font-medium whitespace-nowrap shrink-0">Generate</button>
                 </div>
-
             </div>
 
-            <p
-                id="add-student-message"
-                class="text-sm text-center min-h-[20px]"
-            ></p>
+            <p id="add-student-message" class="text-xs sm:text-sm text-center min-h-[20px] w-full"></p>
 
-            <div class="flex gap-3 pt-2">
-
-                <button
-                    type="button"
-                    onclick="closeAddStudentModal()"
-                    class="flex-1 py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-medium"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    type="submit"
-                    class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium"
-                >
-                    Create Account
-                </button>
-
+            <div class="flex gap-2 sm:gap-3 pt-2 w-full">
+                <button type="button" onclick="closeAddStudentModal()" class="flex-1 py-2.5 sm:py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-medium text-sm sm:text-base">Cancel</button>
+                <button type="submit" class="flex-1 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium text-sm sm:text-base">Create Account</button>
             </div>
-
         </form>
-
     </div>
-
-    
-
 </div>
 
 <!-- FIRST LOGIN CHANGE PASSWORD MODAL -->
-<div
-    id="change-password-modal"
-    class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[200] p-4"
->
-    <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl">
-
-        <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-5">
-            <i class="fa-solid fa-lock"></i>
-        </div>
-
-        <h2 class="text-2xl font-bold text-gray-900">
-            Create a New Password
-        </h2>
-
-        <p class="text-sm text-gray-500 mt-2 mb-6">
-            You are using a temporary password. Change it before continuing to your dashboard.
-        </p>
-
-        <form
-            id="change-password-form"
-            onsubmit="submitFirstLoginPassword(event)"
-            class="space-y-5"
-        >
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Temporary Password
-                </label>
-
-                <input
-                    id="current-password"
-                    type="password"
-                    required
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
+<div id="change-password-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[200] p-4">
+    <div class="bg-white rounded-3xl w-full max-w-md p-5 sm:p-8 shadow-2xl w-full">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-4 sm:mb-5"><i class="fa-solid fa-lock"></i></div>
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Create a New Password</h2>
+        <p class="text-xs sm:text-sm text-gray-500 mt-2 mb-5 sm:mb-6">You are using a temporary password. Change it before continuing to your dashboard.</p>
+        <form id="change-password-form" onsubmit="submitFirstLoginPassword(event)" class="space-y-4 sm:space-y-5 w-full">
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Temporary Password</label>
+                <input id="current-password" type="password" required class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    New Password
-                </label>
-
-                <input
-                    id="new-password"
-                    type="password"
-                    required
-                    minlength="6"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                <input id="new-password" type="password" required minlength="6" class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Confirm New Password
-                </label>
-
-                <input
-                    id="confirm-new-password"
-                    type="password"
-                    required
-                    minlength="6"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                <input id="confirm-new-password" type="password" required minlength="6" class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
-
-            <p
-                id="change-password-message"
-                class="text-sm text-center min-h-[20px]"
-            ></p>
-
-            <button
-                id="change-password-submit"
-                type="submit"
-                class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold"
-            >
-                Change Password
-            </button>
-
+            <p id="change-password-message" class="text-xs sm:text-sm text-center min-h-[20px] w-full"></p>
+            <button id="change-password-submit" type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold text-sm sm:text-base">Change Password</button>
         </form>
-
     </div>
 </div>
 
-
-
 <!-- FORGOT PASSWORD MODAL -->
-<div
-    id="forgot-password-modal"
-    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[210] p-4"
->
-    <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl">
-
-        <div class="flex items-start justify-between mb-6">
-
+<div id="forgot-password-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[210] p-4">
+    <div class="bg-white rounded-3xl w-full max-w-md p-5 sm:p-8 shadow-2xl w-full">
+        <div class="flex items-start justify-between mb-5 sm:mb-6">
             <div>
-                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-4">
-                    <i class="fa-solid fa-key"></i>
-                </div>
-
-                <h2 class="text-2xl font-bold text-gray-900">
-                    Forgot Password
-                </h2>
-
-                <p class="text-sm text-gray-500 mt-2">
-                    Enter your account email to request password-reset instructions.
-                </p>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4"><i class="fa-solid fa-key"></i></div>
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Forgot Password</h2>
+                <p class="text-[11px] sm:text-sm text-gray-500 mt-1 sm:mt-2">Enter your account email to request password-reset instructions.</p>
             </div>
-
-            <button
-                type="button"
-                onclick="closeForgotPasswordModal()"
-                class="text-3xl text-gray-400 hover:text-gray-600 leading-none"
-            >
-                ×
-            </button>
-
+            <button type="button" onclick="closeForgotPasswordModal()" class="text-2xl sm:text-3xl text-gray-400 hover:text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 shrink-0 leading-none">×</button>
         </div>
-
-        <form
-            id="forgot-password-form"
-            onsubmit="submitForgotPassword(event)"
-            class="space-y-5"
-        >
-
-            <div>
-                <label
-                    for="forgot-password-email"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Email Address
-                </label>
-
-                <input
-                    id="forgot-password-email"
-                    type="email"
-                    required
-                    placeholder="student@example.com"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
+        <form id="forgot-password-form" onsubmit="submitForgotPassword(event)" class="space-y-4 sm:space-y-5 w-full">
+            <div class="w-full">
+                <label for="forgot-password-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <input id="forgot-password-email" type="email" required placeholder="student@example.com" class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
-
-            <p
-                id="forgot-password-message"
-                class="text-sm text-center min-h-[20px]"
-            ></p>
-
-            <div class="flex gap-3">
-
-                <button
-                    type="button"
-                    onclick="closeForgotPasswordModal()"
-                    class="flex-1 py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-medium"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    id="forgot-password-submit"
-                    type="submit"
-                    class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium"
-                >
-                    Continue
-                </button>
-
+            <p id="forgot-password-message" class="text-xs sm:text-sm text-center min-h-[20px] w-full"></p>
+            <div class="flex gap-2 sm:gap-3 w-full">
+                <button type="button" onclick="closeForgotPasswordModal()" class="flex-1 py-2.5 sm:py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-medium text-sm sm:text-base">Cancel</button>
+                <button id="forgot-password-submit" type="submit" class="flex-1 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium text-sm sm:text-base">Continue</button>
             </div>
-
         </form>
-
     </div>
 </div>
 
 <!-- STUDENT ASSIGNMENT SUBMISSION MODAL -->
-<div
-    id="assignment-submission-modal"
-    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[220] p-4"
->
-    <div
-        class="bg-white rounded-3xl w-full max-w-xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl"
-    >
-
-        <div class="flex items-start justify-between gap-4 mb-6">
-
+<div id="assignment-submission-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[220] p-4">
+    <div class="bg-white rounded-3xl w-full max-w-xl p-5 sm:p-8 max-h-[90dvh] overflow-y-auto shadow-2xl w-full">
+        <div class="flex items-start justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
             <div>
-                <div
-                    class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-4"
-                >
-                    <i class="fa-solid fa-file-arrow-up"></i>
-                </div>
-
-                <h2
-                    id="submission-assignment-title"
-                    class="text-2xl font-bold text-gray-900"
-                >
-                    Submit Assignment
-                </h2>
-
-                <p
-                    id="submission-assignment-due"
-                    class="text-sm text-gray-500 mt-2"
-                >
-                    Due date
-                </p>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4"><i class="fa-solid fa-file-arrow-up"></i></div>
+                <h2 id="submission-assignment-title" class="text-xl sm:text-2xl font-bold text-gray-900">Submit Assignment</h2>
+                <p id="submission-assignment-due" class="text-[11px] sm:text-sm text-gray-500 mt-1 sm:mt-2">Due date</p>
             </div>
-
-            <button
-                type="button"
-                onclick="closeAssignmentSubmissionModal()"
-                class="text-3xl text-gray-400 hover:text-gray-600 leading-none"
-            >
-                ×
-            </button>
-
+            <button type="button" onclick="closeAssignmentSubmissionModal()" class="text-2xl sm:text-3xl text-gray-400 hover:text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 shrink-0 leading-none">×</button>
         </div>
 
-        <div class="bg-gray-50 rounded-2xl p-5 mb-6">
-
-            <div class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Instructions
-            </div>
-
-            <p
-                id="submission-assignment-description"
-                class="text-sm text-gray-700 leading-relaxed mt-2 whitespace-pre-line"
-            >
-                No instructions provided.
-            </p>
-
+        <div class="bg-gray-50 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 w-full">
+            <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-400">Instructions</div>
+            <p id="submission-assignment-description" class="text-xs sm:text-sm text-gray-700 leading-relaxed mt-2 whitespace-pre-line w-full overflow-hidden break-words">No instructions provided.</p>
         </div>
 
-        <form
-            id="assignment-submission-form"
-            onsubmit="submitAssignmentWork(event)"
-            class="space-y-5"
-        >
-
-            <div>
-
-                <label
-                    for="assignment-answer-text"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Written Answer
-                </label>
-
-                <textarea
-                    id="assignment-answer-text"
-                    rows="7"
-                    placeholder="Type your answer here..."
-                    class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-none"
-                ></textarea>
-
+        <form id="assignment-submission-form" onsubmit="submitAssignmentWork(event)" class="space-y-4 sm:space-y-5 w-full">
+            <div class="w-full">
+                <label for="assignment-answer-text" class="block text-sm font-medium text-gray-700 mb-2">Written Answer</label>
+                <textarea id="assignment-answer-text" rows="5" sm:rows="7" placeholder="Type your answer here..." class="w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-y sm:resize-none text-sm"></textarea>
             </div>
 
-            <div>
-
-                <label
-                    for="assignment-submission-file"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Attach File
-                </label>
-
-                <input
-                    id="assignment-submission-file"
-                    type="file"
-                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.jpg,.jpeg,.png"
-                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl"
-                >
-
-                <p class="text-xs text-gray-500 mt-2">
-                    You may submit a written answer, attach a file, or both.
-                </p>
-
+            <div class="w-full">
+                <label for="assignment-submission-file" class="block text-sm font-medium text-gray-700 mb-2">Attach File</label>
+                <input id="assignment-submission-file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.jpg,.jpeg,.png" class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs sm:text-sm">
+                <p class="text-[10px] sm:text-xs text-gray-500 mt-2">You may submit a written answer, attach a file, or both.</p>
             </div>
 
-            <p
-                id="assignment-submission-message"
-                class="text-sm text-center min-h-[20px]"
-            ></p>
+            <p id="assignment-submission-message" class="text-xs sm:text-sm text-center min-h-[20px] w-full"></p>
 
-            <div class="grid grid-cols-2 gap-3 pt-2">
-
-                <button
-                    type="button"
-                    onclick="closeAssignmentSubmissionModal()"
-                    class="py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-2xl font-semibold"
-                >
-                    Cancel
+            <div class="grid grid-cols-2 gap-2 sm:gap-3 pt-2 w-full">
+                <button type="button" onclick="closeAssignmentSubmissionModal()" class="py-2.5 sm:py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-2xl font-semibold text-sm">Cancel</button>
+                <button id="assignment-submission-button" type="submit" class="py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-paper-plane hidden sm:inline"></i> Submit
                 </button>
-
-                <button
-                    id="assignment-submission-button"
-                    type="submit"
-                    class="py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold flex items-center justify-center gap-2"
-                >
-                    <i class="fa-solid fa-paper-plane"></i>
-                    Submit Work
-                </button>
-
             </div>
-
         </form>
-
     </div>
 </div>
 
 <!-- REVIEW SUBMISSION MODAL -->
-<div
-    id="submission-review-modal"
-    class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[230] p-4"
->
-    <div class="bg-white rounded-3xl w-full max-w-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl">
-
-        <div class="flex items-start justify-between gap-4 mb-6">
-
+<div id="submission-review-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[230] p-4">
+    <div class="bg-white rounded-3xl w-full max-w-2xl p-5 sm:p-8 max-h-[90dvh] overflow-y-auto shadow-2xl w-full">
+        <div class="flex items-start justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
             <div>
-                <div class="w-12 h-12 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center text-xl mb-4">
-                    <i class="fa-solid fa-file-circle-check"></i>
-                </div>
-
-                <h2
-                    id="review-submission-title"
-                    class="text-2xl font-bold text-gray-900"
-                >
-                    Review Submission
-                </h2>
-
-                <p
-                    id="review-submission-student"
-                    class="text-sm text-gray-500 mt-2"
-                ></p>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4"><i class="fa-solid fa-file-circle-check"></i></div>
+                <h2 id="review-submission-title" class="text-xl sm:text-2xl font-bold text-gray-900">Review Submission</h2>
+                <p id="review-submission-student" class="text-[11px] sm:text-sm text-gray-500 mt-1 sm:mt-2"></p>
             </div>
-
-            <button
-                type="button"
-                onclick="closeSubmissionReviewModal()"
-                class="text-3xl text-gray-400 hover:text-gray-600"
-            >
-                ×
-            </button>
-
+            <button type="button" onclick="closeSubmissionReviewModal()" class="text-2xl sm:text-3xl text-gray-400 hover:text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 shrink-0">×</button>
         </div>
 
-        <div class="bg-gray-50 rounded-2xl p-5 mb-5">
-
-            <div class="text-xs uppercase font-semibold tracking-wide text-gray-400">
-                Student Answer
-            </div>
-
-            <p
-                id="review-submission-answer"
-                class="text-sm text-gray-700 mt-2 whitespace-pre-line"
-            >
-                No written answer.
-            </p>
-
+        <div class="bg-gray-50 rounded-2xl p-4 sm:p-5 mb-4 sm:mb-5 w-full">
+            <div class="text-[10px] sm:text-xs uppercase font-semibold tracking-wide text-gray-400">Student Answer</div>
+            <p id="review-submission-answer" class="text-xs sm:text-sm text-gray-700 mt-2 whitespace-pre-line w-full overflow-hidden break-words">No written answer.</p>
         </div>
 
-        <a
-            id="review-submission-file"
-            href="#"
-            target="_blank"
-            class="hidden mb-6 items-center justify-center gap-2 w-full py-3 border border-blue-200 bg-blue-50 text-blue-600 rounded-2xl font-medium"
-        >
-            <i class="fa-solid fa-paperclip"></i>
-            Open Attached File
+        <a id="review-submission-file" href="#" target="_blank" class="hidden mb-5 sm:mb-6 items-center justify-center gap-2 w-full py-2.5 sm:py-3 border border-blue-200 bg-blue-50 text-blue-600 rounded-2xl font-medium text-sm">
+            <i class="fa-solid fa-paperclip"></i> Open Attached File
         </a>
 
-        <form
-            onsubmit="saveSubmissionGrade(event)"
-            class="space-y-5"
-        >
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Score
-                </label>
-
-                <input
-                    id="review-submission-score"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    required
-                    placeholder="0–100"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500"
-                >
+        <form onsubmit="saveSubmissionGrade(event)" class="space-y-4 sm:space-y-5 w-full">
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Score</label>
+                <input id="review-submission-score" type="number" min="0" max="100" step="0.01" required placeholder="0–100" class="w-full px-4 sm:px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500">
             </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Teacher Feedback
-                </label>
-
-                <textarea
-                    id="review-submission-feedback"
-                    rows="4"
-                    placeholder="Write feedback for the student..."
-                    class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-none"
-                ></textarea>
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Teacher Feedback</label>
+                <textarea id="review-submission-feedback" rows="3" sm:rows="4" placeholder="Write feedback for the student..." class="w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 resize-y sm:resize-none text-sm"></textarea>
             </div>
-
-            <p
-                id="review-submission-message"
-                class="text-sm text-center min-h-[20px]"
-            ></p>
-
-            <div class="grid grid-cols-2 gap-3">
-
-                <button
-                    type="button"
-                    onclick="closeSubmissionReviewModal()"
-                    class="py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-semibold"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    id="save-submission-grade-button"
-                    type="submit"
-                    class="py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-semibold"
-                >
-                    Save Grade
- 
+            <p id="review-submission-message" class="text-xs sm:text-sm text-center min-h-[20px] w-full"></p>
+            <div class="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+                <button type="button" onclick="closeSubmissionReviewModal()" class="py-2.5 sm:py-3 border border-gray-200 hover:bg-gray-50 rounded-2xl font-semibold text-sm">Cancel</button>
+                <button id="save-submission-grade-button" type="submit" class="py-2.5 sm:py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-semibold text-sm">Save Grade</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
