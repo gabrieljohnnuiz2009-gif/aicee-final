@@ -981,7 +981,7 @@ ${JSON.stringify(studentContext, null, 2)}
     ],
     temperature: 0.45,
     max_completion_tokens: 2000
-   reasoning_effort: "medium"
+
 });
 
             const aiReply = String(completion.choices[0].message.content || "").trim();
