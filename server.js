@@ -439,6 +439,8 @@ app.use(
 
 app.use(express.json({ limit: "100kb" }));
 
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("Referrer-Policy", "no-referrer");
