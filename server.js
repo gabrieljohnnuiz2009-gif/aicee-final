@@ -979,7 +979,7 @@ ${JSON.stringify(studentContext, null, 2)}
             content: message
         }
     ],
-    temperature: 0.45,
+    temperature: 1,
     max_completion_tokens: 2000
 
 });
