@@ -9,7 +9,7 @@ const fs = require("fs").promises;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { rateLimit } = require("express-rate-limit");
-const { Groq } = require('groq-sdk');
+const OpenAI = require("openai");
 const db = require("./database");
 
 const app = express();
@@ -419,11 +419,25 @@ const upload = multer({
 
 app.disable("x-powered-by");
 
-app.use(cors()); // Pinapayagan na ang lahat ng requests nang walang restrictions
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            if (isAllowedOrigin(origin)) {
+                return callback(null, true);
+            }
+
+            callback(
+                new Error(
+                    "This website origin is not allowed to access the AICEE API."
+                )
+            );
+        },
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"]
+    })
+);
 
 app.use(express.json({ limit: "100kb" }));
-
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
@@ -435,13 +449,14 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("uploads"));
 
 /* =========================================
-    AI
+   OPENAI AI CONFIGURATION
 ========================================= */
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /*
     Separate chat history per student.
@@ -526,7 +541,7 @@ app.get("/", (req, res) => {
 });
 
 /* =========================================
-   PERSONALIZED AI CHAT
+   PERSONALIZED AI CHAT (OPENAI)
 ========================================= */
 
 app.post("/chat", authenticateToken, requireRole("student"), requireSelfBody("userId"), async (req, res) => {
@@ -819,13 +834,14 @@ ${JSON.stringify(studentContext, null, 2)}
             aiConversationHistory.get(userId) || [];
 
         try {
-            // Reformat history for Groq
+            // Reformat history for OpenAI format
             const formattedHistory = previousHistory.map(msg => ({
                 role: msg.role === 'model' ? 'assistant' : msg.role,
                 content: msg.parts[0].text
             }));
             
-            const chatCompletion = await groq.chat.completions.create({
+            const completion = await openai.chat.completions.create({
+                model: "gpt-4o-mini", // Gumagamit ng mabilis at murang OpenAI model
                 messages: [
                     {
                         role: "system",
@@ -837,15 +853,14 @@ ${JSON.stringify(studentContext, null, 2)}
                         content: message
                     }
                 ],
-                "model: -3.1-8b-instant", 
                 temperature: 0.45,
                 max_tokens: 700
             });
 
-            const aiReply = String(chatCompletion.choices[0].message.content || "").trim();
+            const aiReply = String(completion.choices[0].message.content || "").trim();
 
             if (!aiReply) {
-                throw new Error("Groq returned an empty response.");
+                throw new Error("OpenAI returned an empty response.");
             }
 
             // Save history using your app's existing format structure
@@ -870,7 +885,7 @@ ${JSON.stringify(studentContext, null, 2)}
             });
 
         } catch (aiError) {
-            console.error("Groq response error:", aiError);
+            console.error("OpenAI response error:", aiError);
 
             return res.json({
                 reply: createPersonalizedFallback(studentContext),
