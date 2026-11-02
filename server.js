@@ -841,7 +841,7 @@ ${JSON.stringify(studentContext, null, 2)}
             }));
             
             const completion = await openai.chat.completions.create({
-                model: "gpt-4o-mini", // Gumagamit ng mabilis at murang OpenAI model
+                model: "gpt-5.5", // Gumagamit ng mabilis at murang OpenAI model
                 messages: [
                     {
                         role: "system",
