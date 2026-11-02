@@ -438,7 +438,7 @@ app.use((req, res, next) => {
 app.use("/uploads", express.static("uploads"));
 
 /* =========================================
-   GROQ AI
+    AI
 ========================================= */
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -837,7 +837,7 @@ ${JSON.stringify(studentContext, null, 2)}
                         content: message
                     }
                 ],
-                model: "llama3-8b-8192", 
+                model: llama-3.1-8b-instant", 
                 temperature: 0.45,
                 max_tokens: 700
             });
