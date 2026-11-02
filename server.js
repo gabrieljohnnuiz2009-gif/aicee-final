@@ -837,7 +837,7 @@ ${JSON.stringify(studentContext, null, 2)}
                         content: message
                     }
                 ],
-                model: llama-3.1-8b-instant", 
+                "model: -3.1-8b-instant", 
                 temperature: 0.45,
                 max_tokens: 700
             });
