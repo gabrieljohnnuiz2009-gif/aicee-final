@@ -419,23 +419,7 @@ const upload = multer({
 
 app.disable("x-powered-by");
 
-app.use(
-    cors({
-        origin: function (origin, callback) {
-            if (isAllowedOrigin(origin)) {
-                return callback(null, true);
-            }
-
-            callback(
-                new Error(
-                    "This website origin is not allowed to access the AICEE API."
-                )
-            );
-        },
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"]
-    })
-);
+app.use(cors());
 
 app.use(express.json({ limit: "100kb" }));
 
