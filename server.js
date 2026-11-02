@@ -3317,8 +3317,38 @@ app.get("/diagnostic-questions", authenticateToken, requireRole("student"), asyn
             ORDER BY subject, id
         `);
 
+        if (questions.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "No diagnostic questions are available yet."
+            });
+        }
+
+        /*
+            Signed token for the exact set of questions
+            given to this student. It expires in 2 hours.
+        */
+        const diagnosticSetToken = jwt.sign(
+            {
+                purpose: "diagnostic_set",
+                questionIds: questions.map(
+                    question => Number(question.id)
+                )
+            },
+            JWT_SECRET,
+            {
+                algorithm: "HS256",
+                subject: String(req.auth.userId),
+                issuer: "aicee-api",
+                audience: "aicee-diagnostic",
+                expiresIn: "2h"
+            }
+        );
+
         res.json({
             success: true,
+            diagnostic_set_token: diagnosticSetToken,
             questions
         });
 
