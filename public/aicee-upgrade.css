@@ -2272,3 +2272,27 @@ button:not(:disabled):hover::after,
         opacity: .08;
     }
 }
+
+
+/* =====================================================
+   RESPONSIVE FIX: SIDEBAR DRAWER (BELOW 1024px)
+   Sidebar must float over the content on phone/tablet,
+   not take space in the flex row. Desktop (>=1024px)
+   is intentionally untouched.
+===================================================== */
+@media (max-width: 1023px) {
+    #sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        height: 100dvh !important;
+        z-index: 200 !important;
+    }
+
+    #main-app > .flex-1 {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+    }
+}
