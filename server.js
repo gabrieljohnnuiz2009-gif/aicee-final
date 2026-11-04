@@ -279,7 +279,7 @@ function requireSelfQuery(field) {
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 5,
+    limit: 20,
     standardHeaders: "draft-8",
     legacyHeaders: false,
     skipSuccessfulRequests: true,
@@ -293,7 +293,7 @@ const loginLimiter = rateLimit({
 
 const recoveryLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 5,
+    limit: 20,
     standardHeaders: "draft-8",
     legacyHeaders: false,
     message: {
