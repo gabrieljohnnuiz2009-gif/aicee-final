@@ -2027,40 +2027,74 @@
         </div>
     </div>
     
-    <!-- AI ASSISTANT MODAL -->
-    <div id="ai-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-0 sm:p-4">
-        <div class="bg-white w-full max-w-2xl mx-0 sm:mx-4 rounded-none sm:rounded-3xl shadow-2xl modal flex flex-col h-[100dvh] sm:h-auto sm:max-h-[95dvh]">
-            <div class="flex items-center justify-between border-b px-4 sm:px-6 py-4 sm:py-5 shrink-0">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <i class="fa-solid fa-sparkles text-amber-500 text-xl sm:text-2xl shrink-0"></i>
-                    <div>
-                        <div class="font-semibold text-sm sm:text-base">AIcee Study Assistant</div>
-                        <div class="text-[10px] sm:text-xs text-gray-500 hidden sm:block">Personalized learning companion</div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-1 sm:gap-2">
-                    <button type="button" onclick="clearAIChatHistory()" class="px-2 sm:px-3 py-2 rounded-xl text-[10px] sm:text-xs font-semibold text-gray-500 hover:text-red-600 hover:bg-red-50 transition whitespace-nowrap">
-                        <i class="fa-solid fa-trash-can sm:mr-1"></i> <span class="hidden sm:inline">Clear chat</span>
-                    </button>
-                    <button onclick="closeAIModal()" class="text-2xl sm:text-3xl leading-none text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">×</button>
+   <!-- AIcee Chat Modal with History Sidebar -->
+<div id="ai-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="bg-gray-900 text-white w-full max-w-4xl h-[85vh] rounded-3xl flex overflow-hidden border border-gray-800 shadow-2xl">
+
+        <!-- 1. KALIWANG SIDEBAR: Chat History & New Chat -->
+        <div class="w-64 bg-gray-950 p-4 border-r border-gray-800 flex flex-col justify-between shrink-0">
+            <div>
+                <!-- New Chat Button -->
+                <button type="button" onclick="startNewChat()" class="w-full py-2.5 px-4 mb-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New chat</span>
+                </button>
+
+                <div class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2 px-2">Recent Chats</div>
+
+                <!-- Dito kakarga ang listahan ng conversations -->
+                <div id="ai-conversations-list" class="space-y-1 overflow-y-auto max-h-[calc(85vh-160px)] pr-1">
+                    <div class="text-xs text-gray-500 p-2 text-center">Loading history...</div>
                 </div>
             </div>
-            
-            <div class="flex-1 min-h-[200px] p-4 sm:p-6 overflow-y-auto bg-gray-50 w-full" id="ai-chat-log"></div>
-            
-            <div class="p-4 sm:p-5 border-t bg-white shrink-0 w-full">
-                <div class="mb-3 sm:mb-4">
-                    <label for="ai-module-select" class="block text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 sm:mb-2">Teacher Learning Material</label>
-                    <select id="ai-module-select" class="w-full px-3 py-2 sm:px-4 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-blue-500"><option value="">No specific learning material</option></select>
-                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-1 sm:mt-2 hidden sm:block">Select a teacher-provided PDF if you want AIcee to use that learning material as the main reference. AIcee also remembers recent study conversations for continuity.</p>
+
+            <!-- Footer ng Sidebar -->
+            <div class="pt-3 border-t border-gray-800 text-xs text-gray-400 truncate">
+                <i class="fa-solid fa-user text-blue-400 mr-2"></i>
+                <span id="sidebar-user-name">AIcee Student</span>
+            </div>
+        </div>
+
+        <!-- 2. KANANG MAIN CHAT AREA -->
+        <div class="flex-1 flex flex-col justify-between bg-gray-900 min-w-0">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-base text-gray-100">AIcee Study Assistant</h3>
+                    <p class="text-xs text-gray-400">Personalized learning companion</p>
                 </div>
-                <div class="flex gap-2 sm:gap-3 w-full">
-                    <input id="ai-input" onkeypress="if(event.key === 'Enter') sendAIMessage()" type="text" placeholder="Ask AIcee..." class="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-white border border-gray-200 rounded-full sm:rounded-3xl text-sm focus:outline-none focus:border-blue-500 w-full">
-                    <button onclick="sendAIMessage()" class="px-5 sm:px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full sm:rounded-3xl font-medium transition text-sm whitespace-nowrap"><i class="fa-solid fa-paper-plane sm:hidden"></i><span class="hidden sm:inline">Send</span></button>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="clearAIChatHistory()" class="text-xs text-gray-400 hover:text-red-400 flex items-center gap-1 transition-colors">
+                        <i class="fa-solid fa-trash-can"></i> Clear chat
+                    </button>
+                    <!-- WORKING X BUTTON -->
+                    <button type="button" onclick="closeAIModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition-colors">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages Log -->
+            <div id="ai-chat-log" class="flex-1 p-4 overflow-y-auto space-y-4">
+                <!-- Messages render here -->
+            </div>
+
+            <!-- Controls & Input Area -->
+            <div class="p-4 border-t border-gray-800 space-y-3">
+                <select id="ai-module-select" class="w-full bg-gray-800 text-sm rounded-xl p-2.5 border border-gray-700 text-gray-200 focus:outline-none focus:border-blue-500">
+                    <option value="">No specific learning material</option>
+                </select>
+                <div class="flex gap-2">
+                    <input type="text" id="ai-input" placeholder="Ask AIcee..." onkeydown="if(event.key==='Enter') sendAIMessage()" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <button type="button" id="ai-send-button" onclick="sendAIMessage()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors">
+                        Send
+                    </button>
                 </div>
             </div>
         </div>
+
     </div>
+</div>
     
     <!-- UPLOAD MODAL -->
     <div
