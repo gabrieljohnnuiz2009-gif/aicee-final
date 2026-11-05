@@ -3858,13 +3858,27 @@ async function selectConversation(conversationId) {
 
 // 3. Mag-start ng bagong chat session ("+ New chat" button)
 async function startNewChat() {
+    // 1. I-reset ang ID para malaman ng system na bagong session ito
     currentConversationId = null;
+
     const chatLog = document.getElementById("ai-chat-log");
-    if (chatLog) chatLog.innerHTML = "";
-    await openAIAssistant();
+    if (chatLog) {
+        // 2. Linisin ang chat history window
+        chatLog.innerHTML = "";
+
+        // 3. Maglagay ng bagong AIcee greeting
+        const greeting = document.createElement("div");
+        greeting.className = "aicee-chat-bubble aicee-assistant-bubble aicee-greeting-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
+        
+        const firstName = String(currentUser.name || "Student").trim().split(/\s+/)[0] || "Student";
+        greeting.textContent = `Hello ${firstName}! I'm ready to help you study. Select a lesson or ask me a question.`;
+        
+        chatLog.appendChild(greeting);
+    }
+
+    // 4. I-refresh ang sidebar para mawala ang highlight (blue background) sa mga lumang chat
     await loadConversationsList();
 }
-
 // 4. I-load ang mga mensahe sa loob ng chat
 async function loadAIChatHistory(conversationId) {
     const targetId = conversationId || currentConversationId;
