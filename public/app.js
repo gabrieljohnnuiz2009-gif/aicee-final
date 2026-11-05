@@ -1,5 +1,6 @@
 // EduVision AI - Main Script
 let currentRole = 'student';
+let currentConversationId = null;
 let currentUser = {
     id: null,
     name: "",
@@ -3762,18 +3763,14 @@ function setAIceeComposerBusy(isBusy) {
 
 // 1. LOAD AI CHAT HISTORY
 async function loadAIChatHistory(conversationId) {
-    if (currentRole !== "student" || !currentUser.id || !conversationId) {
+    const targetId = conversationId || currentConversationId;
+    if (currentRole !== "student" || !currentUser.id || !targetId) {
         return [];
     }
 
     try {
         const response = await fetch(
-            `/ai/conversations/${conversationId}/messages`,
-            {
-                headers: {
-                    "Authorization": `Bearer ${authToken}`
-                }
-            }
+            `/ai/conversations/${targetId}/messages`
         );
         const data = await response.json();
 
@@ -3790,10 +3787,10 @@ async function loadAIChatHistory(conversationId) {
         messages.forEach(item => {
             appendAIChatMessage(
                 item.role === "user" ? "user" : "model",
-                item.content, // 'content' ang tamang key sa server.js
+                item.content,
                 {
                     moduleTitle: item.module_title || null,
-                    fallback: Boolean(item.is_fallback) // 'is_fallback' ang nasa server.js
+                    fallback: Boolean(item.is_fallback)
                 }
             );
         });
@@ -3810,7 +3807,8 @@ async function loadAIChatHistory(conversationId) {
 
 // 2. CLEAR / DELETE AI CHAT HISTORY
 async function clearAIChatHistory(conversationId) {
-    if (currentRole !== "student" || !currentUser.id || !conversationId) {
+    const targetId = conversationId || currentConversationId;
+    if (currentRole !== "student" || !currentUser.id || !targetId) {
         return;
     }
 
@@ -3827,12 +3825,9 @@ async function clearAIChatHistory(conversationId) {
 
     try {
         const response = await fetch(
-            `/ai/conversations/${conversationId}`,
+            `/ai/conversations/${targetId}`,
             {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${authToken}`
-                }
+                method: "DELETE"
             }
         );
         const data = await response.json();
@@ -3843,11 +3838,7 @@ async function clearAIChatHistory(conversationId) {
             );
         }
 
-        // I-reset ang active conversation ID at i-refresh ang UI
-        if (typeof currentConversationId !== "undefined") {
-            currentConversationId = null;
-        }
-
+        currentConversationId = null;
         await openAIAssistant();
     } catch (error) {
         console.error(
@@ -3859,6 +3850,7 @@ async function clearAIChatHistory(conversationId) {
         );
     }
 }
+
 async function openAIAssistant() {
     const modal = document.getElementById("ai-modal");
     if (!modal) return;
@@ -3893,28 +3885,25 @@ async function openAIAssistant() {
 
     chat.appendChild(greeting);
 
-    await loadAIChatHistory();
+    if (!currentConversationId) {
+        try {
+            const res = await fetch("/ai/conversations");
+            const data = await res.json();
+            if (res.ok && data.success && Array.isArray(data.conversations) && data.conversations.length > 0) {
+                currentConversationId = data.conversations[0].id;
+            }
+        } catch (e) {
+            console.warn("Could not fetch active conversation:", e);
+        }
+    }
+
+    if (currentConversationId) {
+        await loadAIChatHistory(currentConversationId);
+    }
     chat.scrollTop = chat.scrollHeight;
 
     const input = document.getElementById("ai-input");
     setTimeout(() => input?.focus(), 180);
-}
-
-function closeAIModal() {
-    const modal = document.getElementById("ai-modal");
-    if (!modal) return;
-
-    modal.classList.remove("aicee-ai-modal-open");
-    modal.classList.add("aicee-ai-modal-closing");
-
-    setTimeout(() => {
-        modal.classList.add("hidden");
-        modal.classList.remove("aicee-ai-modal-closing");
-        document
-            .getElementById("aicee-thinking-indicator")
-            ?.remove();
-        setAIceeComposerBusy(false);
-    }, 180);
 }
 
 async function sendAIMessage() {
@@ -3947,6 +3936,26 @@ async function sendAIMessage() {
                     Number(moduleId)
             )
             : null;
+
+    // Gumawa muna ng bagong conversation sa backend kung wala pa
+    if (!currentConversationId) {
+        try {
+            const createRes = await fetch("/ai/conversations", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+            const createData = await createRes.json();
+            if (createRes.ok && createData.success && createData.conversation) {
+                currentConversationId = createData.conversation.id;
+            } else {
+                throw new Error("Could not start a new conversation session.");
+            }
+        } catch (err) {
+            console.error("Conversation creation error:", err);
+            appendAIChatMessage("model", "Sorry, could not initialize chat session. Please try again.", { fallback: true });
+            return;
+        }
+    }
 
     appendAIChatMessage(
         "user",
@@ -3981,14 +3990,10 @@ async function sendAIMessage() {
 
                     body:
                         JSON.stringify({
-                            message:
-                                question,
-
-                            userId:
-                                currentUser.id,
-
-                            moduleId:
-                                moduleId
+                            message: question,
+                            userId: currentUser.id,
+                            conversationId: currentConversationId,
+                            moduleId: moduleId
                         })
                 }
             );
@@ -6658,10 +6663,19 @@ function buildAIceePrototypeContext() {
 async function loadDiagnosticProfileData(){
     if(currentRole!=="student"||!currentUser.id) return;
     try{
-        const [sr,hr]=await Promise.all([fetch(`/diagnostic-status/${currentUser.id}`),fetch(`/diagnostic-history/${currentUser.id}`)]);
-        const s=await sr.json(), h=await hr.json();
-        if(sr.ok&&s.success) diagnosticStatus={has_completed:Boolean(s.has_completed),can_take:Boolean(s.can_take),last_taken_at:s.last_taken_at||null,next_available_at:s.next_available_at||null};
-        if(hr.ok&&h.success) diagnosticHistory=Array.isArray(h.attempts)?h.attempts:[];
+        const [sr,hr]=await Promise.all([
+            fetch(`/diagnostic-status/${currentUser.id}`).catch(() => ({ ok: false })),
+            fetch(`/diagnostic-history/${currentUser.id}`).catch(() => ({ ok: false }))
+        ]);
+        let s = { success: false }, h = { success: false };
+        if (sr.ok && sr.headers?.get("content-type")?.includes("application/json")) {
+            s = await sr.json();
+        }
+        if (hr.ok && hr.headers?.get("content-type")?.includes("application/json")) {
+            h = await hr.json();
+        }
+        if(s.success) diagnosticStatus={has_completed:Boolean(s.has_completed),can_take:Boolean(s.can_take),last_taken_at:s.last_taken_at||null,next_available_at:s.next_available_at||null};
+        if(h.success) diagnosticHistory=Array.isArray(h.attempts)?h.attempts:[];
         updateDiagnosticActionButton(); renderDiagnosticHistory(); renderLearningBridgeDashboard();
     }catch(e){console.error("Diagnostic profile load error:",e);}
 }
