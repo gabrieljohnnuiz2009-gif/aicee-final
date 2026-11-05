@@ -3805,23 +3805,24 @@ async function loadAIChatHistory(conversationId) {
     }
 }
 
+// ==========================================
+// AICEE CHAT & SIDEBAR HISTORY LOGIC
+// ==========================================
+
+
 // 1. Kumuha at mag-display ng listahan ng past chats sa sidebar
 async function loadConversationsList() {
     if (currentRole !== "student" || !currentUser.id) return;
-
     const listContainer = document.getElementById("ai-conversations-list");
     if (!listContainer) return;
 
     try {
-        const response = await fetch("/ai/conversations");
+        const response = await fetch("/ai/conversations"); // Walang manual authToken dahil auto-injected na
         const data = await response.json();
 
-        if (!response.ok || !data.success) {
-            throw new Error(data.message || "Failed to load conversation history.");
-        }
+        if (!response.ok || !data.success) throw new Error(data.message);
 
         const conversations = Array.isArray(data.conversations) ? data.conversations : [];
-
         if (conversations.length === 0) {
             listContainer.innerHTML = `<div class="text-xs text-gray-500 p-3 text-center">No past chats yet.</div>`;
             return;
@@ -3834,30 +3835,23 @@ async function loadConversationsList() {
                 : "text-gray-300 hover:bg-gray-800/80";
 
             return `
-                <button 
-                    type="button" 
-                    onclick="selectConversation(${chat.id})" 
-                    class="w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all truncate flex items-center justify-between ${activeClass}"
-                >
+                <button type="button" onclick="selectConversation(${chat.id})" class="w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all truncate flex items-center justify-between mb-1 ${activeClass}">
                     <span class="truncate mr-2"><i class="fa-regular fa-message mr-2 opacity-70"></i>${escapeHTML(chat.title || 'Study Session')}</span>
                 </button>
             `;
         }).join("");
-
     } catch (error) {
-        console.error("Load conversations error:", error);
+        console.error("Sidebar history error:", error);
+        listContainer.innerHTML = `<div class="text-xs text-red-500 p-3 text-center">Failed to load history</div>`;
     }
 }
 
 // 2. Mag-switch sa napiling lumang chat mula sa sidebar
 async function selectConversation(conversationId) {
     if (!conversationId) return;
-
     currentConversationId = conversationId;
-
     const chatLog = document.getElementById("ai-chat-log");
     if (chatLog) chatLog.innerHTML = "";
-
     await loadAIChatHistory(conversationId);
     await loadConversationsList();
 }
@@ -3865,367 +3859,192 @@ async function selectConversation(conversationId) {
 // 3. Mag-start ng bagong chat session ("+ New chat" button)
 async function startNewChat() {
     currentConversationId = null;
-
     const chatLog = document.getElementById("ai-chat-log");
     if (chatLog) chatLog.innerHTML = "";
-
     await openAIAssistant();
     await loadConversationsList();
 }
 
-// 2. OPEN AI ASSISTANT (Kukuha muna ng active chat bago i-load ang history)
-async function openAIAssistant() {
-    const modal = document.getElementById("ai-modal");
-    if (!modal) return;
-
-    modal.classList.remove("hidden");
-    modal.classList.remove("aicee-ai-modal-open");
-    void modal.offsetWidth;
-    modal.classList.add("aicee-ai-modal-open");
-
-    await loadAIceeLearningMaterials();
-
-    const chat = document.getElementById("ai-chat-log");
-    if (!chat) return;
-
-    chat.innerHTML = "";
-
-    const greeting = document.createElement("div");
-    greeting.className =
-        "aicee-chat-bubble aicee-assistant-bubble aicee-greeting-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
-
-    const firstName =
-        String(currentUser.name || "Student")
-            .trim()
-            .split(/\s+/)[0] || "Student";
-
-    const focus =
-        getPrototypeLearningSignals().needsFocus?.subject;
-
-    greeting.textContent = focus
-        ? `Hello ${firstName}! Based on your latest diagnostic profile, ${focus} may be useful to review. Your recent AIcee chat history will also appear here. You can choose a teacher-provided PDF below when you want to study from a specific material.`
-        : `Hello ${firstName}! Your recent AIcee chat history will appear here. Ask me about any lesson, or choose a teacher-provided PDF below so I can guide you using that learning material.`;
-
-    chat.appendChild(greeting);
-
-    // Kumuha muna ng huling active conversation sa backend kung wala pa
-    if (!currentConversationId) {
-        try {
-            const res = await fetch("/ai/conversations");
-            const data = await res.json();
-            if (res.ok && data.success && Array.isArray(data.conversations) && data.conversations.length > 0) {
-                currentConversationId = data.conversations[0].id;
-            }
-        } catch (e) {
-            console.warn("Could not fetch active conversation:", e);
-        }
-    }
-
-    // I-load na ang mga dating mensahe sa active conversation
-    if (currentConversationId) {
-        await loadAIChatHistory(currentConversationId);
-    }
-    chat.scrollTop = chat.scrollHeight;
-
-    const input = document.getElementById("ai-input");
-    setTimeout(() => input?.focus(), 180);
-
-    // call ang loadConversationsList para ma-refresh ang sidebar at ma-highlight ang active chat
-await loadConversationsList();
-}
-
-// Function para i-fetch at ipakita ang listahan ng past chats sa sidebar/modal
-async function loadConversationsList() {
-    if (currentRole !== "student" || !currentUser.id) return;
-
-    const listContainer = document.getElementById("ai-conversations-list");
-    if (!listContainer) return; // Siguraduhing may element na may ID na ito sa HTML
+// 4. I-load ang mga mensahe sa loob ng chat
+async function loadAIChatHistory(conversationId) {
+    const targetId = conversationId || currentConversationId;
+    if (currentRole !== "student" || !currentUser.id || !targetId) return [];
 
     try {
-        const response = await fetch("/ai/conversations");
+        const response = await fetch(`/ai/conversations/${targetId}/messages`);
         const data = await response.json();
 
-        if (!response.ok || !data.success) {
-            throw new Error(data.message || "Failed to load chat sessions.");
-        }
+        if (!response.ok || !data.success) throw new Error(data.message);
 
-        const conversations = Array.isArray(data.conversations) ? data.conversations : [];
-
-        if (conversations.length === 0) {
-            listContainer.innerHTML = `<div class="text-xs text-gray-400 p-3 text-center">No chat history yet.</div>`;
-            return;
-        }
-
-        listContainer.innerHTML = conversations.map(chat => `
-            <button 
-                type="button" 
-                onclick="selectConversation(${chat.id})" 
-                class="w-full text-left p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-between ${currentConversationId === chat.id ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}"
-            >
-                <span class="truncate text-sm flex-1 mr-2">${escapeHTML(chat.title || 'Untitled Chat')}</span>
-                ${chat.is_pinned ? '<i class="fa-solid fa-thumbtack text-xs text-amber-500"></i>' : ''}
-            </button>
-        `).join("");
-
+        const messages = Array.isArray(data.messages) ? data.messages : [];
+        messages.forEach(item => {
+            appendAIChatMessage(item.role === "user" ? "user" : "model", item.content, {
+                moduleTitle: item.module_title || null,
+                fallback: Boolean(item.is_fallback)
+            });
+        });
+        return messages;
     } catch (error) {
-        console.error("Load conversations error:", error);
+        console.error("AIcee chat history load error:", error);
+        return [];
     }
 }
 
-// Function para mag-reset at mag-umpisa ng panibagong chat
-async function startNewChat() {
-    currentConversationId = null;
-
-    const chatLog = document.getElementById("ai-chat-log");
-    if (chatLog) chatLog.innerHTML = "";
-
-    // Re-open/refresh assistant screen para mag-appear ang default greeting
-    await openAIAssistant();
-    await loadConversationsList();
-}
-
-
-// Function kapag in-click ang isang conversation sa listahan
-async function selectConversation(conversationId) {
-    if (!conversationId) return;
-
-    currentConversationId = conversationId;
-
-    const chatLog = document.getElementById("ai-chat-log");
-    if (chatLog) chatLog.innerHTML = ""; // I-clear ang kasalukuyang chat window
-
-    // Load ang mga mensahe ng napiling conversation ID
-    await loadAIChatHistory(conversationId);
-
-    // Refresh ang listahan para mag-highlight ang active chat
-    await loadConversationsList();
-}
-
-async function openAIAssistant() {
-    const modal = document.getElementById("ai-modal");
-    if (!modal) return;
-
-    modal.classList.remove("hidden");
-    modal.classList.remove("aicee-ai-modal-open");
-    void modal.offsetWidth;
-    modal.classList.add("aicee-ai-modal-open");
-
-    await loadAIceeLearningMaterials();
-
-    const chat = document.getElementById("ai-chat-log");
-    if (!chat) return;
-
-    chat.innerHTML = "";
-
-    const greeting = document.createElement("div");
-    greeting.className =
-        "aicee-chat-bubble aicee-assistant-bubble aicee-greeting-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
-
-    const firstName =
-        String(currentUser.name || "Student")
-            .trim()
-            .split(/\s+/)[0] || "Student";
-
-    const focus =
-        getPrototypeLearningSignals().needsFocus?.subject;
-
-    greeting.textContent = focus
-        ? `Hello ${firstName}! Based on your latest diagnostic profile, ${focus} may be useful to review. Your recent AIcee chat history will also appear here. You can choose a teacher-provided PDF below when you want to study from a specific material.`
-        : `Hello ${firstName}! Your recent AIcee chat history will appear here. Ask me about any lesson, or choose a teacher-provided PDF below so I can guide you using that learning material.`;
-
-    chat.appendChild(greeting);
-
-    if (!currentConversationId) {
-        try {
-            const res = await fetch("/ai/conversations");
-            const data = await res.json();
-            if (res.ok && data.success && Array.isArray(data.conversations) && data.conversations.length > 0) {
-                currentConversationId = data.conversations[0].id;
-            }
-        } catch (e) {
-            console.warn("Could not fetch active conversation:", e);
-        }
-    }
-
-    if (currentConversationId) {
-        await loadAIChatHistory(currentConversationId);
-    }
-    chat.scrollTop = chat.scrollHeight;
-
-    const input = document.getElementById("ai-input");
-    setTimeout(() => input?.focus(), 180);
-
-await loadConversationsList();
-}
-
-async function sendAIMessage() {
-    const input = document.getElementById("ai-input");
-
-    if (
-        !input ||
-        input.disabled ||
-        !input.value.trim()
-    ) {
+// 5. Burahin ang current chat
+async function clearAIChatHistory() {
+    if (currentRole !== "student" || !currentUser.id || !currentConversationId) {
+        showLegacyAlert("Walang active chat na pwedeng i-clear.");
         return;
     }
 
+    const confirmed = await showConfirmPopup({
+        title: "Clear AIcee chat history?",
+        message: "Burahin ang current chat session na ito?",
+        confirmText: "Clear history",
+        cancelText: "Cancel",
+        type: "warning"
+    });
+
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch(`/ai/conversations/${currentConversationId}`, { method: "DELETE" });
+        const data = await response.json();
+
+        if (!response.ok || !data.success) throw new Error(data.message);
+
+        currentConversationId = null;
+        await openAIAssistant();
+        await loadConversationsList();
+    } catch (error) {
+        console.error("Clear chat error:", error);
+        showLegacyAlert("Could not clear AIcee chat history.");
+    }
+}
+
+// 6. Buksan ang Modal (at i-load ang chat + sidebar)
+async function openAIAssistant() {
+    const modal = document.getElementById("ai-modal");
+    if (!modal) return;
+
+    modal.classList.remove("hidden", "aicee-ai-modal-closing");
+    void modal.offsetWidth;
+    modal.classList.add("aicee-ai-modal-open");
+
+    await loadAIceeLearningMaterials();
+    
     const chat = document.getElementById("ai-chat-log");
     if (!chat) return;
+    chat.innerHTML = "";
 
-    const question = input.value.trim();
-    const select = document.getElementById("ai-module-select");
+    const greeting = document.createElement("div");
+    greeting.className = "aicee-chat-bubble aicee-assistant-bubble aicee-greeting-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
+    const firstName = String(currentUser.name || "Student").trim().split(/\s+/)[0] || "Student";
+    greeting.textContent = `Hello ${firstName}! I'm ready to help you study. Select a lesson or ask me a question.`;
+    chat.appendChild(greeting);
 
-    const moduleId =
-        select?.value
-            ? Number(select.value)
-            : null;
-
-    const selectedMaterial =
-        Array.isArray(aiLearningMaterials)
-            ? aiLearningMaterials.find(
-                item =>
-                    Number(item.id) ===
-                    Number(moduleId)
-            )
-            : null;
-
-    // Gumawa muna ng bagong conversation sa backend kung wala pa
+    // Default chat fallback
     if (!currentConversationId) {
         try {
-            const createRes = await fetch("/ai/conversations", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" }
-            });
+            const res = await fetch("/ai/conversations");
+            const data = await res.json();
+            if (res.ok && data.success && Array.isArray(data.conversations) && data.conversations.length > 0) {
+                currentConversationId = data.conversations[0].id;
+            }
+        } catch (e) {
+            console.warn("Could not fetch active conversation:", e);
+        }
+    }
+
+    if (currentConversationId) {
+        await loadAIChatHistory(currentConversationId);
+    }
+    
+    chat.scrollTop = chat.scrollHeight;
+    await loadConversationsList(); // I-refresh ang sidebar
+    
+    setTimeout(() => document.getElementById("ai-input")?.focus(), 180);
+}
+
+// 7. Isara ang Modal (Fix for the 'X' button)
+function closeAIModal() {
+    const modal = document.getElementById("ai-modal");
+    if (!modal) return;
+    modal.classList.remove("aicee-ai-modal-open");
+    modal.classList.add("aicee-ai-modal-closing");
+    setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("aicee-ai-modal-closing");
+        document.getElementById("aicee-thinking-indicator")?.remove();
+        setAIceeComposerBusy(false);
+    }, 180);
+}
+
+// 8. I-send ang message sa AI
+async function sendAIMessage() {
+    const input = document.getElementById("ai-input");
+    if (!input || input.disabled || !input.value.trim()) return;
+
+    const chat = document.getElementById("ai-chat-log");
+    const question = input.value.trim();
+    const select = document.getElementById("ai-module-select");
+    const moduleId = select?.value ? Number(select.value) : null;
+    
+    let selectedMaterial = null;
+    if (typeof aiLearningMaterials !== "undefined" && Array.isArray(aiLearningMaterials)) {
+        selectedMaterial = aiLearningMaterials.find(item => Number(item.id) === Number(moduleId));
+    }
+
+    if (!currentConversationId) {
+        try {
+            const createRes = await fetch("/ai/conversations", { method: "POST" });
             const createData = await createRes.json();
             if (createRes.ok && createData.success && createData.conversation) {
                 currentConversationId = createData.conversation.id;
+                await loadConversationsList(); // Update sidebar kapag may bagong chat
             } else {
-                throw new Error("Could not start a new conversation session.");
+                throw new Error("Could not start session.");
             }
         } catch (err) {
-            console.error("Conversation creation error:", err);
-            appendAIChatMessage("model", "Sorry, could not initialize chat session. Please try again.", { fallback: true });
+            appendAIChatMessage("model", "Sorry, could not initialize chat. Try again.", { fallback: true });
             return;
         }
     }
 
-    appendAIChatMessage(
-        "user",
-        question,
-        {
-            moduleTitle:
-                selectedMaterial?.title || null
-        }
-    );
-
+    appendAIChatMessage("user", question, { moduleTitle: selectedMaterial?.title || null });
     input.value = "";
-    chat.scrollTop = chat.scrollHeight;
+    if (chat) chat.scrollTop = chat.scrollHeight;
 
     setAIceeComposerBusy(true);
-
-    const thinkingIndicator =
-        showAIceeThinkingIndicator(
-            selectedMaterial
-        );
+    const thinkingIndicator = typeof showAIceeThinkingIndicator === "function" ? showAIceeThinkingIndicator(selectedMaterial) : null;
 
     try {
-        const response =
-            await fetch(
-                "/chat",
-                {
-                    method: "POST",
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: question,
+                userId: currentUser.id,
+                conversationId: currentConversationId,
+                moduleId: moduleId
+            })
+        });
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            message: question,
-                            userId: currentUser.id,
-                            conversationId: currentConversationId,
-                            moduleId: moduleId
-                        })
-                }
-            );
-
-        let data;
-
-        try {
-            data = await response.json();
-        } catch (jsonError) {
-            throw new Error(
-                "AIcee returned an invalid server response."
-            );
-        }
-
+        const data = await response.json();
         thinkingIndicator?.remove();
 
-        if (!response.ok) {
-            throw new Error(
-                data?.message ||
-                data?.reply ||
-                "AIcee request failed."
-            );
-        }
+        if (!response.ok) throw new Error(data?.message || data?.reply || "Request failed.");
 
-        if (data.warning) {
-            appendAIChatMessage(
-                "model",
-                data.warning,
-                {
-                    warning: true
-                }
-            );
-        }
-
-        appendAIChatMessage(
-            "model",
-
-            String(
-                data.reply ||
-                "AIcee did not return a response."
-            ),
-
-            {
-                fallback:
-                    Boolean(data.fallback)
-            }
-        );
-
-        chat.scrollTop =
-            chat.scrollHeight;
-
+        if (data.warning) appendAIChatMessage("model", data.warning, { warning: true });
+        appendAIChatMessage("model", String(data.reply || "No response."), { fallback: Boolean(data.fallback) });
+        
+        if (chat) chat.scrollTop = chat.scrollHeight;
     } catch (error) {
         thinkingIndicator?.remove();
-
-        console.error(
-            "AIcee message error:",
-            error
-        );
-
-        appendAIChatMessage(
-            "model",
-
-            error?.message &&
-            !String(error.message)
-                .includes("Failed to fetch")
-                ? `Sorry, something went wrong: ${error.message}`
-                : "Sorry, AIcee is currently unavailable. Please try again in a moment.",
-
-            {
-                fallback: true
-            }
-        );
-
-        chat.scrollTop =
-            chat.scrollHeight;
-
+        appendAIChatMessage("model", error.message.includes("Failed to fetch") ? "AIcee is unavailable." : `Error: ${error.message}`, { fallback: true });
+        if (chat) chat.scrollTop = chat.scrollHeight;
     } finally {
-        thinkingIndicator?.remove();
         setAIceeComposerBusy(false);
-
         input.focus();
     }
 }
