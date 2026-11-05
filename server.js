@@ -1147,7 +1147,7 @@ ${JSON.stringify(studentContext, null, 2)}
 
         try {
             const completion = await openai.chat.completions.create({
-                model: "gpt-6.1-sol",
+                model: "gpt-4o",
                 messages: [
                     {
                         role: "system",
@@ -1160,7 +1160,7 @@ ${JSON.stringify(studentContext, null, 2)}
                     }
                 ],
                 temperature: 1,
-                max_tokens: 2000
+                max_completion_tokens: 2000
             });
 
             const aiReply = String(completion.choices[0].message.content || "").trim();
@@ -3414,7 +3414,6 @@ async function startServer() {
         console.log(`Server running securely on port ${PORT}`);
     });
 }
-
 if (require.main === module) {
     startServer().catch(error => {
         console.error(
@@ -3430,4 +3429,3 @@ module.exports = {
     app,
     initializeSecurityStorage
 };
-
