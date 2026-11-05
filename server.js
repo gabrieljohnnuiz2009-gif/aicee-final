@@ -524,6 +524,60 @@ app.get("/", (req, res) => {
     res.send("Backend is working!");
 });
 
+
+
+
+/* =========================================
+   AI CONVERSATIONS: LIST (RECENT + PINNED)
+========================================= */
+
+app.get(
+    "/ai/conversations",
+    authenticateToken,
+    requireRole("student"),
+    async (req, res) => {
+        try {
+            const [rows] = await db.query(`
+                SELECT
+                    id,
+                    title,
+                    is_pinned,
+                    pinned_at,
+                    last_message_at,
+                    created_at
+                FROM chat_conversations
+                WHERE user_id = ?
+                ORDER BY
+                    is_pinned DESC,
+                    pinned_at DESC,
+                    last_message_at DESC
+                LIMIT 100
+            `, [req.auth.userId]);
+
+            res.json({
+                success: true,
+                conversations: rows.map(row => ({
+                    id: Number(row.id),
+                    title: row.title,
+                    is_pinned: Boolean(row.is_pinned),
+                    pinned_at: row.pinned_at,
+                    last_message_at: row.last_message_at,
+                    created_at: row.created_at
+                }))
+            });
+        } catch (error) {
+            console.error("List AI conversations error:", error);
+            res.status(500).json({
+                success: false,
+                message: "Could not load your conversations."
+            });
+        }
+    }
+);
+
+
+
+
 /* =========================================
    PERSONALIZED AI CHAT (OPENAI)
 ========================================= */
