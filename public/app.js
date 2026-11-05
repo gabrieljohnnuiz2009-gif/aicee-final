@@ -3760,14 +3760,20 @@ function setAIceeComposerBusy(isBusy) {
     }
 }
 
-async function loadAIChatHistory() {
-    if (currentRole !== "student" || !currentUser.id) {
+// 1. LOAD AI CHAT HISTORY
+async function loadAIChatHistory(conversationId) {
+    if (currentRole !== "student" || !currentUser.id || !conversationId) {
         return [];
     }
 
     try {
         const response = await fetch(
-            `/chat-history/${currentUser.id}?limit=50`
+            `/ai/conversations/${conversationId}/messages`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${authToken}`
+                }
+            }
         );
         const data = await response.json();
 
@@ -3784,10 +3790,10 @@ async function loadAIChatHistory() {
         messages.forEach(item => {
             appendAIChatMessage(
                 item.role === "user" ? "user" : "model",
-                item.message,
+                item.content, // 'content' ang tamang key sa server.js
                 {
                     moduleTitle: item.module_title || null,
-                    fallback: Boolean(item.fallback)
+                    fallback: Boolean(item.is_fallback) // 'is_fallback' ang nasa server.js
                 }
             );
         });
@@ -3802,8 +3808,9 @@ async function loadAIChatHistory() {
     }
 }
 
-async function clearAIChatHistory() {
-    if (currentRole !== "student" || !currentUser.id) {
+// 2. CLEAR / DELETE AI CHAT HISTORY
+async function clearAIChatHistory(conversationId) {
+    if (currentRole !== "student" || !currentUser.id || !conversationId) {
         return;
     }
 
@@ -3820,9 +3827,12 @@ async function clearAIChatHistory() {
 
     try {
         const response = await fetch(
-            `/chat-history/${currentUser.id}`,
+            `/ai/conversations/${conversationId}`,
             {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${authToken}`
+                }
             }
         );
         const data = await response.json();
@@ -3831,6 +3841,11 @@ async function clearAIChatHistory() {
             throw new Error(
                 data.message || "Failed to clear chat history."
             );
+        }
+
+        // I-reset ang active conversation ID at i-refresh ang UI
+        if (typeof currentConversationId !== "undefined") {
+            currentConversationId = null;
         }
 
         await openAIAssistant();
@@ -3844,7 +3859,6 @@ async function clearAIChatHistory() {
         );
     }
 }
-
 async function openAIAssistant() {
     const modal = document.getElementById("ai-modal");
     if (!modal) return;
