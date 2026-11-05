@@ -3851,6 +3851,73 @@ async function clearAIChatHistory(conversationId) {
     }
 }
 
+// Function para i-fetch at ipakita ang listahan ng past chats sa sidebar/modal
+async function loadConversationsList() {
+    if (currentRole !== "student" || !currentUser.id) return;
+
+    const listContainer = document.getElementById("ai-conversations-list");
+    if (!listContainer) return; // Siguraduhing may element na may ID na ito sa HTML
+
+    try {
+        const response = await fetch("/ai/conversations");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Failed to load chat sessions.");
+        }
+
+        const conversations = Array.isArray(data.conversations) ? data.conversations : [];
+
+        if (conversations.length === 0) {
+            listContainer.innerHTML = `<div class="text-xs text-gray-400 p-3 text-center">No chat history yet.</div>`;
+            return;
+        }
+
+        listContainer.innerHTML = conversations.map(chat => `
+            <button 
+                type="button" 
+                onclick="selectConversation(${chat.id})" 
+                class="w-full text-left p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-between ${currentConversationId === chat.id ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}"
+            >
+                <span class="truncate text-sm flex-1 mr-2">${escapeHTML(chat.title || 'Untitled Chat')}</span>
+                ${chat.is_pinned ? '<i class="fa-solid fa-thumbtack text-xs text-amber-500"></i>' : ''}
+            </button>
+        `).join("");
+
+    } catch (error) {
+        console.error("Load conversations error:", error);
+    }
+}
+
+// Function para mag-reset at mag-umpisa ng panibagong chat
+async function startNewChat() {
+    currentConversationId = null;
+
+    const chatLog = document.getElementById("ai-chat-log");
+    if (chatLog) chatLog.innerHTML = "";
+
+    // Re-open/refresh assistant screen para mag-appear ang default greeting
+    await openAIAssistant();
+    await loadConversationsList();
+}
+
+
+// Function kapag in-click ang isang conversation sa listahan
+async function selectConversation(conversationId) {
+    if (!conversationId) return;
+
+    currentConversationId = conversationId;
+
+    const chatLog = document.getElementById("ai-chat-log");
+    if (chatLog) chatLog.innerHTML = ""; // I-clear ang kasalukuyang chat window
+
+    // Load ang mga mensahe ng napiling conversation ID
+    await loadAIChatHistory(conversationId);
+
+    // Refresh ang listahan para mag-highlight ang active chat
+    await loadConversationsList();
+}
+
 async function openAIAssistant() {
     const modal = document.getElementById("ai-modal");
     if (!modal) return;
@@ -3904,6 +3971,8 @@ async function openAIAssistant() {
 
     const input = document.getElementById("ai-input");
     setTimeout(() => input?.focus(), 180);
+
+await loadConversationsList();
 }
 
 async function sendAIMessage() {
