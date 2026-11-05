@@ -3805,6 +3805,74 @@ async function loadAIChatHistory(conversationId) {
     }
 }
 
+// 1. Kumuha at mag-display ng listahan ng past chats sa sidebar
+async function loadConversationsList() {
+    if (currentRole !== "student" || !currentUser.id) return;
+
+    const listContainer = document.getElementById("ai-conversations-list");
+    if (!listContainer) return;
+
+    try {
+        const response = await fetch("/ai/conversations");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Failed to load conversation history.");
+        }
+
+        const conversations = Array.isArray(data.conversations) ? data.conversations : [];
+
+        if (conversations.length === 0) {
+            listContainer.innerHTML = `<div class="text-xs text-gray-500 p-3 text-center">No past chats yet.</div>`;
+            return;
+        }
+
+        listContainer.innerHTML = conversations.map(chat => {
+            const isActive = Number(currentConversationId) === Number(chat.id);
+            const activeClass = isActive 
+                ? "bg-blue-600/20 text-blue-400 font-semibold border border-blue-500/30" 
+                : "text-gray-300 hover:bg-gray-800/80";
+
+            return `
+                <button 
+                    type="button" 
+                    onclick="selectConversation(${chat.id})" 
+                    class="w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all truncate flex items-center justify-between ${activeClass}"
+                >
+                    <span class="truncate mr-2"><i class="fa-regular fa-message mr-2 opacity-70"></i>${escapeHTML(chat.title || 'Study Session')}</span>
+                </button>
+            `;
+        }).join("");
+
+    } catch (error) {
+        console.error("Load conversations error:", error);
+    }
+}
+
+// 2. Mag-switch sa napiling lumang chat mula sa sidebar
+async function selectConversation(conversationId) {
+    if (!conversationId) return;
+
+    currentConversationId = conversationId;
+
+    const chatLog = document.getElementById("ai-chat-log");
+    if (chatLog) chatLog.innerHTML = "";
+
+    await loadAIChatHistory(conversationId);
+    await loadConversationsList();
+}
+
+// 3. Mag-start ng bagong chat session ("+ New chat" button)
+async function startNewChat() {
+    currentConversationId = null;
+
+    const chatLog = document.getElementById("ai-chat-log");
+    if (chatLog) chatLog.innerHTML = "";
+
+    await openAIAssistant();
+    await loadConversationsList();
+}
+
 // 2. OPEN AI ASSISTANT (Kukuha muna ng active chat bago i-load ang history)
 async function openAIAssistant() {
     const modal = document.getElementById("ai-modal");
@@ -3861,6 +3929,9 @@ async function openAIAssistant() {
 
     const input = document.getElementById("ai-input");
     setTimeout(() => input?.focus(), 180);
+
+    // call ang loadConversationsList para ma-refresh ang sidebar at ma-highlight ang active chat
+await loadConversationsList();
 }
 
 // Function para i-fetch at ipakita ang listahan ng past chats sa sidebar/modal
