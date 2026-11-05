@@ -750,6 +750,90 @@ app.patch(
     }
 );
 
+
+
+/* =========================================
+   AI CONVERSATIONS: DELETE
+========================================= */
+
+app.delete(
+    "/ai/conversations/:id",
+    authenticateToken,
+    requireRole("student"),
+    async (req, res) => {
+        try {
+            const conversationId = Number(req.params.id);
+
+            if (!Number.isInteger(conversationId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid conversation ID."
+                });
+            }
+
+            const [result] = await db.query(`
+                DELETE FROM chat_conversations
+                WHERE id = ? AND user_id = ?
+            `, [conversationId, req.auth.userId]);
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Conversation not found."
+                });
+            }
+
+            res.json({ success: true });
+        } catch (error) {
+            console.error("Delete AI conversation error:", error);
+            res.status(500).json({
+                success: false,
+                message: "Could not delete this conversation."
+            });
+        }
+    }
+);
+
+
+
+/* =========================================
+   AI CHAT: SAVE ONE QUESTION + ANSWER
+========================================= */
+
+async function saveChatTurn({
+    conversationId,
+    userMessage,
+    aiReply,
+    moduleId,
+    isFallback
+}) {
+    await db.query(`
+        INSERT INTO chat_messages
+            (conversation_id, role, content, module_id)
+        VALUES (?, 'user', ?, ?)
+    `, [conversationId, userMessage, moduleId]);
+
+    await db.query(`
+        INSERT INTO chat_messages
+            (conversation_id, role, content, module_id, is_fallback)
+        VALUES (?, 'assistant', ?, ?, ?)
+    `, [conversationId, aiReply, moduleId, isFallback ? 1 : 0]);
+
+    const title = userMessage
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 60);
+
+    await db.query(`
+        UPDATE chat_conversations
+        SET
+            last_message_at = NOW(),
+            title = IF(title = 'New chat', ?, title)
+        WHERE id = ?
+    `, [title, conversationId]);
+}
+
+
 /* =========================================
    PERSONALIZED AI CHAT (OPENAI)
 ========================================= */
@@ -780,6 +864,31 @@ app.post("/chat", authenticateToken, requireRole("student"), requireSelfBody("us
                     "Please keep your message below 2,000 characters."
             });
         }
+
+
+        
+        const conversationId = Number(req.body.conversationId);
+
+        if (!Number.isInteger(conversationId)) {
+            return res.status(400).json({
+                reply: "A valid conversation ID is required."
+            });
+        }
+
+        const [ownedConversations] = await db.query(`
+            SELECT id
+            FROM chat_conversations
+            WHERE id = ? AND user_id = ?
+            LIMIT 1
+        `, [conversationId, userId]);
+
+        if (ownedConversations.length === 0) {
+            return res.status(404).json({
+                reply: "Conversation not found."
+            });
+        }
+
+        const requestedModuleId = Number(req.body.moduleId);
 
         /*
             Student identity and section.
@@ -1183,15 +1292,31 @@ AICEE STUDENT CONTEXT:
 ${JSON.stringify(studentContext, null, 2)}
         `.trim();
 
-        const previousHistory =
-            aiConversationHistory.get(userId) || [];
+                const [historyRows] = await db.query(`
+            SELECT role, content
+            FROM (
+                SELECT id, role, content
+                FROM chat_messages
+                WHERE conversation_id = ?
+                ORDER BY id DESC
+                LIMIT ?
+            ) AS recent
+            ORDER BY id ASC
+        `, [conversationId, AI_HISTORY_LIMIT]);
+
+        const formattedHistory = historyRows.map(row => ({
+            role: row.role,
+            content: row.content
+        }));
+
+        const savedModuleId =
+            normalizedModules.some(
+                module => module.id === requestedModuleId
+            )
+                ? requestedModuleId
+                : null;
 
         try {
-            // Reformat history for OpenAI format
-            const formattedHistory = previousHistory.map(msg => ({
-                role: msg.role === 'model' ? 'assistant' : msg.role,
-                content: msg.parts[0].text
-            }));
             const completion = await openai.chat.completions.create({
     model: "gpt-6.1-sol",
     messages: [
@@ -1216,15 +1341,13 @@ ${JSON.stringify(studentContext, null, 2)}
                 throw new Error("OpenAI returned an empty response.");
             }
 
-            // Save history using your app's existing format structure
-            aiConversationHistory.set(
-                userId,
-                [
-                    ...previousHistory,
-                    { role: "user", parts: [{ text: message }] },
-                    { role: "model", parts: [{ text: aiReply }] }
-                ].slice(-AI_HISTORY_LIMIT)
-            );
+                        await saveChatTurn({
+                conversationId,
+                userMessage: message,
+                aiReply,
+                moduleId: savedModuleId,
+                isFallback: false
+            });
 
             return res.json({
                 reply: aiReply,
@@ -1238,10 +1361,21 @@ ${JSON.stringify(studentContext, null, 2)}
             });
 
         } catch (aiError) {
-            console.error("OpenAI response error:", aiError);
+                        console.error("OpenAI response error:", aiError);
+
+            const fallbackReply =
+                createPersonalizedFallback(studentContext);
+
+            await saveChatTurn({
+                conversationId,
+                userMessage: message,
+                aiReply: fallbackReply,
+                moduleId: savedModuleId,
+                isFallback: true
+            });
 
             return res.json({
-                reply: createPersonalizedFallback(studentContext),
+                reply: fallbackReply,
                 personalized: true,
                 fallback: true,
                 context_used: {
