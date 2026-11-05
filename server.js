@@ -694,6 +694,62 @@ app.get(
 );
 
 
+
+/* =========================================
+   AI CONVERSATIONS: PIN / UNPIN
+========================================= */
+
+app.patch(
+    "/ai/conversations/:id/pin",
+    authenticateToken,
+    requireRole("student"),
+    async (req, res) => {
+        try {
+            const conversationId = Number(req.params.id);
+
+            if (
+                !Number.isInteger(conversationId) ||
+                typeof req.body.pinned !== "boolean"
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "A valid conversation ID and pinned value (true or false) are required."
+                });
+            }
+
+            const [result] = await db.query(`
+                UPDATE chat_conversations
+                SET
+                    is_pinned = ?,
+                    pinned_at = ${req.body.pinned ? "NOW()" : "NULL"}
+                WHERE id = ? AND user_id = ?
+            `, [
+                req.body.pinned ? 1 : 0,
+                conversationId,
+                req.auth.userId
+            ]);
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Conversation not found."
+                });
+            }
+
+            res.json({
+                success: true,
+                is_pinned: req.body.pinned
+            });
+        } catch (error) {
+            console.error("Pin AI conversation error:", error);
+            res.status(500).json({
+                success: false,
+                message: "Could not update this conversation."
+            });
+        }
+    }
+);
+
 /* =========================================
    PERSONALIZED AI CHAT (OPENAI)
 ========================================= */
