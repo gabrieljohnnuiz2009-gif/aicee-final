@@ -1147,7 +1147,7 @@ ${JSON.stringify(studentContext, null, 2)}
 
         try {
             const completion = await openai.chat.completions.create({
-                model: "gpt-4o",
+                model: "gpt-6.1-sol",
                 messages: [
                     {
                         role: "system",
