@@ -578,6 +578,43 @@ app.get(
 
 
 
+
+
+/* =========================================
+   AI CONVERSATIONS: CREATE NEW CHAT
+========================================= */
+
+app.post(
+    "/ai/conversations",
+    authenticateToken,
+    requireRole("student"),
+    async (req, res) => {
+        try {
+            const [result] = await db.query(`
+                INSERT INTO chat_conversations (user_id)
+                VALUES (?)
+            `, [req.auth.userId]);
+
+            res.status(201).json({
+                success: true,
+                conversation: {
+                    id: Number(result.insertId),
+                    title: "New chat",
+                    is_pinned: false,
+                    pinned_at: null
+                }
+            });
+        } catch (error) {
+            console.error("Create AI conversation error:", error);
+            res.status(500).json({
+                success: false,
+                message: "Could not start a new conversation."
+            });
+        }
+    }
+);
+
+
 /* =========================================
    PERSONALIZED AI CHAT (OPENAI)
 ========================================= */
