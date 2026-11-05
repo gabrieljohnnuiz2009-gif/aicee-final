@@ -615,6 +615,85 @@ app.post(
 );
 
 
+
+/* =========================================
+   AI CONVERSATIONS: LOAD MESSAGES
+========================================= */
+
+app.get(
+    "/ai/conversations/:id/messages",
+    authenticateToken,
+    requireRole("student"),
+    async (req, res) => {
+        try {
+            const conversationId = Number(req.params.id);
+
+            if (!Number.isInteger(conversationId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid conversation ID."
+                });
+            }
+
+            const [conversations] = await db.query(`
+                SELECT id, title, is_pinned
+                FROM chat_conversations
+                WHERE id = ? AND user_id = ?
+                LIMIT 1
+            `, [conversationId, req.auth.userId]);
+
+            if (conversations.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Conversation not found."
+                });
+            }
+
+            const [messages] = await db.query(`
+                SELECT
+                    chat_messages.id,
+                    chat_messages.role,
+                    chat_messages.content,
+                    chat_messages.module_id,
+                    chat_messages.is_fallback,
+                    chat_messages.created_at,
+                    modules.title AS module_title
+                FROM chat_messages
+                LEFT JOIN modules
+                    ON modules.id = chat_messages.module_id
+                WHERE chat_messages.conversation_id = ?
+                ORDER BY chat_messages.id ASC
+                LIMIT 200
+            `, [conversationId]);
+
+            res.json({
+                success: true,
+                conversation: {
+                    id: Number(conversations[0].id),
+                    title: conversations[0].title,
+                    is_pinned: Boolean(conversations[0].is_pinned)
+                },
+                messages: messages.map(row => ({
+                    id: Number(row.id),
+                    role: row.role,
+                    content: row.content,
+                    module_id: row.module_id,
+                    module_title: row.module_title || null,
+                    is_fallback: Boolean(row.is_fallback),
+                    created_at: row.created_at
+                }))
+            });
+        } catch (error) {
+            console.error("Load AI conversation messages error:", error);
+            res.status(500).json({
+                success: false,
+                message: "Could not load this conversation."
+            });
+        }
+    }
+);
+
+
 /* =========================================
    PERSONALIZED AI CHAT (OPENAI)
 ========================================= */
