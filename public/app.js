@@ -3761,7 +3761,7 @@ function setAIceeComposerBusy(isBusy) {
     }
 }
 
-// 1. LOAD AI CHAT HISTORY
+// 1. LOAD AI CHAT HISTORY (Naka-default na sa currentConversationId)
 async function loadAIChatHistory(conversationId) {
     const targetId = conversationId || currentConversationId;
     if (currentRole !== "student" || !currentUser.id || !targetId) {
@@ -3805,50 +3805,62 @@ async function loadAIChatHistory(conversationId) {
     }
 }
 
-// 2. CLEAR / DELETE AI CHAT HISTORY
-async function clearAIChatHistory(conversationId) {
-    const targetId = conversationId || currentConversationId;
-    if (currentRole !== "student" || !currentUser.id || !targetId) {
-        return;
-    }
+// 2. OPEN AI ASSISTANT (Kukuha muna ng active chat bago i-load ang history)
+async function openAIAssistant() {
+    const modal = document.getElementById("ai-modal");
+    if (!modal) return;
 
-    const confirmed = await showConfirmPopup({
-        title: "Clear AIcee chat history?",
-        message:
-            "This removes your saved AIcee conversation history from the prototype.",
-        confirmText: "Clear history",
-        cancelText: "Cancel",
-        type: "warning"
-    });
+    modal.classList.remove("hidden");
+    modal.classList.remove("aicee-ai-modal-open");
+    void modal.offsetWidth;
+    modal.classList.add("aicee-ai-modal-open");
 
-    if (!confirmed) return;
+    await loadAIceeLearningMaterials();
 
-    try {
-        const response = await fetch(
-            `/ai/conversations/${targetId}`,
-            {
-                method: "DELETE"
+    const chat = document.getElementById("ai-chat-log");
+    if (!chat) return;
+
+    chat.innerHTML = "";
+
+    const greeting = document.createElement("div");
+    greeting.className =
+        "aicee-chat-bubble aicee-assistant-bubble aicee-greeting-bubble p-4 rounded-2xl max-w-[80%] whitespace-pre-wrap break-words mb-4";
+
+    const firstName =
+        String(currentUser.name || "Student")
+            .trim()
+            .split(/\s+/)[0] || "Student";
+
+    const focus =
+        getPrototypeLearningSignals().needsFocus?.subject;
+
+    greeting.textContent = focus
+        ? `Hello ${firstName}! Based on your latest diagnostic profile, ${focus} may be useful to review. Your recent AIcee chat history will also appear here. You can choose a teacher-provided PDF below when you want to study from a specific material.`
+        : `Hello ${firstName}! Your recent AIcee chat history will appear here. Ask me about any lesson, or choose a teacher-provided PDF below so I can guide you using that learning material.`;
+
+    chat.appendChild(greeting);
+
+    // Kumuha muna ng huling active conversation sa backend kung wala pa
+    if (!currentConversationId) {
+        try {
+            const res = await fetch("/ai/conversations");
+            const data = await res.json();
+            if (res.ok && data.success && Array.isArray(data.conversations) && data.conversations.length > 0) {
+                currentConversationId = data.conversations[0].id;
             }
-        );
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-            throw new Error(
-                data.message || "Failed to clear chat history."
-            );
+        } catch (e) {
+            console.warn("Could not fetch active conversation:", e);
         }
-
-        currentConversationId = null;
-        await openAIAssistant();
-    } catch (error) {
-        console.error(
-            "AIcee chat history clear error:",
-            error
-        );
-        showLegacyAlert(
-            "Could not clear AIcee chat history."
-        );
     }
+
+    // I-load na ang mga dating mensahe sa active conversation
+    if (currentConversationId) {
+        await loadAIChatHistory(currentConversationId);
+    }
+    chat.scrollTop = chat.scrollHeight;
+
+    const input = document.getElementById("ai-input");
+    setTimeout(() => input?.focus(), 180);
 }
 
 // Function para i-fetch at ipakita ang listahan ng past chats sa sidebar/modal
