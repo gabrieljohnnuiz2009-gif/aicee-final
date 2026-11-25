@@ -140,3 +140,222 @@ textarea:focus-visible,
     background-clip: text;
     color: transparent;
 }
+
+/* =====================================================
+   STEP 2 — SIDEBAR + TOPBAR
+   CSS only. Same HTML, same JS, same onclick handlers.
+===================================================== */
+
+/* ---------- Sidebar: ink panel with soft color glows ---------- */
+
+#main-app #sidebar {
+    background:
+        radial-gradient(280px 240px at 0% 100%, rgba(255, 107, 87, 0.20), transparent 70%),
+        radial-gradient(320px 280px at 100% 0%, rgba(var(--aicee-accent-rgb), 0.38), transparent 70%),
+        linear-gradient(180deg, #15132f 0%, #0f0e2a 100%) !important;
+    border-color: rgba(255, 255, 255, 0.07) !important;
+    box-shadow: 12px 0 44px rgba(20, 18, 60, 0.20);
+    color: #e8e9ff;
+}
+
+#main-app #sidebar .border-b,
+#main-app #sidebar .border-t,
+#main-app #sidebar .border-gray-100 {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Logo block */
+#main-app #sidebar .logo-font {
+    color: #ffffff !important;
+}
+
+#main-app #sidebar .text-gray-500 {
+    color: rgba(214, 217, 255, 0.62) !important;
+}
+
+#main-app #sidebar img {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.14), 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* User strip (role badge + name) */
+#main-app #sidebar .bg-gray-50 {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+#main-app #sidebar #role-badge {
+    background: var(--aicee-lime) !important;
+    color: #15152b !important;
+    letter-spacing: 0.06em;
+    font-weight: 800;
+}
+
+#main-app #sidebar #user-name {
+    color: #ffffff !important;
+}
+
+/* Nav links */
+#main-app #sidebar nav {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+#main-app #sidebar .sidebar-link {
+    padding: 0.45rem 0.7rem;
+    border-radius: 16px;
+    color: rgba(226, 228, 255, 0.74) !important;
+    background: transparent !important;
+    box-shadow: none;
+}
+
+#main-app #sidebar .sidebar-link > span {
+    font-size: 0.92rem;
+}
+
+#main-app #sidebar .sidebar-link > i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 2.15rem !important;
+    height: 2.15rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: rgba(226, 228, 255, 0.85);
+    background: rgba(255, 255, 255, 0.06);
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+#main-app #sidebar .sidebar-link:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    transform: translateX(3px);
+}
+
+#main-app #sidebar .sidebar-link:hover > i {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.06);
+}
+
+#main-app #sidebar .sidebar-link.is-active {
+    color: #ffffff !important;
+    background: linear-gradient(90deg, rgba(var(--aicee-accent-rgb), 0.38), rgba(var(--aicee-accent-rgb), 0.10)) !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+#main-app #sidebar .sidebar-link.is-active > i {
+    color: #ffffff;
+    background: var(--aicee-gradient);
+    box-shadow: 0 6px 16px rgba(var(--aicee-accent-rgb), 0.45);
+}
+
+#main-app #sidebar .sidebar-link.is-active::before {
+    background: var(--aicee-lime);
+    left: -0.5rem;
+    width: 4px;
+    height: 22px;
+}
+
+/* Logout + mobile close buttons */
+#main-app #sidebar button[onclick="logout()"] {
+    color: #ffb4a9 !important;
+    background: rgba(255, 107, 87, 0.10) !important;
+    border-radius: 16px;
+}
+
+#main-app #sidebar button[onclick="logout()"]:hover {
+    color: #ffffff !important;
+    background: rgba(255, 107, 87, 0.28) !important;
+}
+
+#main-app #sidebar button[onclick="closeMobileSidebar()"] {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+#main-app #sidebar button[onclick="closeMobileSidebar()"]:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* ---------- Topbar: translucent bar + identity buttons ---------- */
+
+#main-app header {
+    background: rgba(255, 253, 249, 0.82) !important;
+    border-bottom: 1px solid var(--aicee-border) !important;
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+}
+
+:root[data-theme="dark"] #main-app header {
+    background: rgba(18, 24, 48, 0.80) !important;
+}
+
+#main-app header #current-page-title {
+    font-family: var(--aicee-font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* AI Assistant button */
+#main-app header button[onclick="openAIAssistant()"] {
+    position: relative;
+    overflow: hidden;
+    background: var(--aicee-gradient) !important;
+    border-radius: 999px !important;
+    box-shadow: 0 10px 24px rgba(var(--aicee-accent-rgb), 0.32);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#main-app header button[onclick="openAIAssistant()"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+}
+
+#main-app header button[onclick="openAIAssistant()"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(var(--aicee-accent-rgb), 0.42);
+}
+
+#main-app header button[onclick="openAIAssistant()"]:hover::after {
+    transform: translateX(120%);
+}
+
+/* Notification bell */
+#main-app header button[onclick="toggleNotifications()"] {
+    border-radius: 14px;
+    color: var(--aicee-muted) !important;
+    background: var(--aicee-surface-2);
+    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+#main-app header button[onclick="toggleNotifications()"]:hover {
+    color: var(--aicee-accent) !important;
+    background: var(--aicee-accent-soft);
+    transform: translateY(-1px);
+}
+
+#main-app header #notif-count {
+    background: var(--aicee-coral) !important;
+    box-shadow: 0 0 0 2px var(--aicee-surface);
+}
+
+/* Profile avatar */
+#main-app header .aicee-header-avatar {
+    background: var(--aicee-gradient);
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(var(--aicee-accent-rgb), 0.30);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #main-app #sidebar .sidebar-link,
+    #main-app #sidebar .sidebar-link > i,
+    #main-app header button[onclick="openAIAssistant()"],
+    #main-app header button[onclick="openAIAssistant()"]::after {
+        transition: none !important;
+        transform: none !important;
+    }
+}
