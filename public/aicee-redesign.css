@@ -1,0 +1,142 @@
+/* =====================================================
+   AICEE REDESIGN — STEP 1: "Aurora Study Deck" tokens
+   Load this AFTER style.css and aicee-upgrade.css.
+   It only re-themes existing --aicee-* variables and
+   adds typography + a soft background. No layout changes.
+   To undo: remove the link to this file in index.html.
+===================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap");
+
+/* ---------- 1. Light theme tokens (default) ---------- */
+
+:root,
+:root[data-accent="blue"] {
+    /* Electric indigo replaces the old plain blue */
+    --aicee-accent: #5b4bff;
+    --aicee-accent-strong: #4333e6;
+    --aicee-accent-soft: #e9e6ff;
+    --aicee-accent-rgb: 91, 75, 255;
+}
+
+:root {
+    /* Warm ivory surfaces instead of stark white */
+    --aicee-bg: #fbf8f3;
+    --aicee-surface: #fffdf9;
+    --aicee-surface-2: #f5f0e7;
+    --aicee-border: #ebe4d8;
+    --aicee-text: #15152b;
+    --aicee-muted: #6c6a82;
+    --aicee-shadow: 0 24px 60px rgba(40, 30, 110, 0.10);
+    --aicee-shadow-soft: 0 12px 30px rgba(40, 30, 110, 0.07);
+    --aicee-radius: 22px;
+
+    /* New identity colors (used by the next redesign steps) */
+    --aicee-ink: #15152b;
+    --aicee-coral: #ff6b57;
+    --aicee-lime: #b8f23c;
+    --aicee-sun: #ffc53d;
+    --aicee-gradient: linear-gradient(135deg, #5b4bff 0%, #8a5cff 55%, #ff6b57 130%);
+
+    /* Typography */
+    --aicee-font-display: "Sora", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --aicee-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ---------- 2. Dark theme tokens ---------- */
+
+:root[data-theme="dark"] {
+    --aicee-bg: #0b1020;
+    --aicee-surface: #121830;
+    --aicee-surface-2: #1a2142;
+    --aicee-border: #2a3358;
+    --aicee-text: #f4f5ff;
+    --aicee-muted: #9aa3c7;
+    --aicee-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
+    --aicee-shadow-soft: 0 12px 36px rgba(0, 0, 0, 0.32);
+    --aicee-ink: #f4f5ff;
+}
+
+/* Brighter indigo so it stays readable on dark backgrounds */
+:root[data-theme="dark"][data-accent="blue"] {
+    --aicee-accent: #8b7dff;
+    --aicee-accent-strong: #7466ff;
+    --aicee-accent-soft: rgba(139, 125, 255, 0.16);
+    --aicee-accent-rgb: 139, 125, 255;
+}
+
+/* ---------- 3. Typography ---------- */
+
+body,
+button,
+input,
+textarea,
+select {
+    font-family: var(--aicee-font-body);
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+.logo-font {
+    font-family: var(--aicee-font-display);
+    letter-spacing: -0.02em;
+}
+
+/* Big stat numbers get the display font too */
+.text-4xl,
+.text-5xl,
+.text-6xl {
+    font-family: var(--aicee-font-display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+}
+
+/* ---------- 4. Soft aurora background (content area only) ---------- */
+
+#main-app > .flex-1 {
+    background-color: var(--aicee-bg);
+    background-image:
+        radial-gradient(900px 480px at 88% -12%, rgba(var(--aicee-accent-rgb), 0.14), transparent 60%),
+        radial-gradient(720px 440px at -6% 108%, rgba(255, 107, 87, 0.10), transparent 60%);
+    background-repeat: no-repeat;
+}
+
+:root[data-theme="dark"] #main-app > .flex-1 {
+    background-image:
+        radial-gradient(900px 480px at 88% -12%, rgba(var(--aicee-accent-rgb), 0.20), transparent 60%),
+        radial-gradient(720px 440px at -6% 108%, rgba(255, 107, 87, 0.12), transparent 60%);
+}
+
+/* ---------- 5. Accessibility ---------- */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--aicee-accent);
+    outline-offset: 2px;
+}
+
+/* ---------- 6. Settings swatch matches the new "Blue" (indigo) ---------- */
+
+.accent-choice.accent-blue {
+    background: #5b4bff;
+}
+
+/* ---------- 7. Reusable helper for later steps ---------- */
+
+.aicee-gradient-text {
+    background: var(--aicee-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
