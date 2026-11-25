@@ -359,3 +359,146 @@ textarea:focus-visible,
         transform: none !important;
     }
 }
+
+/* =====================================================
+   STEP 3 — LOGIN PAGE
+   CSS only. IDs, inputs, buttons and 3D mascot untouched.
+===================================================== */
+
+/* ---------- Page background ---------- */
+
+.aicee-login {
+    background:
+        radial-gradient(circle at 10% 8%, rgba(var(--aicee-accent-rgb), 0.16), transparent 36%),
+        radial-gradient(circle at 92% 90%, rgba(255, 107, 87, 0.13), transparent 34%),
+        var(--aicee-bg);
+}
+
+.login-blob-one { background: rgba(var(--aicee-accent-rgb), 0.20); }
+.login-blob-two { background: rgba(255, 107, 87, 0.14); }
+.login-blob-three { background: rgba(184, 242, 60, 0.16); }
+
+/* ---------- Showcase (left side, desktop) ---------- */
+
+.login-showcase {
+    background:
+        radial-gradient(640px 440px at 8% 4%, rgba(var(--aicee-accent-rgb), 0.55), transparent 62%),
+        radial-gradient(540px 400px at 98% 98%, rgba(255, 107, 87, 0.30), transparent 65%),
+        linear-gradient(150deg, rgba(14, 12, 42, 0.90), rgba(22, 18, 66, 0.86)),
+        url('./assets/aicee-login-bg.png') center/cover no-repeat;
+}
+
+.login-showcase h1 {
+    background: linear-gradient(180deg, #ffffff 35%, #d6d2ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Lime highlights instead of emerald */
+.login-showcase .bg-emerald-300 {
+    background-color: var(--aicee-lime) !important;
+    box-shadow: 0 0 0 4px rgba(184, 242, 60, 0.18);
+}
+
+.login-showcase .text-emerald-300 {
+    color: var(--aicee-lime) !important;
+}
+
+/* Stat cards: each gets its own accent color */
+.login-stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.login-stat-card::before {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 0;
+    height: 3px;
+    border-radius: 0 0 6px 6px;
+    background: var(--aicee-gradient);
+    opacity: 0.85;
+}
+
+.login-stat-card:nth-child(1) i {
+    background: var(--aicee-gradient);
+    box-shadow: 0 8px 18px rgba(var(--aicee-accent-rgb), 0.45);
+}
+
+.login-stat-card:nth-child(2) i {
+    background: linear-gradient(135deg, #ff6b57, #ff9a62);
+    box-shadow: 0 8px 18px rgba(255, 107, 87, 0.40);
+}
+
+.login-stat-card:nth-child(3) i {
+    color: #15152b;
+    background: linear-gradient(135deg, #b8f23c, #7ee0a0);
+    box-shadow: 0 8px 18px rgba(184, 242, 60, 0.32);
+}
+
+.login-stat-card:nth-child(2)::before {
+    background: linear-gradient(90deg, #ff6b57, #ff9a62);
+}
+
+.login-stat-card:nth-child(3)::before {
+    background: linear-gradient(90deg, #b8f23c, #7ee0a0);
+}
+
+/* ---------- Form side ---------- */
+
+.login-form-side {
+    background: rgba(251, 248, 243, 0.78);
+}
+
+:root[data-theme="dark"] .login-form-side {
+    background: rgba(11, 16, 32, 0.72);
+}
+
+.login-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--aicee-border) !important;
+    border-radius: 28px;
+    background:
+        radial-gradient(420px 220px at 100% 0%, rgba(var(--aicee-accent-rgb), 0.10), transparent 70%),
+        var(--aicee-surface) !important;
+    box-shadow: 0 32px 80px rgba(40, 30, 110, 0.14);
+}
+
+.login-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 4px;
+    background: var(--aicee-gradient);
+}
+
+:root[data-theme="dark"] .login-card {
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.45);
+}
+
+/* Eyebrow becomes a small pill */
+.login-eyebrow {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--aicee-accent-soft);
+}
+
+/* Sign In button uses the identity gradient */
+.login-card .aicee-primary-button {
+    background: var(--aicee-gradient);
+    box-shadow: 0 16px 32px rgba(var(--aicee-accent-rgb), 0.32);
+}
+
+.login-card .aicee-primary-button:not(:disabled):hover {
+    box-shadow: 0 20px 40px rgba(var(--aicee-accent-rgb), 0.42);
+}
+
+.login-error-message {
+    color: var(--aicee-coral);
+}
