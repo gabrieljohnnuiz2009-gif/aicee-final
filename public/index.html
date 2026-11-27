@@ -1107,6 +1107,14 @@
     </form>
 </dialog>
 
+<dialog id="teacher-assessment-dialog" class="m-auto w-[92vw] max-w-xl max-h-[85vh] overflow-auto rounded-2xl bg-white p-6 shadow-xl backdrop:bg-slate-950/55" aria-labelledby="teacher-assessment-title">
+    <div class="flex items-center justify-between gap-4">
+        <h3 id="teacher-assessment-title" class="text-xl font-bold">Assessment</h3>
+        <form method="dialog"><button class="px-4 py-2 rounded-xl bg-gray-100">Close</button></form>
+    </div>
+    <div id="teacher-assessment-content" class="mt-4 space-y-4" aria-live="polite"></div>
+</dialog>
+
 <dialog id="edit-module-subject-dialog" class="m-auto w-[92vw] max-w-lg rounded-2xl bg-white p-6 shadow-xl backdrop:bg-slate-950/55" aria-labelledby="edit-module-subject-title">
     <form onsubmit="saveModuleSubject(event)" class="space-y-4">
         <h3 id="edit-module-subject-title" class="text-xl font-bold">Change module subject</h3>
@@ -1214,7 +1222,7 @@
         <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
 
             <div class="text-sm text-gray-500">
-                Completed Diagnostic
+                Completed Assessment
             </div>
 
             <div
@@ -1229,7 +1237,7 @@
         <div class="bg-white border border-gray-100 rounded-3xl p-5 w-full">
 
             <div class="text-sm text-gray-500">
-                Pending Diagnostic
+                Pending Assessment
             </div>
 
             <div
@@ -1302,7 +1310,7 @@
                         </th>
 
                         <th class="px-4 sm:px-6 py-4 text-center">
-                            Diagnostic
+                            Assessment
                         </th>
 
                         <th class="px-4 sm:px-6 py-4 text-center">
