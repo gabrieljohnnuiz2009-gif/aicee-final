@@ -46,6 +46,8 @@ function showSignedOutScreen(message) {
         must_change_password: 0
     };
 
+    window.AiceePet?.setUser?.(null);
+
     const mainApp = document.getElementById("main-app");
     const loginPage = document.getElementById("login-page");
     const errorBox = document.getElementById("login-error");
@@ -2917,6 +2919,8 @@ async function login() {
         JSON.stringify(currentUser)
     );
 
+    window.AiceePet?.setUser?.(currentUser);
+
     if (
     currentUser.must_change_password === 1
 ) {
@@ -3082,6 +3086,8 @@ async function logout() {
         diagnostic_completed: 0,
         must_change_password: 0
     };
+
+    window.AiceePet?.setUser?.(null);
 
     currentRole = "student";
 
@@ -5171,6 +5177,7 @@ async function viewModule(id) {
 }
 
 async function openStudentModule(moduleId, currentProgress) {
+    window.AiceePet?.observeModuleProgress?.(moduleId, currentProgress);
     if (!await viewModule(moduleId)) return;
     if ((Number(currentProgress) || 0) < 25) await updateModuleProgress(moduleId, 25);
 }
@@ -5240,6 +5247,8 @@ async function updateModuleProgress(moduleId, progress) {
             return;
 
         }
+
+        window.AiceePet?.recordModuleProgress?.(moduleId, progress);
 
         await loadDashboard();
 
@@ -5944,6 +5953,8 @@ async function submitDiagnosticQuiz(event) {
                 )
                 : 0;
 
+        window.AiceePet?.rewardDiagnostic?.(overallPercentage);
+
         const subjectScores =
             results
                 .map(
@@ -6565,6 +6576,8 @@ window.onload = async function () {
                 )
                     .trim()
                     .toLowerCase();
+
+            window.AiceePet?.setUser?.(currentUser);
 
                     if (
     Number(
