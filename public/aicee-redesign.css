@@ -1,18 +1,12 @@
-/* =====================================================
-   AICEE REDESIGN — STEP 1: "Aurora Study Deck" tokens
-   Load this AFTER style.css and aicee-upgrade.css.
-   It only re-themes existing --aicee-* variables and
-   adds typography + a soft background. No layout changes.
-   To undo: remove the link to this file in index.html.
-===================================================== */
-
+/*
+ * AIcee • Aurora Study Deck
+ * Load after style.css and aicee-upgrade.css.
+ * Uses the existing HTML and app.js animation hooks.
+ */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap");
-
-/* ---------- 1. Light theme tokens (default) ---------- */
 
 :root,
 :root[data-accent="blue"] {
-    /* Electric indigo replaces the old plain blue */
     --aicee-accent: #5b4bff;
     --aicee-accent-strong: #4333e6;
     --aicee-accent-soft: #e9e6ff;
@@ -20,53 +14,73 @@
 }
 
 :root {
-    /* Warm ivory surfaces instead of stark white */
     --aicee-bg: #fbf8f3;
     --aicee-surface: #fffdf9;
     --aicee-surface-2: #f5f0e7;
     --aicee-border: #ebe4d8;
-    --aicee-text: #15152b;
+    --aicee-text: #19182c;
     --aicee-muted: #6c6a82;
-    --aicee-shadow: 0 24px 60px rgba(40, 30, 110, 0.10);
-    --aicee-shadow-soft: 0 12px 30px rgba(40, 30, 110, 0.07);
-    --aicee-radius: 22px;
-
-    /* New identity colors (used by the next redesign steps) */
     --aicee-ink: #15152b;
     --aicee-coral: #ff6b57;
     --aicee-lime: #b8f23c;
     --aicee-sun: #ffc53d;
     --aicee-gradient: linear-gradient(135deg, #5b4bff 0%, #8a5cff 55%, #ff6b57 130%);
-
-    /* Typography */
-    --aicee-font-display: "Sora", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --aicee-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --aicee-font-display: "Sora", Inter, ui-sans-serif, system-ui, sans-serif;
+    --aicee-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --aicee-shadow: 0 24px 60px rgba(40, 30, 110, .10);
+    --aicee-shadow-soft: 0 12px 30px rgba(40, 30, 110, .07);
+    --aicee-radius: 22px;
+    --aicee-ease: cubic-bezier(.2, .75, .25, 1);
+    color-scheme: light;
 }
 
-/* ---------- 2. Dark theme tokens ---------- */
-
+:root[data-accent="violet"] {
+    --aicee-accent: #7c3aed;
+    --aicee-accent-strong: #6d28d9;
+    --aicee-accent-soft: #ede9fe;
+    --aicee-accent-rgb: 124, 58, 237;
+}
+:root[data-accent="emerald"] {
+    --aicee-accent: #059669;
+    --aicee-accent-strong: #047857;
+    --aicee-accent-soft: #d1fae5;
+    --aicee-accent-rgb: 5, 150, 105;
+}
+:root[data-accent="rose"] {
+    --aicee-accent: #e11d48;
+    --aicee-accent-strong: #be123c;
+    --aicee-accent-soft: #ffe4e6;
+    --aicee-accent-rgb: 225, 29, 72;
+}
+:root[data-accent="amber"] {
+    --aicee-accent: #d97706;
+    --aicee-accent-strong: #b45309;
+    --aicee-accent-soft: #fef3c7;
+    --aicee-accent-rgb: 217, 119, 6;
+}
 :root[data-theme="dark"] {
     --aicee-bg: #0b1020;
     --aicee-surface: #121830;
     --aicee-surface-2: #1a2142;
     --aicee-border: #2a3358;
     --aicee-text: #f4f5ff;
-    --aicee-muted: #9aa3c7;
-    --aicee-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
-    --aicee-shadow-soft: 0 12px 36px rgba(0, 0, 0, 0.32);
+    --aicee-muted: #a4accb;
     --aicee-ink: #f4f5ff;
+    --aicee-shadow: 0 24px 64px rgba(0, 0, 0, .42);
+    --aicee-shadow-soft: 0 12px 36px rgba(0, 0, 0, .32);
+    color-scheme: dark;
 }
-
-/* Brighter indigo so it stays readable on dark backgrounds */
 :root[data-theme="dark"][data-accent="blue"] {
     --aicee-accent: #8b7dff;
     --aicee-accent-strong: #7466ff;
-    --aicee-accent-soft: rgba(139, 125, 255, 0.16);
+    --aicee-accent-soft: rgba(139, 125, 255, .16);
     --aicee-accent-rgb: 139, 125, 255;
 }
 
-/* ---------- 3. Typography ---------- */
-
+html {
+    background: var(--aicee-bg);
+    scroll-behavior: smooth;
+}
 body,
 button,
 input,
@@ -74,431 +88,387 @@ textarea,
 select {
     font-family: var(--aicee-font-body);
 }
-
 body {
+    color: var(--aicee-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: color .35s ease, background-color .35s ease;
 }
-
-h1,
-h2,
-h3,
-h4,
-.logo-font {
+h1, h2, h3, h4, .logo-font, .settings-section-title h3 {
     font-family: var(--aicee-font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -.025em;
 }
-
-/* Big stat numbers get the display font too */
-.text-4xl,
-.text-5xl,
-.text-6xl {
+.text-4xl, .text-5xl, .text-6xl {
     font-family: var(--aicee-font-display);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.03em;
+    letter-spacing: -.035em;
+}
+::selection {
+    color: var(--aicee-text);
+    background: rgba(var(--aicee-accent-rgb), .22);
+}
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid rgba(var(--aicee-accent-rgb), .8);
+    outline-offset: 3px;
 }
 
-/* ---------- 4. Soft aurora background (content area only) ---------- */
-
-#main-app > .flex-1 {
+/* A soft aurora under the actual app content. */
+#main-app,
+#main-app > .flex-1,
+#main-app .overflow-auto {
     background-color: var(--aicee-bg);
+}
+#main-app > .flex-1 {
     background-image:
-        radial-gradient(900px 480px at 88% -12%, rgba(var(--aicee-accent-rgb), 0.14), transparent 60%),
-        radial-gradient(720px 440px at -6% 108%, rgba(255, 107, 87, 0.10), transparent 60%);
+        radial-gradient(900px 500px at 95% -12%, rgba(var(--aicee-accent-rgb), .13), transparent 62%),
+        radial-gradient(680px 460px at -8% 108%, rgba(255, 107, 87, .09), transparent 64%);
     background-repeat: no-repeat;
 }
-
-:root[data-theme="dark"] #main-app > .flex-1 {
-    background-image:
-        radial-gradient(900px 480px at 88% -12%, rgba(var(--aicee-accent-rgb), 0.20), transparent 60%),
-        radial-gradient(720px 440px at -6% 108%, rgba(255, 107, 87, 0.12), transparent 60%);
+#main-app .overflow-auto {
+    scrollbar-color: rgba(var(--aicee-accent-rgb), .35) transparent;
+    scrollbar-width: thin;
+}
+#main-app .overflow-auto::-webkit-scrollbar { width: 10px; height: 10px; }
+#main-app .overflow-auto::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: rgba(var(--aicee-accent-rgb), .28);
+    background-clip: padding-box;
 }
 
-/* ---------- 5. Accessibility ---------- */
-
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[tabindex]:focus-visible {
-    outline: 2px solid var(--aicee-accent);
-    outline-offset: 2px;
-}
-
-/* ---------- 6. Settings swatch matches the new "Blue" (indigo) ---------- */
-
-.accent-choice.accent-blue {
-    background: #5b4bff;
-}
-
-/* ---------- 7. Reusable helper for later steps ---------- */
-
-.aicee-gradient-text {
-    background: var(--aicee-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-/* =====================================================
-   STEP 2 — SIDEBAR + TOPBAR
-   CSS only. Same HTML, same JS, same onclick handlers.
-===================================================== */
-
-/* ---------- Sidebar: ink panel with soft color glows ---------- */
-
+/* Branded side rail and a frosted, compact top bar. */
 #main-app #sidebar {
+    color: #eeedff;
     background:
-        radial-gradient(280px 240px at 0% 100%, rgba(255, 107, 87, 0.20), transparent 70%),
-        radial-gradient(320px 280px at 100% 0%, rgba(var(--aicee-accent-rgb), 0.38), transparent 70%),
-        linear-gradient(180deg, #15132f 0%, #0f0e2a 100%) !important;
-    border-color: rgba(255, 255, 255, 0.07) !important;
-    box-shadow: 12px 0 44px rgba(20, 18, 60, 0.20);
-    color: #e8e9ff;
+        radial-gradient(320px 260px at 100% 0%, rgba(112, 91, 255, .32), transparent 70%),
+        radial-gradient(300px 240px at 0% 100%, rgba(255, 107, 87, .19), transparent 70%),
+        linear-gradient(180deg, #171531 0%, #100f29 100%) !important;
+    border-color: rgba(255, 255, 255, .08) !important;
+    box-shadow: 14px 0 42px rgba(28, 22, 72, .14);
 }
-
 #main-app #sidebar .border-b,
 #main-app #sidebar .border-t,
-#main-app #sidebar .border-gray-100 {
-    border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-/* Logo block */
-#main-app #sidebar .logo-font {
-    color: #ffffff !important;
-}
-
-#main-app #sidebar .text-gray-500 {
-    color: rgba(214, 217, 255, 0.62) !important;
-}
-
-#main-app #sidebar img {
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.14), 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* User strip (role badge + name) */
+#main-app #sidebar .border-gray-100 { border-color: rgba(255, 255, 255, .09) !important; }
+#main-app #sidebar .logo-font { color: #fff !important; }
+#main-app #sidebar .text-gray-500 { color: rgba(226, 225, 255, .62) !important; }
 #main-app #sidebar .bg-gray-50 {
-    background: rgba(255, 255, 255, 0.05) !important;
+    color: #eeedff;
+    background: rgba(255, 255, 255, .055) !important;
+    border-color: rgba(255, 255, 255, .07) !important;
 }
-
 #main-app #sidebar #role-badge {
-    background: var(--aicee-lime) !important;
-    color: #15152b !important;
-    letter-spacing: 0.06em;
-    font-weight: 800;
+    color: #ece8ff !important;
+    background: rgba(139, 125, 255, .18) !important;
+    border: 1px solid rgba(193, 184, 255, .24);
 }
-
-#main-app #sidebar #user-name {
-    color: #ffffff !important;
-}
-
-/* Nav links */
-#main-app #sidebar nav {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
-}
-
+#main-app #sidebar #user-name { color: #fff !important; }
+#main-app #sidebar nav { padding-inline: 14px; }
 #main-app #sidebar .sidebar-link {
-    padding: 0.45rem 0.7rem;
-    border-radius: 16px;
-    color: rgba(226, 228, 255, 0.74) !important;
-    background: transparent !important;
-    box-shadow: none;
+    position: relative;
+    min-height: 46px;
+    margin-block: 3px;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    color: rgba(235, 234, 255, .72) !important;
+    transition: color .22s ease, background .22s ease, border-color .22s ease, transform .22s var(--aicee-ease);
 }
-
-#main-app #sidebar .sidebar-link > span {
-    font-size: 0.92rem;
-}
-
-#main-app #sidebar .sidebar-link > i {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    width: 2.15rem !important;
-    height: 2.15rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    color: rgba(226, 228, 255, 0.85);
-    background: rgba(255, 255, 255, 0.06);
-    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
-}
-
+#main-app #sidebar .sidebar-link > i { transition: transform .22s var(--aicee-ease), color .22s ease; }
 #main-app #sidebar .sidebar-link:hover {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.07) !important;
+    color: #fff !important;
+    background: rgba(255, 255, 255, .085) !important;
+    border-color: rgba(255, 255, 255, .08);
     transform: translateX(3px);
 }
-
-#main-app #sidebar .sidebar-link:hover > i {
-    background: rgba(255, 255, 255, 0.12);
-    transform: scale(1.06);
-}
-
+#main-app #sidebar .sidebar-link:hover > i { color: #c4bcff; transform: scale(1.1); }
 #main-app #sidebar .sidebar-link.is-active {
-    color: #ffffff !important;
-    background: linear-gradient(90deg, rgba(var(--aicee-accent-rgb), 0.38), rgba(var(--aicee-accent-rgb), 0.10)) !important;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    color: #fff !important;
+    background: linear-gradient(105deg, rgba(120, 102, 255, .32), rgba(120, 102, 255, .10)) !important;
+    border-color: rgba(176, 165, 255, .20);
+    box-shadow: inset 3px 0 #b8adff, 0 8px 22px rgba(8, 8, 30, .14);
 }
-
-#main-app #sidebar .sidebar-link.is-active > i {
-    color: #ffffff;
-    background: var(--aicee-gradient);
-    box-shadow: 0 6px 16px rgba(var(--aicee-accent-rgb), 0.45);
-}
-
-#main-app #sidebar .sidebar-link.is-active::before {
-    background: var(--aicee-lime);
-    left: -0.5rem;
-    width: 4px;
-    height: 22px;
-}
-
-/* Logout + mobile close buttons */
+#main-app #sidebar .sidebar-link.is-active > i { color: #c8c0ff; }
 #main-app #sidebar button[onclick="logout()"] {
-    color: #ffb4a9 !important;
-    background: rgba(255, 107, 87, 0.10) !important;
-    border-radius: 16px;
+    border: 1px solid rgba(255, 139, 139, .12);
+    color: #ffb1ad !important;
+    transition: background .2s ease, transform .2s ease;
 }
-
 #main-app #sidebar button[onclick="logout()"]:hover {
-    color: #ffffff !important;
-    background: rgba(255, 107, 87, 0.28) !important;
+    background: rgba(255, 107, 87, .13) !important;
+    transform: translateY(-1px);
 }
-
-#main-app #sidebar button[onclick="closeMobileSidebar()"] {
-    color: rgba(255, 255, 255, 0.75) !important;
-}
-
-#main-app #sidebar button[onclick="closeMobileSidebar()"]:hover {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.10) !important;
-}
-
-/* ---------- Topbar: translucent bar + identity buttons ---------- */
-
 #main-app header {
-    background: rgba(255, 253, 249, 0.82) !important;
-    border-bottom: 1px solid var(--aicee-border) !important;
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    background: rgba(255, 253, 249, .82) !important;
+    border-color: rgba(226, 220, 212, .78) !important;
+    box-shadow: 0 6px 24px rgba(36, 27, 80, .045);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    backdrop-filter: blur(18px) saturate(1.3);
 }
-
 :root[data-theme="dark"] #main-app header {
-    background: rgba(18, 24, 48, 0.80) !important;
+    background: rgba(18, 24, 48, .82) !important;
+    border-color: rgba(74, 84, 125, .52) !important;
 }
-
-#main-app header #current-page-title {
-    font-family: var(--aicee-font-display);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-}
-
-/* AI Assistant button */
+#main-app header #current-page-title { font-family: var(--aicee-font-display); letter-spacing: -.025em; }
 #main-app header button[onclick="openAIAssistant()"] {
     position: relative;
+    isolation: isolate;
     overflow: hidden;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, .22) !important;
     background: var(--aicee-gradient) !important;
-    border-radius: 999px !important;
-    box-shadow: 0 10px 24px rgba(var(--aicee-accent-rgb), 0.32);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 10px 24px rgba(var(--aicee-accent-rgb), .24);
+    transition: transform .22s var(--aicee-ease), box-shadow .22s ease;
 }
-
 #main-app header button[onclick="openAIAssistant()"]::after {
     content: "";
     position: absolute;
-    inset: 0;
-    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
-    transform: translateX(-120%);
-    transition: transform 0.6s ease;
+    z-index: 0;
     pointer-events: none;
+    inset: -40% auto -40% -45%;
+    width: 34%;
+    transform: skewX(-20deg);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .34), transparent);
 }
-
 #main-app header button[onclick="openAIAssistant()"]:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 14px 30px rgba(var(--aicee-accent-rgb), 0.42);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 32px rgba(var(--aicee-accent-rgb), .36);
 }
-
-#main-app header button[onclick="openAIAssistant()"]:hover::after {
-    transform: translateX(120%);
-}
-
-/* Notification bell */
+#main-app header button[onclick="openAIAssistant()"]:hover::after { animation: aiceeTopbarShine .75s ease; }
 #main-app header button[onclick="toggleNotifications()"] {
-    border-radius: 14px;
-    color: var(--aicee-muted) !important;
-    background: var(--aicee-surface-2);
-    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    color: var(--aicee-text);
+    border: 1px solid var(--aicee-border);
+    background: var(--aicee-surface);
 }
-
-#main-app header button[onclick="toggleNotifications()"]:hover {
-    color: var(--aicee-accent) !important;
-    background: var(--aicee-accent-soft);
-    transform: translateY(-1px);
-}
-
 #main-app header #notif-count {
-    background: var(--aicee-coral) !important;
-    box-shadow: 0 0 0 2px var(--aicee-surface);
+    border: 2px solid var(--aicee-surface);
+    box-shadow: 0 3px 10px rgba(255, 107, 87, .28);
+}
+#main-app header .aicee-header-avatar { box-shadow: 0 0 0 3px rgba(var(--aicee-accent-rgb), .16); }
+@keyframes aiceeTopbarShine {
+    from { transform: translateX(0) skewX(-20deg); }
+    to { transform: translateX(460%) skewX(-20deg); }
 }
 
-/* Profile avatar */
-#main-app header .aicee-header-avatar {
-    background: var(--aicee-gradient);
-    color: #ffffff;
-    box-shadow: 0 8px 20px rgba(var(--aicee-accent-rgb), 0.30);
+/* Cards feel layered, with a small lift and a gentle color halo on hover. */
+#main-app .aicee-panel,
+#main-app .card-hover {
+    position: relative;
+    border: 1px solid var(--aicee-border) !important;
+    border-radius: var(--aicee-radius) !important;
+    background-color: var(--aicee-surface) !important;
+    box-shadow: var(--aicee-shadow-soft);
+    transition: transform .28s var(--aicee-ease), box-shadow .28s ease, border-color .28s ease;
+}
+#main-app .aicee-panel:hover,
+#main-app .card-hover:hover {
+    border-color: rgba(var(--aicee-accent-rgb), .26) !important;
+    box-shadow: 0 22px 48px rgba(40, 30, 110, .12), 0 0 0 4px rgba(var(--aicee-accent-rgb), .035);
+    transform: translateY(-4px);
+}
+#main-app .profile-hero,
+#main-app .settings-preview-card { border-radius: 26px; }
+#main-app .settings-section-title,
+#main-app .settings-heading { color: var(--aicee-text); }
+#main-app table thead th {
+    color: var(--aicee-muted);
+    background: var(--aicee-surface-2);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+#main-app table tbody tr { transition: background-color .18s ease; }
+#main-app table tbody tr:hover { background-color: rgba(var(--aicee-accent-rgb), .045); }
+
+/* Buttons: a clear primary action, polished secondary actions, and crisp press feedback. */
+#main-app button,
+#login-page button {
+    font-family: var(--aicee-font-body);
+    -webkit-tap-highlight-color: transparent;
+}
+.aicee-button-motion {
+    transition: transform .2s var(--aicee-ease), box-shadow .22s ease, filter .22s ease, background-color .22s ease;
+}
+.aicee-button-motion:not(:disabled):hover { transform: translateY(-2px); }
+.aicee-button-motion:not(:disabled):active { transform: translateY(0) scale(.975); }
+.aicee-button-motion:disabled { cursor: not-allowed; filter: saturate(.65); }
+.aicee-primary-button,
+#main-app button.bg-blue-600,
+#main-app button.bg-blue-500 {
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, .18) !important;
+    background: var(--aicee-gradient) !important;
+    box-shadow: 0 12px 26px rgba(var(--aicee-accent-rgb), .24);
+}
+.aicee-primary-button:not(:disabled):hover,
+#main-app button.bg-blue-600:not(:disabled):hover,
+#main-app button.bg-blue-500:not(:disabled):hover {
+    box-shadow: 0 17px 34px rgba(var(--aicee-accent-rgb), .34);
+    filter: saturate(1.08);
+}
+.aicee-secondary-button {
+    color: var(--aicee-accent-strong) !important;
+    border: 1px solid rgba(var(--aicee-accent-rgb), .22) !important;
+    background: rgba(var(--aicee-accent-rgb), .07) !important;
+}
+.aicee-secondary-button:not(:disabled):hover {
+    background: rgba(var(--aicee-accent-rgb), .13) !important;
+    box-shadow: 0 8px 20px rgba(var(--aicee-accent-rgb), .12);
+}
+.aicee-ripple { background: rgba(255, 255, 255, .35); }
+#main-app button.rounded-full,
+#main-app button.rounded-xl,
+#main-app button.rounded-2xl { transition: transform .2s var(--aicee-ease), box-shadow .2s ease, background-color .2s ease; }
+
+/* Fields get a visible focus glow without shifting the page. */
+.aicee-field-label { color: var(--aicee-text); font-weight: 650; }
+.aicee-input-shell,
+.aicee-textarea,
+#main-app input:not([type="checkbox"]):not([type="radio"]),
+#main-app select,
+#main-app textarea {
+    border-color: var(--aicee-border);
+    border-radius: 14px;
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.aicee-input-shell:focus-within,
+.aicee-textarea:focus,
+#main-app input:focus,
+#main-app select:focus,
+#main-app textarea:focus {
+    border-color: rgba(var(--aicee-accent-rgb), .75) !important;
+    box-shadow: 0 0 0 4px rgba(var(--aicee-accent-rgb), .12);
+    outline: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    #main-app #sidebar .sidebar-link,
-    #main-app #sidebar .sidebar-link > i,
-    #main-app header button[onclick="openAIAssistant()"],
-    #main-app header button[onclick="openAIAssistant()"]::after {
-        transition: none !important;
-        transform: none !important;
-    }
-}
-
-/* =====================================================
-   STEP 3 — LOGIN PAGE
-   CSS only. IDs, inputs, buttons and 3D mascot untouched.
-===================================================== */
-
-/* ---------- Page background ---------- */
-
+/* Login: vibrant welcome panel, soft floating color, luminous 3D mascot. */
 .aicee-login {
     background:
-        radial-gradient(circle at 10% 8%, rgba(var(--aicee-accent-rgb), 0.16), transparent 36%),
-        radial-gradient(circle at 92% 90%, rgba(255, 107, 87, 0.13), transparent 34%),
+        radial-gradient(circle at 10% 8%, rgba(var(--aicee-accent-rgb), .15), transparent 36%),
+        radial-gradient(circle at 92% 90%, rgba(255, 107, 87, .12), transparent 34%),
         var(--aicee-bg);
 }
-
-.login-blob-one { background: rgba(var(--aicee-accent-rgb), 0.20); }
-.login-blob-two { background: rgba(255, 107, 87, 0.14); }
-.login-blob-three { background: rgba(184, 242, 60, 0.16); }
-
-/* ---------- Showcase (left side, desktop) ---------- */
-
 .login-showcase {
     background:
-        radial-gradient(640px 440px at 8% 4%, rgba(var(--aicee-accent-rgb), 0.55), transparent 62%),
-        radial-gradient(540px 400px at 98% 98%, rgba(255, 107, 87, 0.30), transparent 65%),
-        linear-gradient(150deg, rgba(14, 12, 42, 0.90), rgba(22, 18, 66, 0.86)),
+        radial-gradient(640px 440px at 8% 4%, rgba(var(--aicee-accent-rgb), .55), transparent 62%),
+        radial-gradient(540px 400px at 98% 98%, rgba(255, 107, 87, .30), transparent 65%),
+        linear-gradient(150deg, rgba(14, 12, 42, .94), rgba(22, 18, 66, .90)),
         url('./assets/aicee-login-bg.png') center/cover no-repeat;
 }
-
 .login-showcase h1 {
-    background: linear-gradient(180deg, #ffffff 35%, #d6d2ff 100%);
+    background: linear-gradient(180deg, #fff 35%, #d6d2ff 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 }
-
-/* Lime highlights instead of emerald */
 .login-showcase .bg-emerald-300 {
     background-color: var(--aicee-lime) !important;
-    box-shadow: 0 0 0 4px rgba(184, 242, 60, 0.18);
+    box-shadow: 0 0 0 4px rgba(184, 242, 60, .18);
 }
-
-.login-showcase .text-emerald-300 {
-    color: var(--aicee-lime) !important;
-}
-
-/* Stat cards: each gets its own accent color */
+.login-showcase .text-emerald-300 { color: var(--aicee-lime) !important; }
 .login-stat-card {
     position: relative;
     overflow: hidden;
+    border-color: rgba(255, 255, 255, .15) !important;
+    background: rgba(255, 255, 255, .085) !important;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    transition: transform .28s var(--aicee-ease), background .28s ease;
 }
-
 .login-stat-card::before {
     content: "";
     position: absolute;
-    left: 18px;
-    right: 18px;
-    top: 0;
+    inset: 0 18px auto;
     height: 3px;
     border-radius: 0 0 6px 6px;
     background: var(--aicee-gradient);
-    opacity: 0.85;
 }
-
-.login-stat-card:nth-child(1) i {
-    background: var(--aicee-gradient);
-    box-shadow: 0 8px 18px rgba(var(--aicee-accent-rgb), 0.45);
-}
-
-.login-stat-card:nth-child(2) i {
-    background: linear-gradient(135deg, #ff6b57, #ff9a62);
-    box-shadow: 0 8px 18px rgba(255, 107, 87, 0.40);
-}
-
-.login-stat-card:nth-child(3) i {
-    color: #15152b;
-    background: linear-gradient(135deg, #b8f23c, #7ee0a0);
-    box-shadow: 0 8px 18px rgba(184, 242, 60, 0.32);
-}
-
-.login-stat-card:nth-child(2)::before {
-    background: linear-gradient(90deg, #ff6b57, #ff9a62);
-}
-
-.login-stat-card:nth-child(3)::before {
-    background: linear-gradient(90deg, #b8f23c, #7ee0a0);
-}
-
-/* ---------- Form side ---------- */
-
-.login-form-side {
-    background: rgba(251, 248, 243, 0.78);
-}
-
-:root[data-theme="dark"] .login-form-side {
-    background: rgba(11, 16, 32, 0.72);
-}
-
+.login-stat-card:hover { transform: translateY(-5px) rotate(-.5deg); background: rgba(255, 255, 255, .13) !important; }
+.login-stat-card:nth-child(2)::before { background: linear-gradient(90deg, #ff6b57, #ffab67); }
+.login-stat-card:nth-child(3)::before { background: linear-gradient(90deg, #b8f23c, #7ee0a0); }
+.login-stat-card:nth-child(1) i { background: var(--aicee-gradient); }
+.login-stat-card:nth-child(2) i { background: linear-gradient(135deg, #ff6b57, #ff9a62); }
+.login-stat-card:nth-child(3) i { color: #15152b; background: linear-gradient(135deg, #b8f23c, #7ee0a0); }
+.login-form-side { background: rgba(251, 248, 243, .78); }
+:root[data-theme="dark"] .login-form-side { background: rgba(11, 16, 32, .72); }
 .login-card {
     position: relative;
     overflow: hidden;
     border: 1px solid var(--aicee-border) !important;
     border-radius: 28px;
-    background:
-        radial-gradient(420px 220px at 100% 0%, rgba(var(--aicee-accent-rgb), 0.10), transparent 70%),
-        var(--aicee-surface) !important;
-    box-shadow: 0 32px 80px rgba(40, 30, 110, 0.14);
+    background: radial-gradient(420px 220px at 100% 0%, rgba(var(--aicee-accent-rgb), .10), transparent 70%), var(--aicee-surface) !important;
+    box-shadow: 0 32px 80px rgba(40, 30, 110, .14);
 }
-
 .login-card::before {
     content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
+    inset: 0 0 auto;
     height: 4px;
     background: var(--aicee-gradient);
 }
+.login-eyebrow { border-radius: 999px; background: var(--aicee-accent-soft); }
+.login-card .aicee-primary-button { background: var(--aicee-gradient); }
+.login-error-message { color: var(--aicee-coral); }
+.accent-choice.accent-blue { background: #5b4bff; }
+.aicee-3d-halo { filter: blur(4px); opacity: .92; }
+.aicee-speech-bubble { box-shadow: 0 18px 46px rgba(16, 14, 55, .16); }
 
-:root[data-theme="dark"] .login-card {
-    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.45);
+/* Modals and assistant chat share the same soft glass treatment. */
+.popup-backdrop-enter { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+#ai-modal .modal,
+#notification-dropdown,
+#message-popup-box {
+    border: 1px solid var(--aicee-border);
+    border-radius: 24px;
+    box-shadow: var(--aicee-shadow);
+}
+#ai-modal .modal { background: var(--aicee-surface); }
+.aicee-chat-bubble { border-radius: 18px; }
+.aicee-assistant-bubble { box-shadow: 0 8px 22px rgba(20, 16, 60, .05); }
+
+/* Dark surfaces stay readable when the saved theme changes. */
+:root[data-theme="dark"] #main-app > .flex-1 {
+    background-image:
+        radial-gradient(900px 500px at 95% -12%, rgba(var(--aicee-accent-rgb), .18), transparent 62%),
+        radial-gradient(680px 460px at -8% 108%, rgba(255, 107, 87, .09), transparent 64%);
+}
+:root[data-theme="dark"] #main-app .aicee-panel,
+:root[data-theme="dark"] #main-app .card-hover {
+    border-color: var(--aicee-border) !important;
+    background-color: var(--aicee-surface) !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, .20);
+}
+:root[data-theme="dark"] #main-app .aicee-panel:hover,
+:root[data-theme="dark"] #main-app .card-hover:hover { box-shadow: 0 20px 42px rgba(0, 0, 0, .32); }
+:root[data-theme="dark"] #main-app table thead th { background: var(--aicee-surface-2); }
+:root[data-theme="dark"] .login-card { box-shadow: 0 32px 80px rgba(0, 0, 0, .45); }
+:root[data-theme="dark"] .login-stat-card { background: rgba(255, 255, 255, .075) !important; }
+
+/* Responsive finishing touches. */
+@media (max-width: 1023px) {
+    #main-app > .flex-1 { background-position: center top; }
+    #main-app header { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+}
+@media (max-width: 767px) {
+    .login-card { border-radius: 24px; }
+    #main-app .aicee-panel,
+    #main-app .card-hover { border-radius: 18px !important; }
+    .login-form-side { padding-top: 28px; padding-bottom: 28px; }
 }
 
-/* Eyebrow becomes a small pill */
-.login-eyebrow {
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: var(--aicee-accent-soft);
+/* Motion respects both the app preference and operating-system preference. */
+:root[data-animations="off"] *,
+:root[data-animations="off"] *::before,
+:root[data-animations="off"] *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
 }
-
-/* Sign In button uses the identity gradient */
-.login-card .aicee-primary-button {
-    background: var(--aicee-gradient);
-    box-shadow: 0 16px 32px rgba(var(--aicee-accent-rgb), 0.32);
-}
-
-.login-card .aicee-primary-button:not(:disabled):hover {
-    box-shadow: 0 20px 40px rgba(var(--aicee-accent-rgb), 0.42);
-}
-
-.login-error-message {
-    color: var(--aicee-coral);
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
 }
