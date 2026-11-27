@@ -8524,6 +8524,41 @@ tbody.innerHTML = `
 }
 
 
+async function openTeacherAssessment(studentId) {
+    const dialog = document.getElementById("teacher-assessment-dialog");
+    const title = document.getElementById("teacher-assessment-title");
+    const content = document.getElementById("teacher-assessment-content");
+    const requestId = String(Number(dialog.dataset.requestId || 0) + 1);
+    dialog.dataset.requestId = requestId;
+    title.textContent = "Assessment";
+    content.textContent = "Loading assessment results…";
+    dialog.showModal();
+    const isCurrent = () => dialog.open && dialog.dataset.requestId === requestId;
+    try {
+        const response = await fetch(`/teacher/students/${studentId}/assessment`);
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || "Assessment records are unavailable.");
+        if (!isCurrent()) return;
+        title.textContent = `Assessment for ${data.student.name}`;
+        const dateLabel = value => value ? new Date(value).toLocaleDateString() : "";
+        const renderResults = (label, rows, showDate = false) => {
+            if (!rows.length) return "";
+            return `<section><h4 class="font-semibold mb-1">${escapeHTML(label)}</h4>
+                <ul class="text-sm text-gray-700 space-y-1">${rows.map(row => {
+                    const entry = [row.subject, `${row.score}/${row.total_questions}`, showDate ? dateLabel(row.taken_at) : ""].filter(Boolean).join(" · ");
+                    return `<li>${escapeHTML(entry)}</li>`;
+                }).join("")}</ul></section>`;
+        };
+        content.innerHTML = renderResults("Latest by subject", data.latest, true) +
+            data.attempts.map(attempt => renderResults(`Attempt · ${dateLabel(attempt.taken_at)}`, attempt.results)).join("");
+        if (!content.innerHTML) content.textContent = data.student.completed
+            ? "Marked completed. No scores are available."
+            : "Assessment pending. No results yet.";
+    } catch (error) {
+        if (isCurrent()) content.textContent = error.message;
+    }
+}
+
 function renderManagedStudents(students) {
 
     const tbody =
@@ -8630,6 +8665,10 @@ function renderManagedStudents(students) {
 
             <td class="px-6 py-4 text-center">
                 ${diagnosticBadge}
+                <button type="button" onclick="openTeacherAssessment(${Number(student.id)})"
+                    class="block mx-auto mt-2 text-xs font-semibold text-blue-700 hover:underline">
+                    View Assessment
+                </button>
             </td>
 
             <td class="px-6 py-4 text-center">
