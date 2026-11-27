@@ -1,82 +1,79 @@
 /*
- * AIcee • Aurora Study Deck
- * Load after style.css and aicee-upgrade.css.
- * Uses the existing HTML and app.js animation hooks.
+ * AIcee — Obsidian Aurora
+ * Loaded after style.css and aicee-upgrade.css.
+ * Visual layer only: existing HTML, events, data, and API behavior stay intact.
  */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap");
 
 :root,
 :root[data-accent="blue"] {
-    --aicee-accent: #5b4bff;
-    --aicee-accent-strong: #4333e6;
-    --aicee-accent-soft: #e9e6ff;
-    --aicee-accent-rgb: 91, 75, 255;
-}
-
-:root {
-    --aicee-bg: #fbf8f3;
-    --aicee-surface: #fffdf9;
-    --aicee-surface-2: #f5f0e7;
-    --aicee-border: #ebe4d8;
-    --aicee-text: #19182c;
-    --aicee-muted: #6c6a82;
-    --aicee-ink: #15152b;
-    --aicee-coral: #ff6b57;
-    --aicee-lime: #b8f23c;
-    --aicee-sun: #ffc53d;
-    --aicee-gradient: linear-gradient(135deg, #5b4bff 0%, #8a5cff 55%, #ff6b57 130%);
-    --aicee-font-display: "Sora", Inter, ui-sans-serif, system-ui, sans-serif;
-    --aicee-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --aicee-shadow: 0 24px 60px rgba(40, 30, 110, .10);
-    --aicee-shadow-soft: 0 12px 30px rgba(40, 30, 110, .07);
-    --aicee-radius: 22px;
+    --aicee-bg: #080c14;
+    --aicee-surface: #101722;
+    --aicee-surface-2: #141e2c;
+    --aicee-border: #263244;
+    --aicee-text: #edf3fb;
+    --aicee-muted: #9aa9bd;
+    --aicee-ink: #edf3fb;
+    --aicee-accent: #8b7cff;
+    --aicee-accent-strong: #7162ed;
+    --aicee-accent-soft: rgba(139, 124, 255, .15);
+    --aicee-accent-rgb: 139, 124, 255;
+    --aicee-cyan: #54d8f5;
+    --aicee-gradient: linear-gradient(115deg, #7567f8 0%, #8b7cff 48%, #42cce8 120%);
+    --aicee-font-display: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --aicee-font-body: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --aicee-shadow: 0 22px 56px rgba(0, 0, 0, .34);
+    --aicee-shadow-soft: 0 12px 32px rgba(0, 0, 0, .22);
+    --aicee-radius: 18px;
     --aicee-ease: cubic-bezier(.2, .75, .25, 1);
-    color-scheme: light;
+    color-scheme: dark;
 }
 
 :root[data-accent="violet"] {
-    --aicee-accent: #7c3aed;
-    --aicee-accent-strong: #6d28d9;
-    --aicee-accent-soft: #ede9fe;
-    --aicee-accent-rgb: 124, 58, 237;
+    --aicee-accent: #a38cff;
+    --aicee-accent-strong: #8469f3;
+    --aicee-accent-soft: rgba(163, 140, 255, .16);
+    --aicee-accent-rgb: 163, 140, 255;
 }
 :root[data-accent="emerald"] {
-    --aicee-accent: #059669;
-    --aicee-accent-strong: #047857;
-    --aicee-accent-soft: #d1fae5;
-    --aicee-accent-rgb: 5, 150, 105;
+    --aicee-accent: #36d6b0;
+    --aicee-accent-strong: #15ad8b;
+    --aicee-accent-soft: rgba(54, 214, 176, .15);
+    --aicee-accent-rgb: 54, 214, 176;
 }
 :root[data-accent="rose"] {
-    --aicee-accent: #e11d48;
-    --aicee-accent-strong: #be123c;
-    --aicee-accent-soft: #ffe4e6;
-    --aicee-accent-rgb: 225, 29, 72;
+    --aicee-accent: #ff7898;
+    --aicee-accent-strong: #e8577a;
+    --aicee-accent-soft: rgba(255, 120, 152, .15);
+    --aicee-accent-rgb: 255, 120, 152;
 }
 :root[data-accent="amber"] {
-    --aicee-accent: #d97706;
-    --aicee-accent-strong: #b45309;
-    --aicee-accent-soft: #fef3c7;
-    --aicee-accent-rgb: 217, 119, 6;
-}
-:root[data-theme="dark"] {
-    --aicee-bg: #0b1020;
-    --aicee-surface: #121830;
-    --aicee-surface-2: #1a2142;
-    --aicee-border: #2a3358;
-    --aicee-text: #f4f5ff;
-    --aicee-muted: #a4accb;
-    --aicee-ink: #f4f5ff;
-    --aicee-shadow: 0 24px 64px rgba(0, 0, 0, .42);
-    --aicee-shadow-soft: 0 12px 36px rgba(0, 0, 0, .32);
-    color-scheme: dark;
-}
-:root[data-theme="dark"][data-accent="blue"] {
-    --aicee-accent: #8b7dff;
-    --aicee-accent-strong: #7466ff;
-    --aicee-accent-soft: rgba(139, 125, 255, .16);
-    --aicee-accent-rgb: 139, 125, 255;
+    --aicee-accent: #f4bc61;
+    --aicee-accent-strong: #d99232;
+    --aicee-accent-soft: rgba(244, 188, 97, .16);
+    --aicee-accent-rgb: 244, 188, 97;
 }
 
+/* Keep the existing light theme choice, with the same cool visual identity. */
+:root[data-theme="light"] {
+    --aicee-bg: #f3f6fa;
+    --aicee-surface: #ffffff;
+    --aicee-surface-2: #f7f9fc;
+    --aicee-border: #e1e7ef;
+    --aicee-text: #172235;
+    --aicee-muted: #637189;
+    --aicee-ink: #172235;
+    --aicee-shadow: 0 20px 50px rgba(30, 48, 78, .10);
+    --aicee-shadow-soft: 0 10px 28px rgba(30, 48, 78, .07);
+    color-scheme: light;
+}
+:root[data-theme="light"][data-accent="blue"] {
+    --aicee-accent: #6758e8;
+    --aicee-accent-strong: #5142cb;
+    --aicee-accent-soft: #eeebff;
+    --aicee-accent-rgb: 103, 88, 232;
+}
+
+/* Type, focus, and page canvas. */
 html {
     background: var(--aicee-bg);
     scroll-behavior: smooth;
@@ -90,29 +87,33 @@ select {
 }
 body {
     color: var(--aicee-text);
+    background: var(--aicee-bg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: color .35s ease, background-color .35s ease;
+    transition: color .25s ease, background-color .25s ease;
 }
 h1, h2, h3, h4, .logo-font, .settings-section-title h3 {
     font-family: var(--aicee-font-display);
     letter-spacing: -.025em;
 }
 .text-4xl, .text-5xl, .text-6xl {
-    font-family: var(--aicee-font-display);
     font-variant-numeric: tabular-nums;
     letter-spacing: -.035em;
 }
 ::selection {
-    color: var(--aicee-text);
-    background: rgba(var(--aicee-accent-rgb), .22);
+    color: #fff;
+    background: rgba(var(--aicee-accent-rgb), .34);
 }
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-    outline: 3px solid rgba(var(--aicee-accent-rgb), .8);
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--aicee-cyan);
     outline-offset: 3px;
 }
 
-/* A soft aurora under the actual app content. */
 #main-app,
 #main-app > .flex-1,
 #main-app .overflow-auto {
@@ -120,214 +121,191 @@ h1, h2, h3, h4, .logo-font, .settings-section-title h3 {
 }
 #main-app > .flex-1 {
     background-image:
-        radial-gradient(900px 500px at 95% -12%, rgba(var(--aicee-accent-rgb), .13), transparent 62%),
-        radial-gradient(680px 460px at -8% 108%, rgba(255, 107, 87, .09), transparent 64%);
+        radial-gradient(780px 480px at 92% -14%, rgba(var(--aicee-accent-rgb), .09), transparent 64%),
+        radial-gradient(620px 420px at 0% 100%, rgba(58, 190, 225, .055), transparent 65%);
     background-repeat: no-repeat;
 }
+#main-app::before,
+#main-app::after {
+    opacity: .075;
+    filter: blur(92px);
+}
 #main-app .overflow-auto {
-    scrollbar-color: rgba(var(--aicee-accent-rgb), .35) transparent;
+    scrollbar-color: rgba(var(--aicee-accent-rgb), .3) transparent;
     scrollbar-width: thin;
 }
-#main-app .overflow-auto::-webkit-scrollbar { width: 10px; height: 10px; }
-#main-app .overflow-auto::-webkit-scrollbar-thumb {
+#main-app .overflow-auto::-webkit-scrollbar,
+#ai-chat-log::-webkit-scrollbar { width: 9px; height: 9px; }
+#main-app .overflow-auto::-webkit-scrollbar-thumb,
+#ai-chat-log::-webkit-scrollbar-thumb {
     border: 3px solid transparent;
     border-radius: 999px;
-    background: rgba(var(--aicee-accent-rgb), .28);
+    background: rgba(var(--aicee-accent-rgb), .30);
     background-clip: padding-box;
 }
 
-/* Branded side rail and a frosted, compact top bar. */
+/* Navigation: quiet obsidian rail, clear active state, restrained cyan detail. */
 #main-app #sidebar {
-    color: #eeedff;
+    color: #e8edf6;
     background:
-        radial-gradient(320px 260px at 100% 0%, rgba(112, 91, 255, .32), transparent 70%),
-        radial-gradient(300px 240px at 0% 100%, rgba(255, 107, 87, .19), transparent 70%),
-        linear-gradient(180deg, #171531 0%, #100f29 100%) !important;
-    border-color: rgba(255, 255, 255, .08) !important;
-    box-shadow: 14px 0 42px rgba(28, 22, 72, .14);
+        radial-gradient(340px 260px at 100% 0%, rgba(113, 96, 218, .14), transparent 72%),
+        linear-gradient(180deg, #0d1420 0%, #0a101a 100%) !important;
+    border-color: #202b3a !important;
+    box-shadow: 12px 0 36px rgba(0, 0, 0, .16);
 }
 #main-app #sidebar .border-b,
 #main-app #sidebar .border-t,
-#main-app #sidebar .border-gray-100 { border-color: rgba(255, 255, 255, .09) !important; }
-#main-app #sidebar .logo-font { color: #fff !important; }
-#main-app #sidebar .text-gray-500 { color: rgba(226, 225, 255, .62) !important; }
+#main-app #sidebar .border-gray-100 { border-color: rgba(157, 176, 204, .12) !important; }
+#main-app #sidebar .logo-font { color: #f4f7fc !important; }
+#main-app #sidebar .text-gray-500 { color: #8999af !important; }
 #main-app #sidebar .bg-gray-50 {
-    color: #eeedff;
-    background: rgba(255, 255, 255, .055) !important;
-    border-color: rgba(255, 255, 255, .07) !important;
+    color: #dfe7f3;
+    background: rgba(255, 255, 255, .035) !important;
+    border-color: rgba(157, 176, 204, .09) !important;
 }
 #main-app #sidebar #role-badge {
-    color: #ece8ff !important;
-    background: rgba(139, 125, 255, .18) !important;
-    border: 1px solid rgba(193, 184, 255, .24);
+    color: #c6c1ff !important;
+    background: rgba(var(--aicee-accent-rgb), .12) !important;
+    border: 1px solid rgba(var(--aicee-accent-rgb), .23);
 }
-#main-app #sidebar #user-name { color: #fff !important; }
+#main-app #sidebar #user-name { color: #f4f7fc !important; }
 #main-app #sidebar nav { padding-inline: 14px; }
 #main-app #sidebar .sidebar-link {
-    position: relative;
-    min-height: 46px;
+    min-height: 44px;
     margin-block: 3px;
     border: 1px solid transparent;
-    border-radius: 15px;
-    color: rgba(235, 234, 255, .72) !important;
-    transition: color .22s ease, background .22s ease, border-color .22s ease, transform .22s var(--aicee-ease);
+    border-radius: 12px;
+    color: #9eabc0 !important;
+    transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s var(--aicee-ease);
 }
-#main-app #sidebar .sidebar-link > i { transition: transform .22s var(--aicee-ease), color .22s ease; }
+#main-app #sidebar .sidebar-link > i { transition: color .2s ease, transform .2s var(--aicee-ease); }
 #main-app #sidebar .sidebar-link:hover {
-    color: #fff !important;
-    background: rgba(255, 255, 255, .085) !important;
-    border-color: rgba(255, 255, 255, .08);
-    transform: translateX(3px);
+    color: #f3f6fb !important;
+    background: rgba(255, 255, 255, .055) !important;
+    border-color: rgba(157, 176, 204, .08);
+    transform: translateX(2px);
 }
-#main-app #sidebar .sidebar-link:hover > i { color: #c4bcff; transform: scale(1.1); }
+#main-app #sidebar .sidebar-link:hover > i { color: var(--aicee-cyan); transform: scale(1.05); }
 #main-app #sidebar .sidebar-link.is-active {
     color: #fff !important;
-    background: linear-gradient(105deg, rgba(120, 102, 255, .32), rgba(120, 102, 255, .10)) !important;
-    border-color: rgba(176, 165, 255, .20);
-    box-shadow: inset 3px 0 #b8adff, 0 8px 22px rgba(8, 8, 30, .14);
+    background: linear-gradient(100deg, rgba(var(--aicee-accent-rgb), .16), rgba(var(--aicee-accent-rgb), .055)) !important;
+    border-color: rgba(var(--aicee-accent-rgb), .18);
+    box-shadow: inset 2px 0 var(--aicee-accent), 0 6px 18px rgba(0, 0, 0, .12);
 }
-#main-app #sidebar .sidebar-link.is-active > i { color: #c8c0ff; }
+#main-app #sidebar .sidebar-link.is-active > i { color: var(--aicee-cyan); }
 #main-app #sidebar button[onclick="logout()"] {
-    border: 1px solid rgba(255, 139, 139, .12);
-    color: #ffb1ad !important;
+    border: 1px solid rgba(255, 120, 152, .14);
+    color: #f29aab !important;
     transition: background .2s ease, transform .2s ease;
 }
 #main-app #sidebar button[onclick="logout()"]:hover {
-    background: rgba(255, 107, 87, .13) !important;
+    background: rgba(255, 120, 152, .09) !important;
     transform: translateY(-1px);
 }
+
 #main-app header {
-    background: rgba(255, 253, 249, .82) !important;
-    border-color: rgba(226, 220, 212, .78) !important;
-    box-shadow: 0 6px 24px rgba(36, 27, 80, .045);
-    -webkit-backdrop-filter: blur(18px) saturate(1.3);
-    backdrop-filter: blur(18px) saturate(1.3);
+    color: var(--aicee-text);
+    background: rgba(12, 18, 29, .84) !important;
+    border-color: rgba(75, 91, 113, .38) !important;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, .12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    backdrop-filter: blur(18px) saturate(1.15);
 }
-:root[data-theme="dark"] #main-app header {
-    background: rgba(18, 24, 48, .82) !important;
-    border-color: rgba(74, 84, 125, .52) !important;
+:root[data-theme="light"] #main-app header {
+    background: rgba(255, 255, 255, .82) !important;
+    border-color: rgba(218, 226, 237, .82) !important;
+    box-shadow: 0 6px 22px rgba(32, 49, 78, .055);
 }
-#main-app header #current-page-title { font-family: var(--aicee-font-display); letter-spacing: -.025em; }
+#main-app header #current-page-title { font-weight: 650; }
 #main-app header button[onclick="openAIAssistant()"] {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
     color: #fff !important;
-    border: 1px solid rgba(255, 255, 255, .22) !important;
-    background: var(--aicee-gradient) !important;
-    box-shadow: 0 10px 24px rgba(var(--aicee-accent-rgb), .24);
-    transition: transform .22s var(--aicee-ease), box-shadow .22s ease;
-}
-#main-app header button[onclick="openAIAssistant()"]::after {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    pointer-events: none;
-    inset: -40% auto -40% -45%;
-    width: 34%;
-    transform: skewX(-20deg);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .34), transparent);
+    border: 1px solid rgba(161, 153, 255, .22) !important;
+    background: linear-gradient(110deg, #5e55c8, #5548a7) !important;
+    box-shadow: 0 6px 18px rgba(91, 78, 198, .22);
+    transition: transform .2s var(--aicee-ease), box-shadow .2s ease, background .2s ease;
 }
 #main-app header button[onclick="openAIAssistant()"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 32px rgba(var(--aicee-accent-rgb), .36);
+    background: linear-gradient(110deg, #6b61d8, #6254bc) !important;
+    box-shadow: 0 9px 24px rgba(91, 78, 198, .30);
+    transform: translateY(-1px);
 }
-#main-app header button[onclick="openAIAssistant()"]:hover::after { animation: aiceeTopbarShine .75s ease; }
 #main-app header button[onclick="toggleNotifications()"] {
     color: var(--aicee-text);
     border: 1px solid var(--aicee-border);
     background: var(--aicee-surface);
 }
-#main-app header #notif-count {
-    border: 2px solid var(--aicee-surface);
-    box-shadow: 0 3px 10px rgba(255, 107, 87, .28);
-}
-#main-app header .aicee-header-avatar { box-shadow: 0 0 0 3px rgba(var(--aicee-accent-rgb), .16); }
-@keyframes aiceeTopbarShine {
-    from { transform: translateX(0) skewX(-20deg); }
-    to { transform: translateX(460%) skewX(-20deg); }
-}
+#main-app header #notif-count { border: 2px solid var(--aicee-surface); }
+#main-app header .aicee-header-avatar { box-shadow: 0 0 0 2px rgba(var(--aicee-accent-rgb), .20); }
 
-/* Cards feel layered, with a small lift and a gentle color halo on hover. */
+/* Shared dashboard cards, tables, badges, and content surfaces. */
 #main-app .aicee-panel,
-#main-app .card-hover {
-    position: relative;
-    border: 1px solid var(--aicee-border) !important;
+#main-app .card-hover,
+#main-app .bg-white.rounded-3xl,
+#main-app .bg-white.rounded-2xl {
+    border-color: var(--aicee-border) !important;
     border-radius: var(--aicee-radius) !important;
     background-color: var(--aicee-surface) !important;
     box-shadow: var(--aicee-shadow-soft);
-    transition: transform .28s var(--aicee-ease), box-shadow .28s ease, border-color .28s ease;
+    transition: transform .22s var(--aicee-ease), border-color .22s ease, box-shadow .22s ease;
 }
 #main-app .aicee-panel:hover,
 #main-app .card-hover:hover {
-    border-color: rgba(var(--aicee-accent-rgb), .26) !important;
-    box-shadow: 0 22px 48px rgba(40, 30, 110, .12), 0 0 0 4px rgba(var(--aicee-accent-rgb), .035);
-    transform: translateY(-4px);
+    border-color: rgba(var(--aicee-accent-rgb), .25) !important;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, .24), 0 0 0 1px rgba(var(--aicee-accent-rgb), .08);
+    transform: translateY(-2px);
 }
-#main-app .profile-hero,
-#main-app .settings-preview-card { border-radius: 26px; }
-#main-app .settings-section-title,
-#main-app .settings-heading { color: var(--aicee-text); }
 #main-app table thead th {
     color: var(--aicee-muted);
     background: var(--aicee-surface-2);
-    font-size: .72rem;
-    font-weight: 700;
-    letter-spacing: .08em;
+    font-size: .71rem;
+    font-weight: 650;
+    letter-spacing: .075em;
     text-transform: uppercase;
 }
-#main-app table tbody tr { transition: background-color .18s ease; }
-#main-app table tbody tr:hover { background-color: rgba(var(--aicee-accent-rgb), .045); }
+#main-app table tbody tr { transition: background-color .16s ease; }
+#main-app table tbody tr:hover { background: rgba(var(--aicee-accent-rgb), .045); }
+.accent-choice.accent-blue { background: #8b7cff; }
 
-/* Buttons: a clear primary action, polished secondary actions, and crisp press feedback. */
+/* Consistent, compact controls. Existing ripple and loading hooks remain active. */
 #main-app button,
-#login-page button {
-    font-family: var(--aicee-font-body);
-    -webkit-tap-highlight-color: transparent;
-}
+#login-page button { font-family: var(--aicee-font-body); -webkit-tap-highlight-color: transparent; }
 .aicee-button-motion {
-    transition: transform .2s var(--aicee-ease), box-shadow .22s ease, filter .22s ease, background-color .22s ease;
+    transition: transform .18s var(--aicee-ease), box-shadow .2s ease, filter .2s ease, background-color .2s ease;
 }
-.aicee-button-motion:not(:disabled):hover { transform: translateY(-2px); }
-.aicee-button-motion:not(:disabled):active { transform: translateY(0) scale(.975); }
-.aicee-button-motion:disabled { cursor: not-allowed; filter: saturate(.65); }
+.aicee-button-motion:not(:disabled):hover { transform: translateY(-1px); }
+.aicee-button-motion:not(:disabled):active { transform: translateY(0) scale(.98); }
+.aicee-button-motion:disabled { cursor: not-allowed; filter: saturate(.5); }
 .aicee-primary-button,
 #main-app button.bg-blue-600,
 #main-app button.bg-blue-500 {
     color: #fff !important;
-    border: 1px solid rgba(255, 255, 255, .18) !important;
-    background: var(--aicee-gradient) !important;
-    box-shadow: 0 12px 26px rgba(var(--aicee-accent-rgb), .24);
+    border: 1px solid rgba(176, 168, 255, .20) !important;
+    background: linear-gradient(110deg, #6359cf, #5148ae) !important;
+    box-shadow: 0 7px 18px rgba(82, 72, 177, .20);
 }
 .aicee-primary-button:not(:disabled):hover,
 #main-app button.bg-blue-600:not(:disabled):hover,
 #main-app button.bg-blue-500:not(:disabled):hover {
-    box-shadow: 0 17px 34px rgba(var(--aicee-accent-rgb), .34);
-    filter: saturate(1.08);
+    background: linear-gradient(110deg, #7469df, #5f55c3) !important;
+    box-shadow: 0 10px 22px rgba(82, 72, 177, .27);
 }
 .aicee-secondary-button {
-    color: var(--aicee-accent-strong) !important;
-    border: 1px solid rgba(var(--aicee-accent-rgb), .22) !important;
-    background: rgba(var(--aicee-accent-rgb), .07) !important;
+    color: var(--aicee-text) !important;
+    border: 1px solid var(--aicee-border) !important;
+    background: var(--aicee-surface-2) !important;
 }
 .aicee-secondary-button:not(:disabled):hover {
-    background: rgba(var(--aicee-accent-rgb), .13) !important;
-    box-shadow: 0 8px 20px rgba(var(--aicee-accent-rgb), .12);
+    border-color: rgba(var(--aicee-accent-rgb), .35) !important;
+    background: rgba(var(--aicee-accent-rgb), .09) !important;
 }
-.aicee-ripple { background: rgba(255, 255, 255, .35); }
-#main-app button.rounded-full,
-#main-app button.rounded-xl,
-#main-app button.rounded-2xl { transition: transform .2s var(--aicee-ease), box-shadow .2s ease, background-color .2s ease; }
-
-/* Fields get a visible focus glow without shifting the page. */
-.aicee-field-label { color: var(--aicee-text); font-weight: 650; }
+.aicee-ripple { background: rgba(255, 255, 255, .26); }
 .aicee-input-shell,
 .aicee-textarea,
 #main-app input:not([type="checkbox"]):not([type="radio"]),
 #main-app select,
 #main-app textarea {
     border-color: var(--aicee-border);
-    border-radius: 14px;
+    border-radius: 11px;
     transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
 }
 .aicee-input-shell:focus-within,
@@ -335,130 +313,218 @@ h1, h2, h3, h4, .logo-font, .settings-section-title h3 {
 #main-app input:focus,
 #main-app select:focus,
 #main-app textarea:focus {
-    border-color: rgba(var(--aicee-accent-rgb), .75) !important;
-    box-shadow: 0 0 0 4px rgba(var(--aicee-accent-rgb), .12);
+    border-color: rgba(var(--aicee-accent-rgb), .72) !important;
+    box-shadow: 0 0 0 3px rgba(var(--aicee-accent-rgb), .13);
     outline: none;
 }
 
-/* Login: vibrant welcome panel, soft floating color, luminous 3D mascot. */
+/* Login keeps the 3D mascot and existing layout, with a quiet cinematic backdrop. */
 .aicee-login {
     background:
-        radial-gradient(circle at 10% 8%, rgba(var(--aicee-accent-rgb), .15), transparent 36%),
-        radial-gradient(circle at 92% 90%, rgba(255, 107, 87, .12), transparent 34%),
+        radial-gradient(700px 540px at 4% 8%, rgba(var(--aicee-accent-rgb), .10), transparent 66%),
+        radial-gradient(680px 520px at 94% 94%, rgba(50, 190, 224, .07), transparent 66%),
         var(--aicee-bg);
 }
 .login-showcase {
     background:
-        radial-gradient(640px 440px at 8% 4%, rgba(var(--aicee-accent-rgb), .55), transparent 62%),
-        radial-gradient(540px 400px at 98% 98%, rgba(255, 107, 87, .30), transparent 65%),
-        linear-gradient(150deg, rgba(14, 12, 42, .94), rgba(22, 18, 66, .90)),
-        url('./assets/aicee-login-bg.png') center/cover no-repeat;
+        radial-gradient(700px 520px at 12% 2%, rgba(96, 83, 196, .20), transparent 66%),
+        radial-gradient(560px 440px at 96% 100%, rgba(45, 161, 194, .11), transparent 68%),
+        linear-gradient(145deg, #0b111b 0%, #101827 52%, #0b1420 100%) !important;
 }
 .login-showcase h1 {
-    background: linear-gradient(180deg, #fff 35%, #d6d2ff 100%);
+    background: linear-gradient(180deg, #f7f8fc 18%, #b9c6d9 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 }
 .login-showcase .bg-emerald-300 {
-    background-color: var(--aicee-lime) !important;
-    box-shadow: 0 0 0 4px rgba(184, 242, 60, .18);
+    background-color: var(--aicee-cyan) !important;
+    box-shadow: 0 0 0 3px rgba(84, 216, 245, .10);
 }
-.login-showcase .text-emerald-300 { color: var(--aicee-lime) !important; }
+.login-showcase .text-emerald-300 { color: var(--aicee-cyan) !important; }
 .login-stat-card {
-    position: relative;
-    overflow: hidden;
-    border-color: rgba(255, 255, 255, .15) !important;
-    background: rgba(255, 255, 255, .085) !important;
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    transition: transform .28s var(--aicee-ease), background .28s ease;
+    border-color: rgba(174, 193, 218, .15) !important;
+    background: rgba(18, 28, 42, .64) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .035);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    transition: transform .22s var(--aicee-ease), border-color .22s ease, background .22s ease;
 }
 .login-stat-card::before {
     content: "";
     position: absolute;
-    inset: 0 18px auto;
-    height: 3px;
+    inset: 0 16px auto;
+    height: 2px;
     border-radius: 0 0 6px 6px;
-    background: var(--aicee-gradient);
+    background: linear-gradient(90deg, var(--aicee-accent), var(--aicee-cyan));
 }
-.login-stat-card:hover { transform: translateY(-5px) rotate(-.5deg); background: rgba(255, 255, 255, .13) !important; }
-.login-stat-card:nth-child(2)::before { background: linear-gradient(90deg, #ff6b57, #ffab67); }
-.login-stat-card:nth-child(3)::before { background: linear-gradient(90deg, #b8f23c, #7ee0a0); }
-.login-stat-card:nth-child(1) i { background: var(--aicee-gradient); }
-.login-stat-card:nth-child(2) i { background: linear-gradient(135deg, #ff6b57, #ff9a62); }
-.login-stat-card:nth-child(3) i { color: #15152b; background: linear-gradient(135deg, #b8f23c, #7ee0a0); }
-.login-form-side { background: rgba(251, 248, 243, .78); }
-:root[data-theme="dark"] .login-form-side { background: rgba(11, 16, 32, .72); }
+.login-stat-card:hover {
+    border-color: rgba(var(--aicee-accent-rgb), .30) !important;
+    background: rgba(23, 35, 52, .82) !important;
+    transform: translateY(-3px);
+}
+.login-stat-card:nth-child(2)::before { background: linear-gradient(90deg, #8793ff, #61cee8); }
+.login-stat-card:nth-child(3)::before { background: linear-gradient(90deg, #55c8d8, #72d4b8); }
+.login-stat-card:nth-child(1) i { background: linear-gradient(135deg, #7165e8, #4eaad7); }
+.login-stat-card:nth-child(2) i { background: linear-gradient(135deg, #6277d9, #48aecb); }
+.login-stat-card:nth-child(3) i { color: #07131b; background: linear-gradient(135deg, #80d8d5, #7bd6b2); }
+.login-form-side {
+    background: radial-gradient(520px 420px at 100% 0%, rgba(var(--aicee-accent-rgb), .07), transparent 70%), #0b111a;
+}
+:root[data-theme="light"] .login-form-side {
+    background: radial-gradient(520px 420px at 100% 0%, rgba(var(--aicee-accent-rgb), .07), transparent 70%), #f3f6fa;
+}
 .login-card {
-    position: relative;
-    overflow: hidden;
     border: 1px solid var(--aicee-border) !important;
-    border-radius: 28px;
-    background: radial-gradient(420px 220px at 100% 0%, rgba(var(--aicee-accent-rgb), .10), transparent 70%), var(--aicee-surface) !important;
-    box-shadow: 0 32px 80px rgba(40, 30, 110, .14);
+    border-radius: 20px;
+    background: linear-gradient(145deg, rgba(20, 29, 43, .98), rgba(14, 21, 33, .98)) !important;
+    box-shadow: 0 28px 70px rgba(0, 0, 0, .30);
 }
+:root[data-theme="light"] .login-card { background: var(--aicee-surface) !important; }
 .login-card::before {
     content: "";
     position: absolute;
     inset: 0 0 auto;
-    height: 4px;
-    background: var(--aicee-gradient);
+    height: 2px;
+    background: linear-gradient(90deg, var(--aicee-accent), var(--aicee-cyan));
 }
-.login-eyebrow { border-radius: 999px; background: var(--aicee-accent-soft); }
-.login-card .aicee-primary-button { background: var(--aicee-gradient); }
-.login-error-message { color: var(--aicee-coral); }
-.accent-choice.accent-blue { background: #5b4bff; }
-.aicee-3d-halo { filter: blur(4px); opacity: .92; }
-.aicee-speech-bubble { box-shadow: 0 18px 46px rgba(16, 14, 55, .16); }
+.login-eyebrow {
+    border: 1px solid rgba(var(--aicee-accent-rgb), .18);
+    border-radius: 999px;
+    color: #c7c1ff;
+    background: rgba(var(--aicee-accent-rgb), .11);
+}
+.login-card .aicee-primary-button { background: linear-gradient(110deg, #6359cf, #5148ae) !important; }
+.login-error-message { color: #ff879d; }
+.aicee-3d-halo { opacity: .52; filter: blur(8px); }
+.aicee-speech-bubble { box-shadow: 0 14px 36px rgba(0, 0, 0, .24); }
 
-/* Modals and assistant chat share the same soft glass treatment. */
-.popup-backdrop-enter { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-#ai-modal .modal,
+/* AIcee Study Companion: conversation-first modal, legible bubbles, calm composer. */
+#ai-modal { background: rgba(3, 7, 13, .76) !important; }
+#ai-modal > .bg-gray-900 {
+    color: var(--aicee-text) !important;
+    border: 1px solid #2a3749 !important;
+    border-radius: 19px !important;
+    background: #0e1520 !important;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, .52) !important;
+}
+#ai-modal > .bg-gray-900 > div:first-child {
+    background: #0a111b !important;
+    border-color: #263244 !important;
+}
+#ai-modal > .bg-gray-900 > div:nth-child(2) { background: #0f1723 !important; }
+#ai-modal .border-gray-800 { border-color: #263244 !important; }
+#ai-modal .bg-gray-800 { background-color: #151f2d !important; }
+#ai-modal .text-gray-100,
+#ai-modal .text-white { color: #edf3fb !important; }
+#ai-modal .text-gray-400 { color: #9aa9bd !important; }
+#ai-conversations-list > * {
+    border-radius: 9px;
+    transition: background-color .16s ease, color .16s ease;
+}
+#ai-conversations-list > *:hover { background: rgba(255, 255, 255, .055); }
+#ai-chat-log {
+    background:
+        radial-gradient(700px 360px at 15% 0%, rgba(var(--aicee-accent-rgb), .045), transparent 68%),
+        #0f1723 !important;
+    scroll-behavior: smooth;
+}
+.aicee-chat-bubble {
+    border: 1px solid rgba(151, 170, 196, .13);
+    border-radius: 15px;
+    line-height: 1.65;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.aicee-assistant-bubble {
+    color: #dce6f2 !important;
+    border-color: #29384b;
+    background: #172230 !important;
+    box-shadow: 0 9px 24px rgba(0, 0, 0, .14);
+}
+.aicee-user-bubble {
+    color: #fff !important;
+    border-color: rgba(159, 151, 255, .25);
+    background: linear-gradient(135deg, #4f4b97, #3c5682) !important;
+    box-shadow: 0 8px 20px rgba(37, 46, 93, .22);
+}
+.aicee-error-bubble,
+.aicee-warning-bubble {
+    color: #ffd6dd !important;
+    border-color: rgba(255, 120, 152, .22) !important;
+    background: rgba(102, 39, 55, .34) !important;
+}
+#ai-chat-log pre {
+    overflow-x: auto;
+    padding: 14px 16px;
+    border: 1px solid #2a3749;
+    border-radius: 11px;
+    color: #d8e7f4;
+    background: #09101a;
+}
+#ai-chat-log code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+#ai-chat-log :not(pre) > code {
+    padding: .12em .38em;
+    border-radius: 5px;
+    color: #a9eaff;
+    background: rgba(84, 216, 245, .09);
+}
+.aicee-thinking-bubble {
+    border-color: rgba(var(--aicee-accent-rgb), .22) !important;
+    background: #151f2d !important;
+}
+.aicee-thinking-orb {
+    color: var(--aicee-cyan);
+    background: rgba(84, 216, 245, .08);
+    border-color: rgba(84, 216, 245, .15);
+    box-shadow: none;
+}
+.aicee-thinking-title { background-image: linear-gradient(90deg, #cad7e7, var(--aicee-cyan), #cad7e7); }
+#ai-input,
+#ai-module-select {
+    color: #e5edf7 !important;
+    border-color: #2b394c !important;
+    background: #151f2d !important;
+}
+#ai-input::placeholder { color: #77869b; }
+#ai-input:focus,
+#ai-module-select:focus {
+    border-color: rgba(var(--aicee-accent-rgb), .7) !important;
+    box-shadow: 0 0 0 3px rgba(var(--aicee-accent-rgb), .12) !important;
+}
+#ai-send-button {
+    border: 1px solid rgba(159, 151, 255, .22);
+    background: linear-gradient(110deg, #6258ca, #4d55a6) !important;
+    box-shadow: 0 6px 16px rgba(76, 74, 168, .18);
+}
+
+/* Dialogs, dropdowns, toasts, and settings controls. */
+.popup-backdrop-enter { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+#upload-modal > div,
 #notification-dropdown,
-#message-popup-box {
+#message-popup-box,
+#ai-modal .modal {
     border: 1px solid var(--aicee-border);
-    border-radius: 24px;
+    border-radius: 17px;
+    background: var(--aicee-surface) !important;
     box-shadow: var(--aicee-shadow);
 }
-#ai-modal .modal { background: var(--aicee-surface); }
-.aicee-chat-bubble { border-radius: 18px; }
-.aicee-assistant-bubble { box-shadow: 0 8px 22px rgba(20, 16, 60, .05); }
+.theme-choice-card,
+.accent-choice,
+.settings-toggle-row,
+.settings-preview-card { transition: border-color .18s ease, background-color .18s ease, transform .18s var(--aicee-ease); }
+.theme-choice-card:hover { transform: translateY(-2px); }
+.settings-switch { background-color: #3a4659; }
+.settings-toggle-row input:checked + .settings-switch { background-color: var(--aicee-accent); }
 
-/* Dark surfaces stay readable when the saved theme changes. */
-:root[data-theme="dark"] #main-app > .flex-1 {
-    background-image:
-        radial-gradient(900px 500px at 95% -12%, rgba(var(--aicee-accent-rgb), .18), transparent 62%),
-        radial-gradient(680px 460px at -8% 108%, rgba(255, 107, 87, .09), transparent 64%);
-}
-:root[data-theme="dark"] #main-app .aicee-panel,
-:root[data-theme="dark"] #main-app .card-hover {
-    border-color: var(--aicee-border) !important;
-    background-color: var(--aicee-surface) !important;
-    box-shadow: 0 14px 36px rgba(0, 0, 0, .20);
-}
-:root[data-theme="dark"] #main-app .aicee-panel:hover,
-:root[data-theme="dark"] #main-app .card-hover:hover { box-shadow: 0 20px 42px rgba(0, 0, 0, .32); }
-:root[data-theme="dark"] #main-app table thead th { background: var(--aicee-surface-2); }
-:root[data-theme="dark"] .login-card { box-shadow: 0 32px 80px rgba(0, 0, 0, .45); }
-:root[data-theme="dark"] .login-stat-card { background: rgba(255, 255, 255, .075) !important; }
-
-/* Responsive finishing touches. */
-@media (max-width: 1023px) {
-    #main-app > .flex-1 { background-position: center top; }
-    #main-app header { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
-}
-@media (max-width: 767px) {
-    .login-card { border-radius: 24px; }
-    #main-app .aicee-panel,
-    #main-app .card-hover { border-radius: 18px !important; }
-    .login-form-side { padding-top: 28px; padding-bottom: 28px; }
-}
-
-/* Motion respects both the app preference and operating-system preference. */
+/* Respect saved motion settings and system accessibility preferences. */
 :root[data-animations="off"] *,
 :root[data-animations="off"] *::before,
-:root[data-animations="off"] *::after {
+:root[data-animations="off"] *::after,
+:root[data-login-animation="off"] .login-blob,
+:root[data-login-animation="off"] .login-showcase-shine,
+:root[data-login-animation="off"] .login-orbit,
+:root[data-login-animation="off"] .login-reveal {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
@@ -471,4 +537,20 @@ h1, h2, h3, h4, .logo-font, .settings-section-title h3 {
         scroll-behavior: auto !important;
         transition-duration: .01ms !important;
     }
+}
+
+/* Tablet and phone layouts: keep the existing responsive navigation and chat flow. */
+@media (max-width: 1023px) {
+    #main-app > .flex-1 { background-position: center top; }
+    #main-app header { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+}
+@media (max-width: 767px) {
+    #main-app .aicee-panel,
+    #main-app .card-hover,
+    #main-app .bg-white.rounded-3xl,
+    #main-app .bg-white.rounded-2xl { border-radius: 14px !important; }
+    #ai-modal { padding: 8px !important; }
+    #ai-modal > .bg-gray-900 { height: calc(100dvh - 16px) !important; border-radius: 15px !important; }
+    #ai-modal > .bg-gray-900 > div:first-child { height: 20dvh !important; min-height: 112px; }
+    #ai-modal > .bg-gray-900 > div:nth-child(2) { height: auto !important; min-height: 0; }
 }
