@@ -223,7 +223,7 @@ async function authenticateToken(req, res, next, allowTemporaryPassword = false)
                 token_version,
                 must_change_password
             FROM users
-            WHERE id = ?
+            WHERE id = ? AND account_status = 'active'
             LIMIT 1
         `, [userId]);
 
@@ -1353,7 +1353,7 @@ app.post("/login", loginLimiter, async (req, res) => {
                 created_at,
                 token_version
             FROM users
-            WHERE ${isEmailLogin ? "LOWER(email)" : "username"} = ?
+            WHERE ${isEmailLogin ? "LOWER(email)" : "username"} = ? AND account_status = 'active'
             LIMIT 1
         `, [lookup]);
 
@@ -1446,12 +1446,13 @@ app.post("/forgot-password", recoveryLimiter, async (req, res) => {
                 users.role,
                 users.section_id,
                 sections.section_name,
-                sections.teacher_id,
+                teachers.id AS teacher_id,
                 teachers.name AS teacher_name
             FROM users
             LEFT JOIN sections ON users.section_id = sections.id
-            LEFT JOIN users AS teachers ON sections.teacher_id = teachers.id AND LOWER(TRIM(teachers.role)) = 'teacher'
-            WHERE LOWER(users.email) = ?
+            LEFT JOIN users AS teachers ON sections.teacher_id = teachers.id
+                AND LOWER(TRIM(teachers.role)) = 'teacher' AND teachers.account_status = 'active'
+            WHERE LOWER(users.email) = ? AND users.account_status = 'active'
             LIMIT 1
         `, [email]);
 
@@ -1465,6 +1466,13 @@ app.post("/forgot-password", recoveryLimiter, async (req, res) => {
         const user = users[0];
 
         if (String(user.role).toLowerCase() !== "student") {
+            return res.json({
+                success: true,
+                message: "Please contact the school administrator to reset this account."
+            });
+        }
+
+        if (!user.teacher_id) {
             return res.json({
                 success: true,
                 message: "Please contact the school administrator to reset this account."
@@ -1951,7 +1959,7 @@ app.get(
                 SELECT users.id, users.name, users.email, users.username, users.role, users.section_id, users.diagnostic_completed, users.created_at, sections.section_name
                 FROM users
                 JOIN sections ON users.section_id = sections.id
-                WHERE LOWER(users.role) = 'student' AND sections.teacher_id = ?
+                WHERE LOWER(users.role) = 'student' AND sections.teacher_id = ? AND users.account_status = 'active'
                 ORDER BY sections.section_name, users.name
             `, [teacherId]);
 
@@ -2054,7 +2062,7 @@ app.put(
                 SELECT users.id, users.name
                 FROM users
                 JOIN sections ON users.section_id = sections.id
-                WHERE users.id = ? AND LOWER(users.role) = 'student' AND sections.teacher_id = ?
+                WHERE users.id = ? AND LOWER(users.role) = 'student' AND sections.teacher_id = ? AND users.account_status = 'active'
             `, [studentId, teacherId]);
 
             if (students.length === 0) {
@@ -2067,11 +2075,15 @@ app.put(
 
             const hashedPassword = await bcrypt.hash(String(new_password), BCRYPT_ROUNDS);
 
-            await db.query(`
-                UPDATE users
-                SET password = ?, must_change_password = 1, token_version = token_version + 1
-                WHERE id = ?
-            `, [hashedPassword, studentId]);
+            const [updated] = await db.query(`
+                UPDATE users JOIN sections ON sections.id = users.section_id
+                SET users.password = ?, users.must_change_password = 1, users.token_version = users.token_version + 1
+                WHERE users.id = ? AND users.account_status = 'active'
+                    AND users.role = 'student' AND sections.teacher_id = ?
+            `, [hashedPassword, studentId, teacherId]);
+            if (!updated.affectedRows) {
+                return res.status(409).json({ success: false, message: "The student is no longer active in your sections." });
+            }
 
             res.json({
                 success: true,
@@ -2420,7 +2432,7 @@ app.get("/teacher-student-progress/:teacherId", authenticateToken, requireRole("
                 COALESCE(student_module_progress.progress, 0) AS progress,
                 student_module_progress.completed_at
             FROM sections
-            JOIN users ON users.section_id = sections.id AND LOWER(users.role) = 'student'
+            JOIN users ON users.section_id = sections.id AND LOWER(users.role) = 'student' AND users.account_status = 'active'
             JOIN module_sections ON module_sections.section_id = sections.id
             JOIN modules ON modules.id = module_sections.module_id AND modules.teacher_id = ?
             LEFT JOIN student_module_progress ON student_module_progress.student_id = users.id AND student_module_progress.module_id = modules.id
@@ -2965,7 +2977,7 @@ app.get(
                         SELECT COUNT(DISTINCT students.id)
                         FROM users AS students
                         JOIN sections ON sections.id = students.section_id
-                        WHERE sections.teacher_id = ? AND LOWER(TRIM(students.role)) = 'student'
+                        WHERE sections.teacher_id = ? AND LOWER(TRIM(students.role)) = 'student' AND students.account_status = 'active'
                     ) AS total_students,
                     (SELECT COUNT(*) FROM sections WHERE teacher_id = ?) AS handled_sections,
                     (SELECT COUNT(*) FROM modules WHERE teacher_id = ?) AS uploaded_modules,
@@ -2974,7 +2986,7 @@ app.get(
                         FROM official_grades
                         JOIN users AS students ON students.id = official_grades.student_id
                         JOIN sections ON sections.id = official_grades.section_id
-                        WHERE official_grades.teacher_id = ? AND sections.teacher_id = ? AND students.section_id = official_grades.section_id AND LOWER(TRIM(students.role)) = 'student'
+                        WHERE official_grades.teacher_id = ? AND sections.teacher_id = ? AND students.section_id = official_grades.section_id AND LOWER(TRIM(students.role)) = 'student' AND students.account_status = 'active'
                     ) AS average_grade
             `, [teacherId, teacherId, teacherId, teacherId, teacherId]);
 
@@ -2986,7 +2998,7 @@ app.get(
                     COUNT(DISTINCT students.id) AS student_count,
                     ROUND(AVG(official_grades.grade), 1) AS average_grade
                 FROM sections
-                LEFT JOIN users AS students ON students.section_id = sections.id AND LOWER(TRIM(students.role)) = 'student'
+                LEFT JOIN users AS students ON students.section_id = sections.id AND LOWER(TRIM(students.role)) = 'student' AND students.account_status = 'active'
                 LEFT JOIN official_grades ON official_grades.student_id = students.id AND official_grades.section_id = sections.id AND official_grades.teacher_id = ?
                 WHERE sections.teacher_id = ?
                 GROUP BY sections.id, sections.section_name
@@ -3003,7 +3015,7 @@ app.get(
                 FROM official_grades
                 JOIN users AS students ON students.id = official_grades.student_id
                 JOIN sections ON sections.id = official_grades.section_id
-                WHERE official_grades.teacher_id = ? AND sections.teacher_id = ? AND students.section_id = official_grades.section_id AND LOWER(TRIM(students.role)) = 'student'
+                WHERE official_grades.teacher_id = ? AND sections.teacher_id = ? AND students.section_id = official_grades.section_id AND LOWER(TRIM(students.role)) = 'student' AND students.account_status = 'active'
                 GROUP BY students.id, students.name, students.email, sections.section_name
                 HAVING MIN(official_grades.grade) < 75
                 ORDER BY lowest_grade ASC, students.name ASC
@@ -3079,8 +3091,9 @@ app.get(
                     AND official_grades.subject_name = ? AND official_grades.grading_period = ?
                     AND official_grades.school_year = ? AND official_grades.semester = ?
                 WHERE students.section_id = ? AND LOWER(TRIM(students.role)) = 'student'
+                  AND students.account_status = 'active' AND sections.teacher_id = ?
                 ORDER BY students.name
-            `, [teacherId, subject_name, grading_period, school_year, semester, section_id]);
+            `, [teacherId, subject_name, grading_period, school_year, semester, section_id, teacherId]);
 
             res.json({ success: true, students });
 
@@ -3149,6 +3162,7 @@ app.post(
 
                 const [studentRows] = await connection.query(`
                     SELECT id FROM users WHERE id = ? AND section_id = ? AND LOWER(TRIM(role)) = 'student'
+                        AND account_status = 'active' FOR UPDATE
                 `, [studentId, sectionId]);
 
                 if (studentRows.length === 0) {
@@ -3261,6 +3275,7 @@ app.get("/admin/overview", authenticateToken, requireRole("admin"), async (req, 
                 SUM(CASE WHEN LOWER(TRIM(role)) = 'teacher' THEN 1 ELSE 0 END) AS teachers,
                 SUM(CASE WHEN LOWER(TRIM(role)) = 'student' AND diagnostic_completed = 1 THEN 1 ELSE 0 END) AS ai_profiles_ready
             FROM users
+            WHERE account_status = 'active'
         `);
 
         const [[sectionCounts]] = await db.query(`SELECT COUNT(*) AS sections FROM sections`);
@@ -3282,19 +3297,100 @@ app.get("/admin/overview", authenticateToken, requireRole("admin"), async (req, 
 
 app.get("/admin/accounts", authenticateToken, requireRole("admin"), async (req, res) => {
     try {
+        const scope = req.query.status ?? "active";
+        if (scope !== "active" && scope !== "all") {
+            return res.status(400).json({ success: false, message: "Invalid account filter." });
+        }
         const [accounts] = await db.query(`
             SELECT
                 users.id, users.name, users.email, users.username, LOWER(TRIM(users.role)) AS role,
                 users.section_id, users.diagnostic_completed, users.must_change_password, users.created_at,
-                sections.section_name
+                sections.section_name, users.account_status, users.archived_at, users.archived_by,
+                archiver.name AS archived_by_name
             FROM users
             LEFT JOIN sections ON sections.id = users.section_id
+            LEFT JOIN users AS archiver ON archiver.id = users.archived_by
+            WHERE (? = 'all' OR users.account_status = 'active')
             ORDER BY FIELD(LOWER(TRIM(users.role)), 'admin', 'teacher', 'student'), users.name
-        `);
+        `, [scope]);
         res.json({ success: true, accounts });
     } catch (error) {
         console.error("Admin accounts error:", error);
         res.status(500).json({ success: false, message: "Failed to load accounts." });
+    }
+});
+
+app.patch("/admin/accounts/:accountId/status", authenticateToken, requireRole("admin"), async (req, res) => {
+    const accountId = Number(req.params.accountId);
+    const status = req.body?.status;
+    if (!Number.isSafeInteger(accountId) || accountId < 1 ||
+        !["active", "archived", "graduated", "transferred", "withdrawn"].includes(status)) {
+        return res.status(400).json({ success: false, message: "Valid account and status are required." });
+    }
+
+    try {
+        // Keep the account and its relationships in place. Invalidate existing sessions on both transitions.
+        const [result] = status === "active"
+            ? await db.query(`
+                UPDATE users SET account_status = 'active', token_version = token_version + 1
+                WHERE id = ? AND role IN ('student', 'teacher') AND account_status <> 'active'
+            `, [accountId])
+            : await db.query(`
+                UPDATE users SET account_status = ?, archived_at = UTC_TIMESTAMP(), archived_by = ?,
+                    token_version = token_version + 1
+                WHERE id = ? AND account_status = 'active'
+                    AND (role = 'student' OR (role = 'teacher' AND ? = 'archived'))
+            `, [status, req.auth.userId, accountId, status]);
+
+        if (!result.affectedRows) {
+            return res.status(409).json({ success: false, message: "This account cannot make that status change. Refresh the list and check its role and status." });
+        }
+        res.json({ success: true, account_status: status });
+    } catch (error) {
+        console.error("Account status update error:", error);
+        res.status(500).json({ success: false, message: "Failed to update account status." });
+    }
+});
+
+app.get("/admin/accounts/:accountId/history", authenticateToken, requireRole("admin"), async (req, res) => {
+    const accountId = Number(req.params.accountId);
+    if (!Number.isSafeInteger(accountId) || accountId < 1) {
+        return res.status(400).json({ success: false, message: "Valid student account ID is required." });
+    }
+
+    try {
+        const [students] = await db.query(`
+            SELECT id, name FROM users WHERE id = ? AND role = 'student' AND account_status <> 'active'
+        `, [accountId]);
+        if (!students.length) {
+            return res.status(404).json({ success: false, message: "Inactive student account not found." });
+        }
+
+        const [[officialGrades], [moduleGrades], [attempts], [latestResults]] = await Promise.all([
+            db.query(`
+                SELECT g.subject_name, g.grading_period, g.grade, g.school_year, g.semester, s.section_name
+                FROM official_grades AS g LEFT JOIN sections AS s ON s.id = g.section_id
+                WHERE g.student_id = ? ORDER BY g.school_year DESC, g.semester, g.subject_name, g.grading_period
+            `, [accountId]),
+            db.query(`
+                SELECT m.title, g.grade FROM grades AS g LEFT JOIN modules AS m ON m.id = g.module_id
+                WHERE g.student_id = ? ORDER BY g.id DESC
+            `, [accountId]),
+            db.query(`
+                SELECT a.taken_at, r.subject, r.score, r.total_questions
+                FROM diagnostic_attempts AS a LEFT JOIN diagnostic_attempt_results AS r
+                    ON r.attempt_id = a.id AND r.student_id = a.student_id
+                WHERE a.student_id = ? ORDER BY a.taken_at DESC, a.id DESC, r.subject
+            `, [accountId]),
+            db.query(`
+                SELECT created_at AS taken_at, subject, score, total_questions
+                FROM diagnostic_results WHERE student_id = ? ORDER BY created_at DESC, subject
+            `, [accountId])
+        ]);
+        res.json({ success: true, student: students[0], officialGrades, moduleGrades, attempts, latestResults });
+    } catch (error) {
+        console.error("Archived student history error:", error);
+        res.status(500).json({ success: false, message: "Failed to load the student's history." });
     }
 });
 
@@ -3349,7 +3445,7 @@ app.put("/admin/accounts/:accountId", authenticateToken, requireRole("admin"), v
             return res.status(400).json({ success: false, message: "Valid account ID is required." });
         }
 
-        const [targets] = await db.query(`SELECT id, role FROM users WHERE id = ? LIMIT 1`, [accountId]);
+        const [targets] = await db.query(`SELECT id, role FROM users WHERE id = ? AND account_status = 'active' LIMIT 1`, [accountId]);
         if (targets.length === 0) return res.status(404).json({ success: false, message: "Account not found." });
         const existingRole = String(targets[0].role || "").trim().toLowerCase();
         if (existingRole === "admin") {
@@ -3370,10 +3466,11 @@ app.put("/admin/accounts/:accountId", authenticateToken, requireRole("admin"), v
             if (sections.length === 0) return res.status(400).json({ success: false, message: "Selected section does not exist." });
         }
 
-        await db.query(`
+        const [updated] = await db.query(`
             UPDATE users SET name = ?, email = ?, section_id = ?, username = COALESCE(?, username)
-            WHERE id = ?
+            WHERE id = ? AND account_status = 'active'
         `, [name, email, existingRole === "student" ? sectionId : null, req.accountUsername, accountId]);
+        if (!updated.affectedRows) return res.status(409).json({ success: false, message: "The account is no longer active." });
 
         res.json({ success: true, message: "Account updated successfully." });
     } catch (error) {
@@ -3390,18 +3487,19 @@ app.put("/admin/accounts/:accountId/reset-password", authenticateToken, requireR
         if (!Number.isInteger(accountId)) return res.status(400).json({ success: false, message: "Valid account ID is required." });
         if (!isAcceptablePassword(newPassword)) return res.status(400).json({ success: false, message: "New password must contain at least 6 characters and stay below 72 bytes." });
 
-        const [targets] = await db.query(`SELECT id, role FROM users WHERE id = ? LIMIT 1`, [accountId]);
+        const [targets] = await db.query(`SELECT id, role FROM users WHERE id = ? AND account_status = 'active' LIMIT 1`, [accountId]);
         if (targets.length === 0) return res.status(404).json({ success: false, message: "Account not found." });
         if (String(targets[0].role || "").trim().toLowerCase() === "admin") {
             return res.status(403).json({ success: false, message: "Administrator passwords cannot be reset from Account Management." });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
-        await db.query(`
+        const [updated] = await db.query(`
             UPDATE users
             SET password = ?, must_change_password = 1, token_version = token_version + 1
-            WHERE id = ?
+            WHERE id = ? AND account_status = 'active'
         `, [hashedPassword, accountId]);
+        if (!updated.affectedRows) return res.status(409).json({ success: false, message: "The account is no longer active." });
 
         res.json({ success: true, message: "Temporary password set. Existing sessions were signed out." });
     } catch (error) {
@@ -3418,7 +3516,7 @@ app.get("/admin/sections", authenticateToken, requireRole("admin"), async (req, 
                 teachers.name AS teacher_name, COUNT(students.id) AS student_count
             FROM sections
             LEFT JOIN users AS teachers ON teachers.id = sections.teacher_id AND LOWER(TRIM(teachers.role)) = 'teacher'
-            LEFT JOIN users AS students ON students.section_id = sections.id AND LOWER(TRIM(students.role)) = 'student'
+            LEFT JOIN users AS students ON students.section_id = sections.id AND LOWER(TRIM(students.role)) = 'student' AND students.account_status = 'active'
             GROUP BY sections.id, sections.section_name, sections.teacher_id, teachers.name
             ORDER BY sections.section_name
         `);
@@ -3435,7 +3533,7 @@ app.post("/admin/sections", authenticateToken, requireRole("admin"), async (req,
         const teacherId = Number(req.body.teacher_id);
         if (!sectionName || !Number.isInteger(teacherId)) return res.status(400).json({ success: false, message: "Section name and teacher are required." });
 
-        const [teachers] = await db.query(`SELECT id FROM users WHERE id = ? AND LOWER(TRIM(role)) = 'teacher' LIMIT 1`, [teacherId]);
+        const [teachers] = await db.query(`SELECT id FROM users WHERE id = ? AND LOWER(TRIM(role)) = 'teacher' AND account_status = 'active' LIMIT 1`, [teacherId]);
         if (teachers.length === 0) return res.status(400).json({ success: false, message: "Selected teacher account does not exist." });
 
         const [duplicate] = await db.query(`SELECT id FROM sections WHERE LOWER(section_name) = LOWER(?) LIMIT 1`, [sectionName]);
@@ -3458,7 +3556,7 @@ app.put("/admin/sections/:sectionId", authenticateToken, requireRole("admin"), a
             return res.status(400).json({ success: false, message: "Valid section, name, and teacher are required." });
         }
 
-        const [teachers] = await db.query(`SELECT id FROM users WHERE id = ? AND LOWER(TRIM(role)) = 'teacher' LIMIT 1`, [teacherId]);
+        const [teachers] = await db.query(`SELECT id FROM users WHERE id = ? AND LOWER(TRIM(role)) = 'teacher' AND account_status = 'active' LIMIT 1`, [teacherId]);
         if (teachers.length === 0) return res.status(400).json({ success: false, message: "Selected teacher account does not exist." });
 
         const [duplicate] = await db.query(`SELECT id FROM sections WHERE LOWER(section_name) = LOWER(?) AND id <> ? LIMIT 1`, [sectionName, sectionId]);
