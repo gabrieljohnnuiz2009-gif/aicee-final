@@ -10,7 +10,7 @@
     <script>
         try {
             const saved = JSON.parse(localStorage.getItem("aicee_ui_settings") || "{}");
-            const preference = saved.theme || "system";
+            const preference = saved.theme || "dark";
             const resolved = preference === "system"
                 ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
                 : preference;
@@ -26,10 +26,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <!-- DataTablesssdsss CSS -->
+    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/3.0.1/css/dataTables.dataTables.css">
-    <link rel="stylesheet" href="aicee-upgrade.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="aicee-upgrade.css">
     <link rel="stylesheet" href="aicee-redesign.css">
     <!-- DataTables JavaScript -->
     <script src="https://cdn.datatables.net/3.0.1/js/dataTables.js" defer></script>
