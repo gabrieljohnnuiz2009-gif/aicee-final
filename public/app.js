@@ -1188,12 +1188,12 @@ function populateTeacherModules(){
 
 
             <div class="font-semibold text-lg">
-                ${mod.title}
+                ${escapeHTML(mod.title)}
             </div>
 
 
             <div class="text-xs uppercase text-gray-400">
-                ${mod.type}
+                ${mod.type} · ${escapeHTML(mod.subjectName || "Subject unassigned")}
             </div>
 
 
@@ -1201,10 +1201,10 @@ function populateTeacherModules(){
 
 
                 <button 
-                onclick="viewModule('${mod.file}')"
+                onclick="viewModule(${Number(mod.id)})"
                 class="bg-blue-600 text-white rounded-xl py-2 text-sm">
 
-                View
+                Download
 
                 </button>
 
@@ -1228,12 +1228,11 @@ function populateTeacherModules(){
 
 
             </div>
-
+            <button type="button" onclick="openModuleSubjectEditor(${Number(mod.id)})" class="mt-3 text-sm font-semibold text-blue-700">Change Subject</button>
 
         </div>
 
         `;
-
 
     });
 
@@ -1452,8 +1451,8 @@ function populateStudentModules() {
         div.className = "bg-white border border-gray-100 rounded-3xl p-6 card-hover";
         div.innerHTML = `
             <div class="text-4xl mb-6">${mod.icon}</div>
-            <div class="font-semibold text-lg leading-tight mb-1">${mod.title}</div>
-            <div class="text-xs uppercase tracking-widest text-gray-400">${mod.type}</div>
+            <div class="font-semibold text-lg leading-tight mb-1">${escapeHTML(mod.title)}</div>
+            <div class="text-xs uppercase tracking-widest text-gray-400">${mod.type} · ${escapeHTML(mod.subjectName || "Subject unassigned")}</div>
             
             <div class="mt-8">
                 <div class="flex justify-between text-xs mb-2">
@@ -1468,7 +1467,7 @@ function populateStudentModules() {
             <div class="grid grid-cols-2 gap-3 mt-8">
 
     <button
-        onclick="openStudentModule('${mod.file}', ${mod.id}, ${mod.progress})"
+        onclick="openStudentModule(${Number(mod.id)}, ${mod.progress})"
         class="w-full py-3 text-sm border border-gray-200 hover:bg-gray-50 rounded-2xl">
 
         Continue Learning
@@ -3289,6 +3288,7 @@ async function navigateTo(page) {
         }
         await Promise.all([loadAdminAccounts(), loadAdminSections()]);
         renderAdminSections();
+        await loadAdminModuleSubjects();
         return;
     }
 
@@ -3567,7 +3567,7 @@ async function loadAIceeLearningMaterials(){
         const r=await fetch(`/ai-learning-materials/${currentUser.id}`); const d=await r.json();
         if(!r.ok||!d.success) throw new Error(d.message||"Failed to load learning materials.");
         aiLearningMaterials=Array.isArray(d.modules)?d.modules:[];
-        aiLearningMaterials.forEach(m=>{const o=document.createElement("option");o.value=m.id;o.textContent=m.ai_readable?`${m.title} — ${m.teacher_name}`:`${m.title} — PDF required for AI reading`;o.disabled=!m.ai_readable;select.appendChild(o);});
+        aiLearningMaterials.forEach(m=>{const o=document.createElement("option");o.value=m.id;o.textContent=m.ai_readable?`${m.title} — ${m.subject_name || "Subject unassigned"} — ${m.teacher_name}`:`${m.title} — ${m.subject_name || "Subject unassigned"} — PDF required for AI reading`;o.disabled=!m.ai_readable;select.appendChild(o);});
     }catch(e){console.error("Learning materials load error:",e);}
 }
 
@@ -4079,7 +4079,7 @@ async function showUploadModal() {
 
     modal.classList.remove("hidden");
 
-    await loadSections();
+    await Promise.all([loadSections(), populateModuleSubjectSelect(document.getElementById("module-subject"))]);
 }
 
 function closeUploadModal() {
@@ -5009,106 +5009,171 @@ async function loadSections() {
     }
 }
 
-async function fakeUpload(){
-
-    const fileInput = document.getElementById("module-file");
-
-    const title = document.getElementById("module-title").value;
-    const description = document.getElementById("module-description").value;
-
-
-    const formData = new FormData();
-
-    formData.append("file", fileInput.files[0]);
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("teacher_id", currentUser.id);
-    
-    const selectedSections = document.querySelectorAll(".section-checkbox:checked");
-
-selectedSections.forEach(section => {
-
-    formData.append("sections", section.value);
-
-});
-
-
-
-    try{
-
-        const response = await fetch(
-            "/upload-module",
-            {
-                method:"POST",
-                body:formData
-            }
-        );
-
-
-        const data = await response.json();
-
-
-        if(data.success){
-
-           showMessagePopup(
-    "Module Uploaded",
-    "The learning module was uploaded successfully.",
-    "success"
-);
-        }
-
-
-    }catch(error){
-
-        console.error(error);
-
-       showMessagePopup(
-    "Upload Failed",
-    "The module could not be uploaded. Please try again.",
-    "error"
-);
-
-    }
-
+async function fetchModuleSubjects() {
+    const response = await fetch("/subjects");
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || "Failed to load subjects.");
+    return data.subjects;
 }
 
-function viewModule(file) {
+async function populateModuleSubjectSelect(select, selectedId) {
+    select.disabled = true;
+    select.replaceChildren(new Option("Loading subjects…", ""));
+    try {
+        const subjects = await fetchModuleSubjects();
+        if (!subjects.length) {
+            select.replaceChildren(new Option("No subjects yet. Ask your administrator.", ""));
+            return;
+        }
+        select.replaceChildren(new Option("Select subject", ""), ...subjects.map(subject => new Option(subject.name, subject.id)));
+        select.value = String(selectedId ?? "");
+        select.disabled = false;
+    } catch (error) {
+        select.replaceChildren(new Option(error.message, ""));
+    }
+}
 
-    if (!file) {
-        showLegacyAlert("No file attached to this module.");
+async function loadAdminModuleSubjects() {
+    const list = document.getElementById("module-subject-admin-list");
+    try {
+        const subjects = await fetchModuleSubjects();
+        list.replaceChildren(...subjects.map(subject => {
+            const item = document.createElement("li");
+            item.textContent = subject.name;
+            return item;
+        }));
+        if (!subjects.length) list.textContent = "No subjects yet.";
+    } catch (error) {
+        list.textContent = error.message;
+    }
+}
+
+async function addModuleSubject(event) {
+    event.preventDefault();
+    const button = event.currentTarget.querySelector('button[type="submit"]');
+    const input = document.getElementById("new-module-subject");
+    const status = document.getElementById("module-subject-admin-status");
+    button.disabled = true;
+    status.textContent = "";
+    try {
+        const response = await fetch("/subjects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: input.value.trim() })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || "Failed to add the subject.");
+        input.value = "";
+        status.textContent = "Subject added.";
+        await loadAdminModuleSubjects();
+    } catch (error) {
+        status.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+}
+
+async function openModuleSubjectEditor(id) {
+    const module = sampleModules.find(item => Number(item.id) === id);
+    if (!module) return;
+    const dialog = document.getElementById("edit-module-subject-dialog");
+    dialog.dataset.moduleId = String(id);
+    document.getElementById("edit-module-subject-status").textContent = "";
+    dialog.showModal();
+    await populateModuleSubjectSelect(document.getElementById("edit-module-subject"), module.subjectId);
+}
+
+async function saveModuleSubject(event) {
+    event.preventDefault();
+    const dialog = event.currentTarget.closest("dialog");
+    const select = document.getElementById("edit-module-subject");
+    if (select.disabled || !select.value) return;
+    const button = event.currentTarget.querySelector('button[type="submit"]');
+    const status = document.getElementById("edit-module-subject-status");
+    button.disabled = true;
+    status.textContent = "";
+    try {
+        const response = await fetch(`/module/${Number(dialog.dataset.moduleId)}/subject`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subject_id: select.value })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || "Failed to update the module subject.");
+        dialog.close();
+        await loadDashboard();
+        populateModules();
+    } catch (error) {
+        status.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+}
+
+async function fakeUpload() {
+    const file = document.getElementById("module-file").files[0];
+    const title = document.getElementById("module-title").value.trim();
+    const subject = document.getElementById("module-subject");
+    const description = document.getElementById("module-description").value;
+    const sections = document.querySelectorAll(".section-checkbox:checked");
+    if (!file || !title || !subject.value || subject.disabled || !sections.length) {
+        showMessagePopup("Module details required", "Enter a title, choose a subject and file, and select at least one section.", "error");
         return;
     }
 
-    window.open(
-        `/uploads/${file}`,
-        "_blank"
-    );
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("subject_id", subject.value);
+    formData.append("teacher_id", currentUser.id);
+    sections.forEach(section => formData.append("sections", section.value));
 
-}
-
-
-async function openStudentModule(file, moduleId, currentProgress) {
-
-    viewModule(file);
-
-    const numericProgress = Number(currentProgress) || 0;
-
-    const newProgress =
-        numericProgress < 25
-            ? 25
-            : numericProgress;
-
-    if (newProgress !== numericProgress) {
-
-        await updateModuleProgress(
-            moduleId,
-            newProgress
-        );
-
+    const button = document.getElementById("module-upload-button");
+    button.disabled = true;
+    try {
+        const response = await fetch("/upload-module", { method: "POST", body: formData });
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) throw new Error(data?.message || "Upload failed. Check the file type and size.");
+        closeUploadModal();
+        showMessagePopup("Module Uploaded", "The learning module was uploaded successfully.", "success");
+        await loadDashboard();
+        populateModules();
+    } catch (error) {
+        showMessagePopup("Upload Failed", error.message, "error");
+    } finally {
+        button.disabled = false;
     }
-
 }
 
+async function viewModule(id) {
+    try {
+        const response = await fetch(`/modules/${id}/file`);
+        if (!response.ok) {
+            const data = await response.json().catch(() => null);
+            throw new Error(data?.message || "The module file could not be loaded.");
+        }
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const module = sampleModules.find(item => Number(item.id) === id);
+        link.download = String(module?.file || "").split("?")[0].split("/").pop() || module?.title || "module";
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        return true;
+    } catch (error) {
+        showMessagePopup("Module File", error.message, "error");
+        return false;
+    }
+}
+
+async function openStudentModule(moduleId, currentProgress) {
+    if (!await viewModule(moduleId)) return;
+    if ((Number(currentProgress) || 0) < 25) await updateModuleProgress(moduleId, 25);
+}
 
 async function completeModule(moduleId) {
 
@@ -6926,6 +6991,8 @@ async function loadDashboard() {
                     Number(module.progress) || 0,
                 icon: "📘",
                 file: module.file,
+                subjectId: module.subject_id,
+                subjectName: module.subject_name,
 
                 assignedSections:
                     module.assigned_sections || "",
