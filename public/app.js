@@ -151,7 +151,7 @@ window.fetch = async function aiceeAuthenticatedFetch(
 };
 
 const defaultAiceeSettings = {
-    theme: "system",
+    theme: "dark",
     accent: "blue",
     animations: true,
     compact: false,
