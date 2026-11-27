@@ -2561,15 +2561,15 @@ function speakAicee(message, options = {}) {
 }
 
 function setupAiceeMascotInteractions() {
-    const email = document.getElementById("email");
+    const username = document.getElementById("username");
     const password = document.getElementById("password");
     const submit = document.getElementById("login-submit-button");
     const forgot = document.querySelector('.login-text-button[onclick*="showForgotPasswordModal"]');
 
-    if (email && email.dataset.aiceeSpeechReady !== "true") {
-        email.dataset.aiceeSpeechReady = "true";
-        email.addEventListener("focus", () => {
-            speakAicee("Enter your school email here. ✉️");
+    if (username && username.dataset.aiceeSpeechReady !== "true") {
+        username.dataset.aiceeSpeechReady = "true";
+        username.addEventListener("focus", () => {
+            speakAicee("Enter your username here.");
         });
     }
 
@@ -2634,7 +2634,7 @@ function shakeLoginCard() {
 }
 
 function setupLoginKeyboard() {
-    ["email", "password"].forEach(id => {
+    ["username", "password"].forEach(id => {
         const input = document.getElementById(id);
         if (!input || input.dataset.enterReady === "true") return;
 
@@ -2761,8 +2761,8 @@ function initializeAiceeExperience() {
 
 async function login() {
 
-    const emailInput =
-        document.getElementById("email");
+    const usernameInput =
+        document.getElementById("username");
 
     const passwordInput =
         document.getElementById("password");
@@ -2779,15 +2779,15 @@ async function login() {
     const buttonLoading =
         document.getElementById("login-button-loading");
 
-    if (!emailInput || !passwordInput || !errorBox) {
+    if (!usernameInput || !passwordInput || !errorBox) {
         console.error(
             "Login form elements are missing."
         );
         return;
     }
 
-    const email =
-        emailInput.value.trim();
+    const username =
+        usernameInput.value.trim();
 
     const password =
         passwordInput.value;
@@ -2828,7 +2828,7 @@ async function login() {
                 },
 
                 body: JSON.stringify({
-                    email,
+                    username,
                     password
                 })
             }
@@ -2842,11 +2842,11 @@ async function login() {
                 "❌ " +
                 (
                     data.message ||
-                    "Invalid email or password"
+                    "Invalid sign-in details"
                 );
 
             restoreLoginButton();
-            speakAicee("Hmm, that sign-in didn’t work. Check your email and password, then try again.", { hold: 4600 });
+            speakAicee("Hmm, that sign-in didn’t work. Check your sign-in details and try again.", { hold: 4600 });
             window.AIcee3D?.setBusy?.(false);
             window.AIcee3D?.sad?.();
             shakeLoginCard();
@@ -6095,7 +6095,7 @@ function renderAdminAccounts() {
         if (roleFilter !== "all" && role !== roleFilter) return false;
 
         if (!search) return true;
-        const haystack = [account.name, account.email, account.section_name, role].join(" ").toLowerCase();
+        const haystack = [account.name, account.username, account.email, account.section_name, role].join(" ").toLowerCase();
         return haystack.includes(search);
     });
 
@@ -6119,6 +6119,7 @@ function renderAdminAccounts() {
                         ${isStudent ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${diagnosticReady ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500"}">${diagnosticReady ? "AI profile ready" : "Diagnostic pending"}</span>` : ""}
                     </div>
                     <p class="text-sm text-gray-500 mt-1 break-all">${adminEscape(account.email)}</p>
+                    ${account.username ? `<p class="text-sm text-gray-500 break-all">Username: ${adminEscape(account.username)}</p>` : ""}
                     <p class="text-xs text-gray-400 mt-2">${isStudent ? `Section: ${adminEscape(account.section_name || "Unassigned")}` : "Teacher account"}</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -6217,6 +6218,7 @@ function openAdminAccountModal(accountId = null) {
     document.getElementById("admin-account-modal-title").textContent = account ? "Edit Account" : "Create Account";
     document.getElementById("admin-account-name").value = account?.name || "";
     document.getElementById("admin-account-email").value = account?.email || "";
+    document.getElementById("admin-account-username").value = account?.username || "";
     document.getElementById("admin-account-role").value = account?.role || "student";
     document.getElementById("admin-account-role").disabled = Boolean(account);
     document.getElementById("admin-account-section").value = account?.section_id || "";
@@ -6239,6 +6241,7 @@ async function submitAdminAccount(event) {
     const body = {
         name: document.getElementById("admin-account-name").value.trim(),
         email: document.getElementById("admin-account-email").value.trim(),
+        username: document.getElementById("admin-account-username").value.trim() || undefined,
         role: roleEl.value,
         section_id: roleEl.value === "student" ? Number(document.getElementById("admin-account-section").value) : null
     };
@@ -8441,6 +8444,7 @@ function renderManagedStudents(students) {
                 ${escapeHTML(
                     student.email
                 )}
+                ${student.username ? `<div class="text-xs text-gray-500 break-all">Username: ${escapeHTML(student.username)}</div>` : ""}
             </td>
 
             <td class="px-6 py-4">
@@ -8779,6 +8783,9 @@ async function createStudentAccount(event) {
             "new-student-email"
         );
 
+    const usernameInput =
+        document.getElementById("new-student-username");
+
     const sectionInput =
         document.getElementById(
             "new-student-section"
@@ -8824,6 +8831,9 @@ async function createStudentAccount(event) {
                     email:
                         emailInput.value.trim(),
 
+                    username:
+                        usernameInput.value.trim() || undefined,
+
                     temporary_password:
                         passwordInput.value.trim(),
 
@@ -8854,6 +8864,7 @@ async function createStudentAccount(event) {
             `✅ Account created!\n\n` +
             `Student: ${data.student.name}\n` +
             `Email: ${data.student.email}\n` +
+            (data.student.username ? `Username: ${data.student.username}\n` : "") +
             `Temporary password: ${passwordInput.value}`
         );
 
@@ -9213,8 +9224,8 @@ function showForgotPasswordModal() {
             "forgot-password-email"
         );
 
-    const loginEmail =
-        document.getElementById("email");
+    const signInIdentifier =
+        document.getElementById("username")?.value.trim() || "";
 
     const message =
         document.getElementById(
@@ -9225,9 +9236,8 @@ function showForgotPasswordModal() {
         message.textContent = "";
     }
 
-    if (emailInput && loginEmail) {
-        emailInput.value =
-            loginEmail.value.trim();
+    if (emailInput && /^[^\s@]+@[^\s@]+$/.test(signInIdentifier)) {
+        emailInput.value = signInIdentifier;
     }
 
     if (modal) {
