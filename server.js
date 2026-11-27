@@ -56,6 +56,10 @@ async function extractTextFromModuleBlob(blobPathname) {
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "8h";
+const ALLOW_LEGACY_EMAIL_LOGIN = process.env.ALLOW_LEGACY_EMAIL_LOGIN !== "false";
+const USERNAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
+const USERNAME_FORMAT_MESSAGE =
+    "Use 1 to 64 letters, numbers, dots, underscores, or hyphens. Start with a letter or number.";
 
 const BCRYPT_ROUNDS = Math.min(
     14,
@@ -104,6 +108,41 @@ function isAcceptablePassword(password) {
     );
 }
 
+function normalizeUsername(value) {
+    if (typeof value !== "string") return null;
+    const username = value.trim();
+    return USERNAME_PATTERN.test(username) ? username.toLowerCase() : null;
+}
+
+function validateOptionalUsername(req, res, next) {
+    const value = req.body?.username;
+    req.accountUsername = null;
+    if (value == null || (typeof value === "string" && !value.trim())) {
+        return next();
+    }
+
+    const username = normalizeUsername(value);
+    if (username === null) {
+        return res.status(400).json({
+            success: false,
+            message: USERNAME_FORMAT_MESSAGE
+        });
+    }
+
+    req.accountUsername = username;
+    next();
+}
+
+function respondToDuplicateAccount(error, res) {
+    if (error.code !== "ER_DUP_ENTRY") return false;
+
+    res.status(409).json({
+        success: false,
+        message: "An account with this email or username already exists."
+    });
+    return true;
+}
+
 function issueAuthToken(user) {
     return jwt.sign(
         {
@@ -143,7 +182,7 @@ function safeUserRecord(user) {
     };
 }
 
-async function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next, allowTemporaryPassword = false) {
     try {
         const authorization = String(
             req.headers.authorization || ""
@@ -181,7 +220,8 @@ async function authenticateToken(req, res, next) {
             SELECT
                 id,
                 role,
-                token_version
+                token_version,
+                must_change_password
             FROM users
             WHERE id = ?
             LIMIT 1
@@ -205,6 +245,14 @@ async function authenticateToken(req, res, next) {
                 success: false,
                 code: "SESSION_REVOKED",
                 message: "Your session has expired. Please sign in again."
+            });
+        }
+
+        if (!allowTemporaryPassword && Number(user.must_change_password) === 1) {
+            return res.status(403).json({
+                success: false,
+                code: "PASSWORD_CHANGE_REQUIRED",
+                message: "Change your temporary password to continue."
             });
         }
 
@@ -232,6 +280,10 @@ async function authenticateToken(req, res, next) {
                 : "Your sign-in session is invalid."
         });
     }
+}
+
+function authenticateForPasswordChangeOrLogout(req, res, next) {
+    return authenticateToken(req, res, next, true);
 }
 
 function requireRole(...allowedRoles) {
@@ -1255,13 +1307,17 @@ app.get("/test-db", authenticateToken, requireRole("teacher"), async (req, res) 
 
 app.post("/login", loginLimiter, async (req, res) => {
     try {
-        const email = String(req.body.email || "").trim().toLowerCase();
-        const password = String(req.body.password || "");
+        const { username, email, password } = req.body || {};
+        const legacyRequest = username === undefined && ALLOW_LEGACY_EMAIL_LOGIN;
+        const signInValue = legacyRequest ? email : username;
 
-        if (!email || !password) {
+        if (
+            typeof signInValue !== "string" || !signInValue.trim() ||
+            typeof password !== "string" || !password
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Email and password are required."
+                message: "Username and password are required."
             });
         }
 
@@ -1269,6 +1325,17 @@ app.post("/login", loginLimiter, async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Password is too long."
+            });
+        }
+
+        const identifier = signInValue.trim();
+        const isEmailLogin = ALLOW_LEGACY_EMAIL_LOGIN &&
+            (legacyRequest || identifier.includes("@"));
+        const lookup = isEmailLogin ? identifier.toLowerCase() : normalizeUsername(identifier);
+        if (!lookup || (isEmailLogin && Array.from(lookup).length > 254)) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid sign-in details."
             });
         }
 
@@ -1286,14 +1353,14 @@ app.post("/login", loginLimiter, async (req, res) => {
                 created_at,
                 token_version
             FROM users
-            WHERE LOWER(email) = ?
+            WHERE ${isEmailLogin ? "LOWER(email)" : "username"} = ?
             LIMIT 1
-        `, [email]);
+        `, [lookup]);
 
         if (results.length === 0) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid email or password."
+                message: "Invalid sign-in details."
             });
         }
 
@@ -1307,7 +1374,7 @@ app.post("/login", loginLimiter, async (req, res) => {
         if (!passwordMatches) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid email or password."
+                message: "Invalid sign-in details."
             });
         }
 
@@ -1332,7 +1399,7 @@ app.post("/login", loginLimiter, async (req, res) => {
 
 app.post(
     "/logout",
-    authenticateToken,
+    authenticateForPasswordChangeOrLogout,
     async (req, res) => {
         try {
             await db.query(`
@@ -1547,7 +1614,7 @@ app.put(
 
 app.put(
     "/change-password",
-    authenticateToken,
+    authenticateForPasswordChangeOrLogout,
     requireSelfBody("user_id"),
     async (req, res) => {
         try {
@@ -1881,7 +1948,7 @@ app.get(
             }
 
             const [students] = await db.query(`
-                SELECT users.id, users.name, users.email, users.role, users.section_id, users.diagnostic_completed, users.created_at, sections.section_name
+                SELECT users.id, users.name, users.email, users.username, users.role, users.section_id, users.diagnostic_completed, users.created_at, sections.section_name
                 FROM users
                 JOIN sections ON users.section_id = sections.id
                 WHERE LOWER(users.role) = 'student' AND sections.teacher_id = ?
@@ -1901,6 +1968,7 @@ app.post(
     authenticateToken,
     requireRole("teacher"),
     requireSelfBody("teacher_id"),
+    validateOptionalUsername,
     async (req, res) => {
         try {
             const { teacher_id, name, email, temporary_password, section_id } = req.body;
@@ -1939,9 +2007,9 @@ app.post(
             const hashedTemporaryPassword = await bcrypt.hash(String(temporary_password), BCRYPT_ROUNDS);
 
             const [result] = await db.query(`
-                INSERT INTO users (name, email, password, role, bio, section_id, diagnostic_completed, must_change_password)
-                VALUES (?, ?, ?, 'student', '', ?, 0, 1)
-            `, [String(name).trim(), normalizedEmail, hashedTemporaryPassword, sectionId]);
+                INSERT INTO users (name, email, username, password, role, bio, section_id, diagnostic_completed, must_change_password)
+                VALUES (?, ?, ?, ?, 'student', '', ?, 0, 1)
+            `, [String(name).trim(), normalizedEmail, req.accountUsername, hashedTemporaryPassword, sectionId]);
 
             res.status(201).json({
                 success: true,
@@ -1949,12 +2017,14 @@ app.post(
                     id: result.insertId,
                     name: String(name).trim(),
                     email: normalizedEmail,
+                    username: req.accountUsername,
                     section_id: sectionId,
                     section_name: sections[0].section_name
                 },
                 message: "Student account created successfully."
             });
         } catch (error) {
+            if (respondToDuplicateAccount(error, res)) return;
             console.error("Create student account error:", error);
             res.status(500).json({ success: false, message: "Failed to create student account." });
         }
@@ -3214,7 +3284,7 @@ app.get("/admin/accounts", authenticateToken, requireRole("admin"), async (req, 
     try {
         const [accounts] = await db.query(`
             SELECT
-                users.id, users.name, users.email, LOWER(TRIM(users.role)) AS role,
+                users.id, users.name, users.email, users.username, LOWER(TRIM(users.role)) AS role,
                 users.section_id, users.diagnostic_completed, users.must_change_password, users.created_at,
                 sections.section_name
             FROM users
@@ -3228,7 +3298,7 @@ app.get("/admin/accounts", authenticateToken, requireRole("admin"), async (req, 
     }
 });
 
-app.post("/admin/accounts", authenticateToken, requireRole("admin"), async (req, res) => {
+app.post("/admin/accounts", authenticateToken, requireRole("admin"), validateOptionalUsername, async (req, res) => {
     try {
         const name = String(req.body.name || "").trim();
         const email = String(req.body.email || "").trim().toLowerCase();
@@ -3260,18 +3330,19 @@ app.post("/admin/accounts", authenticateToken, requireRole("admin"), async (req,
 
         const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
         const [result] = await db.query(`
-            INSERT INTO users (name, email, password, role, bio, section_id, diagnostic_completed, must_change_password, token_version)
-            VALUES (?, ?, ?, ?, '', ?, 0, 1, 0)
-        `, [name, email, hashedPassword, role, role === "student" ? sectionId : null]);
+            INSERT INTO users (name, email, username, password, role, bio, section_id, diagnostic_completed, must_change_password, token_version)
+            VALUES (?, ?, ?, ?, ?, '', ?, 0, 1, 0)
+        `, [name, email, req.accountUsername, hashedPassword, role, role === "student" ? sectionId : null]);
 
         res.status(201).json({ success: true, account_id: result.insertId, message: `${role === "student" ? "Student" : "Teacher"} account created successfully.` });
     } catch (error) {
+        if (respondToDuplicateAccount(error, res)) return;
         console.error("Admin create account error:", error);
         res.status(500).json({ success: false, message: "Failed to create account." });
     }
 });
 
-app.put("/admin/accounts/:accountId", authenticateToken, requireRole("admin"), async (req, res) => {
+app.put("/admin/accounts/:accountId", authenticateToken, requireRole("admin"), validateOptionalUsername, async (req, res) => {
     try {
         const accountId = Number(req.params.accountId);
         if (!Number.isInteger(accountId)) {
@@ -3300,11 +3371,13 @@ app.put("/admin/accounts/:accountId", authenticateToken, requireRole("admin"), a
         }
 
         await db.query(`
-            UPDATE users SET name = ?, email = ?, section_id = ? WHERE id = ?
-        `, [name, email, existingRole === "student" ? sectionId : null, accountId]);
+            UPDATE users SET name = ?, email = ?, section_id = ?, username = COALESCE(?, username)
+            WHERE id = ?
+        `, [name, email, existingRole === "student" ? sectionId : null, req.accountUsername, accountId]);
 
         res.json({ success: true, message: "Account updated successfully." });
     } catch (error) {
+        if (respondToDuplicateAccount(error, res)) return;
         console.error("Admin update account error:", error);
         res.status(500).json({ success: false, message: "Failed to update account." });
     }
