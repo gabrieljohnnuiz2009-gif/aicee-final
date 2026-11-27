@@ -1037,6 +1037,13 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_180px] gap-4 mb-6">
             <div class="aicee-input-shell"><i class="fa-solid fa-magnifying-glass"></i><input id="admin-account-search" class="aicee-input w-full" type="search" placeholder="Search name, username, email, or section..." oninput="renderAdminAccounts()"></div>
             <select id="admin-account-role-filter" class="aicee-input-shell px-4 w-full" onchange="renderAdminAccounts()"><option value="all">All roles</option><option value="student">Students</option><option value="teacher">Teachers</option></select>
+            <div>
+                <label for="admin-account-status-filter" class="sr-only">Account status</label>
+                <select id="admin-account-status-filter" class="aicee-input-shell px-4 w-full" onchange="renderAdminAccounts()">
+                    <option value="active">Active accounts</option>
+                    <option value="inactive">Archived and former accounts</option>
+                </select>
+            </div>
         </div>
         <div id="admin-accounts-list" class="space-y-3 w-full"><div class="text-sm text-gray-500 text-center py-10">Loading accounts...</div></div>
     </section>
@@ -1072,6 +1079,30 @@
 </div>
 
 <!-- ADMIN ACCOUNT MODAL -->
+<dialog id="admin-account-status-dialog" class="m-auto w-[92vw] max-w-lg rounded-2xl bg-white p-6 shadow-xl backdrop:bg-slate-950/55" aria-labelledby="admin-account-status-title">
+    <form onsubmit="submitAdminAccountStatus(event)" class="space-y-4">
+        <h3 id="admin-account-status-title" class="text-xl font-bold"></h3>
+        <p id="admin-account-status-help" class="text-sm text-gray-600"></p>
+        <div>
+            <label for="admin-account-next-status" class="block text-sm font-semibold mb-1">New status</label>
+            <select id="admin-account-next-status" required class="aicee-input-shell px-4 w-full"></select>
+        </div>
+        <p id="admin-account-status-message" role="status" class="text-sm text-red-700"></p>
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2 rounded-xl bg-gray-100">Cancel</button>
+            <button type="submit" class="aicee-primary-button">Confirm change</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="admin-account-history-dialog" class="m-auto w-[92vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl backdrop:bg-slate-950/55" aria-labelledby="admin-account-history-title">
+    <div class="flex justify-between items-center gap-4">
+        <h3 id="admin-account-history-title" class="text-xl font-bold">Student history</h3>
+        <form method="dialog"><button class="px-4 py-2 rounded-xl bg-gray-100">Close</button></form>
+    </div>
+    <div id="admin-account-history-content" class="space-y-5 mt-4" aria-live="polite"></div>
+</dialog>
+
 <div id="admin-account-modal" class="hidden fixed inset-0 z-[120] bg-slate-950/55 backdrop-blur-sm p-4 flex items-center justify-center">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90dvh] overflow-y-auto p-5 sm:p-8">
         <div class="flex items-start justify-between gap-4"><div><p class="aicee-kicker">Administrator</p><h3 id="admin-account-modal-title" class="text-xl sm:text-2xl font-bold mt-1">Create Account</h3></div><button type="button" onclick="closeAdminAccountModal()" class="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>
