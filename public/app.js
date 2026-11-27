@@ -6062,7 +6062,7 @@ async function loadAdminAccounts() {
     if (currentRole !== "admin") return [];
 
     try {
-        const response = await fetch("/admin/accounts");
+        const response = await fetch("/admin/accounts?status=all");
         const data = await response.json();
         if (!response.ok || !data.success) {
             throw new Error(data.message || "Failed to load accounts.");
@@ -6082,16 +6082,26 @@ async function loadAdminAccounts() {
     }
 }
 
+const accountStatusLabels = {
+    active: "Active",
+    archived: "Archived",
+    graduated: "Graduated",
+    transferred: "Transferred",
+    withdrawn: "Withdrawn"
+};
+
 function renderAdminAccounts() {
     const list = document.getElementById("admin-accounts-list");
     if (!list) return;
 
     const search = String(document.getElementById("admin-account-search")?.value || "").trim().toLowerCase();
     const roleFilter = String(document.getElementById("admin-account-role-filter")?.value || "all").toLowerCase();
+    const showInactive = document.getElementById("admin-account-status-filter")?.value === "inactive";
 
     const accounts = adminAccountsCache.filter(account => {
         const role = String(account.role || "").toLowerCase();
         if (role === "admin") return false;
+        if (((account.account_status || "active") !== "active") !== showInactive) return false;
         if (roleFilter !== "all" && role !== roleFilter) return false;
 
         if (!search) return true;
@@ -6106,6 +6116,9 @@ function renderAdminAccounts() {
 
     list.innerHTML = accounts.map(account => {
         const isStudent = String(account.role).toLowerCase() === "student";
+        const status = account.account_status || "active";
+        const active = status === "active";
+        const archivedAt = account.archived_at ? String(account.archived_at).slice(0, 10) : "";
         const diagnosticReady = Number(account.diagnostic_completed) === 1;
         return `
             <div class="rounded-2xl border border-gray-100 p-5 flex flex-col lg:flex-row lg:items-center gap-4 hover:border-blue-100 transition-colors">
@@ -6121,13 +6134,101 @@ function renderAdminAccounts() {
                     <p class="text-sm text-gray-500 mt-1 break-all">${adminEscape(account.email)}</p>
                     ${account.username ? `<p class="text-sm text-gray-500 break-all">Username: ${adminEscape(account.username)}</p>` : ""}
                     <p class="text-xs text-gray-400 mt-2">${isStudent ? `Section: ${adminEscape(account.section_name || "Unassigned")}` : "Teacher account"}</p>
+                    ${active ? "" : `<p class="text-sm text-gray-600 mt-2">${adminEscape([accountStatusLabels[status], archivedAt, account.archived_by_name].filter(Boolean).join(" · "))}</p>`}
                 </div>
                 <div class="flex flex-wrap gap-2">
+                    ${active ? `
                     <button type="button" onclick="openAdminAccountModal(${Number(account.id)})" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold"><i class="fa-regular fa-pen-to-square mr-1"></i>Edit</button>
-                    <button type="button" onclick="openAdminResetModal(${Number(account.id)})" class="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold"><i class="fa-solid fa-key mr-1"></i>Reset Password</button>
+                    <button type="button" onclick="openAdminResetModal(${Number(account.id)})" class="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold"><i class="fa-solid fa-key mr-1"></i>Reset Password</button>` :
+                    (isStudent ? `<button type="button" onclick="openAdminStudentHistory(${Number(account.id)})" class="px-4 py-2 rounded-xl bg-gray-100 text-sm font-semibold">View History</button>` : "")}
+                    <button type="button" onclick="openAdminAccountStatus(${Number(account.id)})" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold">${active ? "Change Status" : "Restore"}</button>
                 </div>
             </div>`;
     }).join("");
+}
+
+function openAdminAccountStatus(accountId) {
+    const account = adminAccountsCache.find(item => Number(item.id) === accountId);
+    if (!account) return;
+
+    const active = (account.account_status || "active") === "active";
+    const statuses = !active ? ["active"] : account.role === "student"
+        ? ["archived", "graduated", "transferred", "withdrawn"]
+        : ["archived"];
+    const dialog = document.getElementById("admin-account-status-dialog");
+    dialog.dataset.accountId = String(accountId);
+    document.getElementById("admin-account-status-title").textContent = `${active ? "Change status for" : "Restore"} ${account.name}`;
+    const help = document.getElementById("admin-account-status-help");
+    help.textContent = active
+        ? "This signs the account out and removes it from active lists. Grades, assessments, and existing section links stay in place."
+        : "This restores sign-in and active list access using the account's existing section links.";
+    if (active && account.role === "teacher") {
+        help.textContent += " Review assigned sections and pending grading before archiving.";
+    }
+    document.getElementById("admin-account-status-message").textContent = "";
+    const select = document.getElementById("admin-account-next-status");
+    select.replaceChildren(new Option("Select a status", ""), ...statuses.map(status => new Option(accountStatusLabels[status], status)));
+    dialog.showModal();
+}
+
+async function submitAdminAccountStatus(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const dialog = form.closest("dialog");
+    const message = document.getElementById("admin-account-status-message");
+    const button = form.querySelector('[type="submit"]');
+    button.disabled = true;
+    message.textContent = "";
+    try {
+        const response = await fetch(`/admin/accounts/${Number(dialog.dataset.accountId)}/status`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: document.getElementById("admin-account-next-status").value })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || "Failed to update account status.");
+        dialog.close();
+        await Promise.all([loadAdminAccounts(), loadAdminSections(), loadAdminOverview()]);
+    } catch (error) {
+        message.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+}
+
+async function openAdminStudentHistory(accountId) {
+    const dialog = document.getElementById("admin-account-history-dialog");
+    const title = document.getElementById("admin-account-history-title");
+    const content = document.getElementById("admin-account-history-content");
+    content.textContent = "Loading student history…";
+    title.textContent = "Student history";
+    dialog.dataset.accountId = String(accountId);
+    dialog.showModal();
+    try {
+        const response = await fetch(`/admin/accounts/${accountId}/history`);
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || "Failed to load student history.");
+        if (!dialog.open || dialog.dataset.accountId !== String(accountId)) return;
+        title.textContent = `Student history for ${data.student.name}`;
+        const assessmentLine = row => [
+            String(row.taken_at || "").slice(0, 10),
+            row.subject || "Assessment",
+            row.score == null ? null : `${row.score}/${row.total_questions}`
+        ].filter(Boolean).join(" · ");
+        const groups = [
+            ["Official grades", data.officialGrades, row => [row.school_year, row.semester, row.section_name, row.subject_name, row.grading_period, row.grade].filter(value => value != null && value !== "").join(" · ")],
+            ["Module grades", data.moduleGrades, row => `${row.title || "Module"} · ${row.grade ?? "Ungraded"}`],
+            ["Assessment attempts", data.attempts, assessmentLine],
+            ["Latest stored assessment results", data.latestResults, assessmentLine]
+        ];
+        content.innerHTML = groups.map(([label, rows, describe]) => `
+            <section><h4 class="font-semibold mb-2">${label}</h4>
+            <ul class="space-y-1 text-sm text-gray-700">${rows.length
+                ? rows.map(row => `<li>${adminEscape(describe(row))}</li>`).join("")
+                : "<li>No records found.</li>"}</ul></section>`).join("");
+    } catch (error) {
+        if (dialog.open && dialog.dataset.accountId === String(accountId)) content.textContent = error.message;
+    }
 }
 
 async function loadAdminSections() {
@@ -6168,7 +6269,9 @@ function populateAdminTeacherOptions() {
     if (!select) return;
 
     const current = select.value;
-    const teachers = adminAccountsCache.filter(account => String(account.role).toLowerCase() === "teacher");
+    const teachers = adminAccountsCache.filter(account =>
+        String(account.role).toLowerCase() === "teacher" && (account.account_status || "active") === "active"
+    );
     select.innerHTML = '<option value="">Select teacher</option>' + teachers.map(teacher =>
         `<option value="${Number(teacher.id)}">${adminEscape(teacher.name)} — ${adminEscape(teacher.email)}</option>`
     ).join("");
