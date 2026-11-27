@@ -513,6 +513,7 @@
                                 </svg>
                             </button>
                             <div class="pet-speech" id="aicee-pet-speech" aria-live="polite">Tap your buddy to say hi!</div>
+                            <div id="aicee-pet-xp-pop" class="pet-xp-pop" role="status" aria-live="polite">+5 XP</div>
                         </div>
 
                         <div class="pet-details">
@@ -525,7 +526,8 @@
                                 <button id="aicee-pet-rename-toggle" type="button" class="pet-rename-button" aria-label="Rename your study companion" title="Rename buddy"><i class="fa-solid fa-pen"></i></button>
                             </div>
 
-                            <div class="pet-growth-heading"><span>Growth</span><span id="aicee-pet-xp">0 / 25 XP to Hatchling</span></div>
+                            <div class="pet-growth-heading"><span>Growth to next form</span><span class="pet-total-xp"><i class="fa-solid fa-sparkles" aria-hidden="true"></i><strong id="aicee-pet-total-xp">0</strong> XP</span></div>
+                            <div id="aicee-pet-xp" class="pet-growth-label">0 / 25 XP to Hatchling</div>
                             <div id="aicee-pet-progress" class="pet-progress-track" role="progressbar" aria-label="Buddy growth progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0 / 25 XP to Hatchling">
                                 <span id="aicee-pet-progress-bar" class="pet-progress-fill"></span>
                             </div>
@@ -545,7 +547,7 @@
                                 </div>
                             </form>
 
-                            <p class="pet-footnote">Study XP comes from real module progress and completed diagnostics. Your buddy never loses growth.</p>
+                            <p class="pet-footnote">+5 XP per 25% module progress · +10 per diagnostic · +3 per successful study chat (first 10 daily). Your buddy never loses growth.</p>
                         </div>
                     </section>
 
