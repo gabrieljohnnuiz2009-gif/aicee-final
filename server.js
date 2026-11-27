@@ -6,6 +6,8 @@ const multer = require("multer");
 const { put, get, del } = require("@vercel/blob");
 const path = require("path");
 const fs = require("fs").promises;
+const { Readable } = require("node:stream");
+const { pipeline } = require("node:stream/promises");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { rateLimit } = require("express-rate-limit");
@@ -20,24 +22,11 @@ const pdfParse = require("pdf-parse");
 async function extractTextFromModuleBlob(blobPathname) {
     try {
         if (!blobPathname) return null;
-
-        const blobUrl = blobPathname.startsWith("http") 
-            ? blobPathname 
-            : `https://blob.vercel-storage.com/${blobPathname}`;
-
-        const response = await fetch(blobUrl, {
-            headers: {
-                Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`
-            }
-        });
-
-        if (!response.ok) {
-            console.error("Failed to download PDF from Vercel Blob:", response.statusText);
-            return null;
-        }
-
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        const file = await readModuleFile(blobPathname);
+        if (!file) return null;
+        const buffer = file.localPath
+            ? await fs.readFile(file.localPath)
+            : Buffer.from(await new Response(file.stream).arrayBuffer());
 
         const pdfData = await pdfParse(buffer);
         const extractedText = pdfData.text ? pdfData.text.trim() : "";
@@ -47,6 +36,35 @@ async function extractTextFromModuleBlob(blobPathname) {
         console.error("Error extracting PDF text:", err);
         return null;
     }
+}
+
+async function readModuleFile(value) {
+    const location = String(value || "");
+    if (location.startsWith("https://")) {
+        const url = new URL(location);
+        if (/^[a-z0-9-]+\.public\.blob\.vercel-storage\.com$/.test(url.hostname) &&
+            !url.username && !url.password && !url.port) {
+            const response = await fetch(url, { redirect: "error" });
+            return response.ok && response.body ? { stream: response.body } : null;
+        }
+        if (!/^[a-z0-9-]+\.private\.blob\.vercel-storage\.com$/.test(url.hostname) ||
+            url.username || url.password || url.port) return null;
+    } else if (!location.startsWith("modules/")) {
+        const filename = location.replace(/^\/?uploads\//, "");
+        if (!filename || filename !== path.basename(filename) || filename === "." || filename === "..") return null;
+        for (const folder of [path.resolve("uploads"), path.join(__dirname, "public", "uploads")]) {
+            const localPath = path.join(folder, filename);
+            const info = await fs.lstat(localPath).catch(error => {
+                if (error.code !== "ENOENT") throw error;
+                return null;
+            });
+            if (info?.isFile()) return { localPath };
+        }
+        return null;
+    }
+
+    const blob = await get(location, { access: "private" });
+    return blob?.statusCode === 200 && blob.stream ? { stream: blob.stream } : null;
 }
 
 /* =========================================
@@ -507,6 +525,22 @@ app.use((req, res, next) => {
     next();
 });
 
+// Legacy module files are served through the authenticated module route below.
+app.use(async (req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    try {
+        const pathname = path.posix.normalize(decodeURIComponent(req.path).replace(/\\/g, "/"));
+        if (!/^\/uploads\//i.test(pathname)) return next();
+        const filename = pathname.slice("/uploads/".length);
+        const [matches] = await db.query(`
+            SELECT id FROM modules WHERE file IN (?, ?, ?) LIMIT 1
+        `, [filename, `uploads/${filename}`, `/uploads/${filename}`]);
+        if (matches.length) return res.status(404).send("Use the learning module page to access this file.");
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("uploads"));
 
@@ -1781,10 +1815,12 @@ app.get("/dashboard/:id", authenticateToken, requireSelfParam("id"), async (req,
                 const [studentModules] = await db.query(`
                     SELECT DISTINCT
                         modules.id, modules.title, modules.description, modules.teacher_id, modules.created_at, modules.file,
+                        modules.subject_id, subjects.name AS subject_name,
                         COALESCE(student_module_progress.progress, 0) AS progress,
                         student_module_progress.completed_at
                     FROM modules
                     JOIN module_sections ON modules.id = module_sections.module_id
+                    LEFT JOIN subjects ON subjects.id = modules.subject_id
                     LEFT JOIN student_module_progress ON modules.id = student_module_progress.module_id AND student_module_progress.student_id = ?
                     WHERE module_sections.section_id = ?
                     ORDER BY modules.created_at DESC
@@ -1806,19 +1842,24 @@ app.get("/dashboard/:id", authenticateToken, requireSelfParam("id"), async (req,
             const [teacherModules] = await db.query(`
                 SELECT
                     modules.id, modules.title, modules.description, modules.teacher_id, modules.created_at, modules.file,
+                    modules.subject_id, subjects.name AS subject_name,
                     GROUP_CONCAT(sections.section_name ORDER BY sections.section_name SEPARATOR ', ') AS assigned_sections
                 FROM modules
+                LEFT JOIN subjects ON subjects.id = modules.subject_id
                 LEFT JOIN module_sections ON modules.id = module_sections.module_id
                 LEFT JOIN sections ON module_sections.section_id = sections.id
                 WHERE modules.teacher_id = ?
-                GROUP BY modules.id, modules.title, modules.description, modules.teacher_id, modules.created_at, modules.file
+                GROUP BY modules.id, modules.title, modules.description, modules.teacher_id, modules.created_at, modules.file,
+                    modules.subject_id, subjects.name
                 ORDER BY modules.created_at DESC
             `, [userId]);
 
             modules = teacherModules;
         } else {
             const [allModules] = await db.query(`
-                SELECT * FROM modules ORDER BY created_at DESC
+                SELECT modules.*, subjects.name AS subject_name
+                FROM modules LEFT JOIN subjects ON subjects.id = modules.subject_id
+                ORDER BY modules.created_at DESC
             `);
             modules = allModules;
         }
@@ -2100,6 +2141,39 @@ app.put(
    UPLOAD MODULE
 ========================================= */
 
+app.get("/subjects", authenticateToken, requireRole("admin", "teacher"), async (_req, res) => {
+    try {
+        const [subjects] = await db.query("SELECT id, name FROM subjects ORDER BY name");
+        res.json({ success: true, subjects });
+    } catch (error) {
+        console.error("Subject list error:", error);
+        res.status(500).json({ success: false, message: "Failed to load subjects." });
+    }
+});
+
+app.post("/subjects", authenticateToken, requireRole("admin"), async (req, res) => {
+    const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
+    if (!name || Array.from(name).length > 100) {
+        return res.status(400).json({ success: false, message: "Enter a subject name of 1–100 characters." });
+    }
+    try {
+        const [result] = await db.query("INSERT INTO subjects (name) VALUES (?)", [name]);
+        res.status(201).json({ success: true, subject: { id: result.insertId, name } });
+    } catch (error) {
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({ success: false, message: "This subject already exists." });
+        }
+        console.error("Subject creation error:", error);
+        res.status(500).json({ success: false, message: "Failed to add the subject." });
+    }
+});
+
+function positiveId(value) {
+    if (typeof value !== "number" && (typeof value !== "string" || !/^\d+$/.test(value))) return null;
+    const id = Number(value);
+    return Number.isSafeInteger(id) && id > 0 && id <= 2147483647 ? id : null;
+}
+
 app.post(
     "/upload-module",
     authenticateToken,
@@ -2116,9 +2190,15 @@ app.post(
             }
 
             let { title, description, teacher_id, sections } = req.body;
+            const subjectId = positiveId(req.body.subject_id);
 
-            if (!title || !title.trim()) {
-                return res.status(400).json({ success: false, message: "Module title is required." });
+            if (typeof title !== "string" || !title.trim() || Array.from(title.trim()).length > 150) {
+                return res.status(400).json({ success: false, message: "Enter a module title of 1–150 characters." });
+            }
+
+            const [subjects] = subjectId ? await db.query("SELECT id FROM subjects WHERE id = ?", [subjectId]) : [[]];
+            if (!subjects.length) {
+                return res.status(400).json({ success: false, message: "Select a valid subject from the catalog." });
             }
 
             if (!teacher_id) {
@@ -2133,9 +2213,8 @@ app.post(
                 sections = [sections];
             }
 
-            sections = [...new Set(sections.map(Number).filter(Number.isInteger))];
-
-            if (sections.length === 0) {
+            sections = [...new Set(sections.map(positiveId))];
+            if (!sections.length || sections.includes(null)) {
                 return res.status(400).json({ success: false, message: "Please select a valid section." });
             }
 
@@ -2161,10 +2240,19 @@ app.post(
 
             connection = await db.getConnection();
             await connection.beginTransaction();
+            const [currentSections] = await connection.query(
+                `SELECT id FROM sections WHERE teacher_id = ? AND id IN (${placeholders}) FOR UPDATE`,
+                [teacher_id, ...sections]
+            );
+            if (currentSections.length !== sections.length) {
+                await connection.rollback();
+                await del(blobUrl).catch(error => console.error("Module cleanup error:", error.message));
+                return res.status(403).json({ success: false, message: "A selected section is no longer assigned to you." });
+            }
 
             const [result] = await connection.query(
-                `INSERT INTO modules (title, description, teacher_id, file) VALUES (?, ?, ?, ?)`,
-                [title.trim(), description || "", teacher_id, blob.pathname]
+                `INSERT INTO modules (title, description, teacher_id, file, subject_id) VALUES (?, ?, ?, ?, ?)`,
+                [title.trim(), typeof description === "string" ? description : "", teacher_id, blob.pathname, subjectId]
             );
 
             const moduleId = result.insertId;
@@ -2237,9 +2325,10 @@ app.get(
             const [rows] = await db.query(`
                 SELECT DISTINCT
                     modules.id, modules.title, modules.description, modules.file, modules.created_at,
-                    teachers.name AS teacher_name
+                    teachers.name AS teacher_name, subjects.name AS subject_name
                 FROM modules
                 JOIN module_sections ON module_sections.module_id = modules.id
+                LEFT JOIN subjects ON subjects.id = modules.subject_id
                 LEFT JOIN users AS teachers ON teachers.id = modules.teacher_id
                 WHERE module_sections.section_id = ?
                 ORDER BY modules.created_at DESC
@@ -2251,6 +2340,7 @@ app.get(
                 description: module.description || "",
                 created_at: module.created_at,
                 teacher_name: module.teacher_name || "Teacher",
+                subject_name: module.subject_name,
                 ai_readable: path.extname(String(module.file || "")).toLowerCase() === ".pdf"
             }));
 
@@ -2266,6 +2356,58 @@ app.get(
 /* =========================================
    EDIT MODULE
 ========================================= */
+
+app.get("/modules/:id/file", authenticateToken, requireRole("teacher", "student", "admin"), async (req, res) => {
+    const id = positiveId(req.params.id);
+    if (!id) return res.status(400).json({ success: false, message: "Invalid module ID." });
+    try {
+        const { userId, role } = req.auth;
+        const [modules] = await db.query(`
+            SELECT m.file FROM modules AS m
+            WHERE m.id = ? AND (
+                ? = 'admin' OR (? = 'teacher' AND m.teacher_id = ?) OR
+                (? = 'student' AND EXISTS (
+                    SELECT 1 FROM users AS u JOIN module_sections AS ms ON ms.section_id = u.section_id
+                    WHERE u.id = ? AND u.account_status = 'active' AND ms.module_id = m.id
+                ))
+            )
+        `, [id, role, role, userId, role, userId]);
+        const location = modules[0]?.file;
+        if (!location) return res.status(404).json({ success: false, message: "Module file not found." });
+        const file = await readModuleFile(location);
+        if (!file) return res.status(404).json({ success: false, message: "Module file not found." });
+        const filename = path.basename(location.split("?")[0]) || "module";
+        res.attachment(filename).type("application/octet-stream").set("Cache-Control", "private, no-store");
+        if (file.localPath) return res.sendFile(file.localPath);
+        await pipeline(Readable.fromWeb(file.stream), res);
+    } catch (error) {
+        console.error("Module file error:", error);
+        if (!res.headersSent && !res.destroyed) {
+            res.status(500).json({ success: false, message: "Failed to load the module file." });
+        }
+    }
+});
+
+app.patch("/module/:id/subject", authenticateToken, requireRole("teacher"), async (req, res) => {
+    const moduleId = positiveId(req.params.id);
+    const subjectId = positiveId(req.body?.subject_id);
+    if (!moduleId || !subjectId) {
+        return res.status(400).json({ success: false, message: "Select a valid subject." });
+    }
+    try {
+        const [subjects] = await db.query("SELECT id FROM subjects WHERE id = ?", [subjectId]);
+        if (!subjects.length) return res.status(400).json({ success: false, message: "Select a valid subject from the catalog." });
+        const [result] = await db.query(
+            "UPDATE modules SET subject_id = ? WHERE id = ? AND teacher_id = ?",
+            [subjectId, moduleId, req.auth.userId]
+        );
+        if (!result.affectedRows) return res.status(404).json({ success: false, message: "Module not found or you do not own it." });
+        res.json({ success: true, message: "Module subject updated." });
+    } catch (error) {
+        console.error("Module subject update error:", error);
+        res.status(500).json({ success: false, message: "Failed to update the module subject." });
+    }
+});
 
 app.put("/module/:id", authenticateToken, requireRole("teacher"), requireSelfBody("teacher_id"), async (req, res) => {
     try {
@@ -2405,6 +2547,13 @@ app.put("/module-progress", authenticateToken, requireRole("student"), requireSe
         }
 
         const completedAt = numericProgress === 100 ? new Date() : null;
+
+        const [access] = await db.query(`
+            SELECT 1 FROM users JOIN module_sections ON module_sections.section_id = users.section_id
+            WHERE users.id = ? AND users.account_status = 'active' AND module_sections.module_id = ?
+            LIMIT 1
+        `, [student_id, module_id]);
+        if (!access.length) return res.status(404).json({ success: false, message: "Module not found in your section." });
 
         await db.query(`
             INSERT INTO student_module_progress (student_id, module_id, progress, completed_at)
