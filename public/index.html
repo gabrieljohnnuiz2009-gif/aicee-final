@@ -1056,6 +1056,18 @@
         <button type="button" onclick="openAdminSectionModal()" class="aicee-primary-button w-full sm:w-auto px-6 justify-center"><i class="fa-solid fa-plus"></i> New Section</button>
     </div>
     <div id="admin-sections-list" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 w-full"><div class="aicee-panel p-6 text-gray-500">Loading sections...</div></div>
+    <section class="aicee-panel p-5 space-y-4">
+        <h3 class="text-xl font-bold">Module Subjects</h3>
+        <form onsubmit="addModuleSubject(event)" class="flex flex-wrap items-end gap-3">
+            <div class="grow">
+                <label for="new-module-subject" class="block text-sm font-semibold mb-1">Official subject name</label>
+                <input id="new-module-subject" required maxlength="100" class="aicee-input-shell px-4 w-full">
+            </div>
+            <button type="submit" class="aicee-primary-button">Add subject</button>
+        </form>
+        <p id="module-subject-admin-status" role="status" class="text-sm"></p>
+        <ul id="module-subject-admin-list" class="list-disc list-inside text-sm space-y-1"></ul>
+    </section>
 </div>
 
 <!-- ADMIN DATA SOURCES -->
@@ -1091,6 +1103,19 @@
         <div class="flex justify-end gap-3">
             <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2 rounded-xl bg-gray-100">Cancel</button>
             <button type="submit" class="aicee-primary-button">Confirm change</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="edit-module-subject-dialog" class="m-auto w-[92vw] max-w-lg rounded-2xl bg-white p-6 shadow-xl backdrop:bg-slate-950/55" aria-labelledby="edit-module-subject-title">
+    <form onsubmit="saveModuleSubject(event)" class="space-y-4">
+        <h3 id="edit-module-subject-title" class="text-xl font-bold">Change module subject</h3>
+        <label for="edit-module-subject" class="block text-sm font-semibold">Subject</label>
+        <select id="edit-module-subject" required class="aicee-input-shell px-4 w-full"></select>
+        <p id="edit-module-subject-status" role="status" class="text-sm"></p>
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2 rounded-xl bg-gray-100">Cancel</button>
+            <button type="submit" class="aicee-primary-button">Save subject</button>
         </div>
     </form>
 </dialog>
@@ -2162,7 +2187,14 @@
             <div class="space-y-4 sm:space-y-5 w-full">
                 <div class="w-full">
                     <label for="module-title" class="block text-sm font-medium text-gray-700 mb-2">Module Title</label>
-                    <input id="module-title" type="text" placeholder="Enter the module title" class="w-full border border-gray-200 px-4 sm:px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500">
+                    <input id="module-title" type="text" maxlength="150" placeholder="Enter the module title" class="w-full border border-gray-200 px-4 sm:px-5 py-3 rounded-2xl focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div class="w-full">
+                    <label for="module-subject" class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                    <select id="module-subject" required class="w-full border border-gray-200 px-4 sm:px-5 py-3 rounded-2xl">
+                        <option value="">Select subject</option>
+                    </select>
                 </div>
 
                 <div class="w-full">
@@ -2184,7 +2216,7 @@
 
                 <div class="flex justify-end gap-3 pt-3 w-full">
                     <button type="button" onclick="closeUploadModal()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-2xl text-sm font-medium border border-gray-200 sm:border-transparent">Cancel</button>
-                    <button type="button" onclick="fakeUpload()" class="flex-1 sm:flex-none px-6 sm:px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-medium">Upload</button>
+                    <button type="button" id="module-upload-button" onclick="fakeUpload()" class="flex-1 sm:flex-none px-6 sm:px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-medium">Upload</button>
                 </div>
             </div>
 
